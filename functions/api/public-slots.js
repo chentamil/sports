@@ -3,10 +3,6 @@ export async function onRequest(context) {
   const SUPABASE_URL = context.env.SUPABASE_URL;
   const SUPABASE_KEY = context.env.SUPABASE_ANON_KEY;
 
-    return Response.json({
-    env_keys: Object.keys(context.env)
-  });
-
   try {
 
     const res = await fetch(
