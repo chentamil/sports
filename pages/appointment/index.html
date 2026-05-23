@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
     
-        Sorry Page Not Found | Best Web Developer in Kanchipuram | Best Web Developer in kanchipuram | Maharaja Retail
+        Appointment Booking Page | Best Web Developer in Kanchipuram | Best Web Developer in kanchipuram | Maharaja Retail
     
     </title>
     <meta name="description" content="Best Web developer in Kanchipuram.Tamilnadu">
@@ -129,15 +129,182 @@
 
   <main style="margin-top: 50px;">
     
-
-    <!-- PAGE CONTENT -->
-    <div class="container mt-5 pt-5">
-        <h1>404 - Page Not Found</h1>
-        <p>Sorry, this page doesn’t exist.</p>
-        <a  class="btn btn-primary m-2" href="https://www.achabazar.com/">Go back home</a>
+<!-- CONTACT -->
+<section id="contact-mail" class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold">Get Started Today</h2>
+      <p class="text-secondary">Have a project? Let's talk about it.</p>
     </div>
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card shadow-lg">
+          <div class="card-body p-4">
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-4">
+              <div class="header-icon me-3">
+                <i class="bi bi-send-fill fs-3 p-3 rounded-2" style="background: color-mix(in srgb, #0ea5e9 12%, transparent); color: #0ea5e9;"></i>
+              </div>
+              <div class="header-text">
+                <h4 class="mb-1">Send Us a Message</h4>
+                <p class="mb-0 text-muted">Fill out the form and our team will respond within 24 hours.</p>
+              </div>
+            </div>
 
-</div>  
+            <!-- Alert -->
+            <div id="leadFormAlert" class="alert d-none" role="alert"></div>
+
+            <!-- Form -->
+            <form id="leadForm">
+              <input type="hidden" name="site" value="www.achabazar.com">
+
+              <!-- Honeypot -->
+              <input type="text" name="website" class="d-none" autocomplete="off">
+
+              <div class="row g-3">
+
+                <!-- Name -->
+                <div class="col-md-6">
+                  <div class="input-group-custom">
+                    <label>Your Name</label>
+                    <div class="input-wrapper d-flex align-items-center border rounded p-2">
+                      <i class="bi bi-person me-2"></i>
+                      <input type="text" name="name" class="form-control border-0" placeholder="John Doe" required>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Email -->
+                <div class="col-md-6">
+                  <div class="input-group-custom">
+                    <label>Email Address</label>
+                    <div class="input-wrapper d-flex align-items-center border rounded p-2">
+                      <i class="bi bi-envelope me-2"></i>
+                      <input type="email" name="email" class="form-control border-0" placeholder="john@example.com" required>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Mobile -->
+                <div class="col-12">
+                  <div class="input-group-custom">
+                    <label>Mobile</label>
+                    <div class="input-wrapper d-flex align-items-center border rounded p-2">
+                      <i class="bi bi-chat-square-text me-2"></i>
+                      <input type="tel" name="mobile" class="form-control border-0" placeholder="Your Mobile No. 9443456789" required>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Message -->
+                <div class="col-12">
+                  <div class="input-group-custom">
+                    <label>Your Message</label>
+                    <div class="input-wrapper textarea-wrapper d-flex align-items-start border rounded p-2">
+                      <i class="bi bi-pencil-square mt-1 me-2"></i>
+                      <textarea name="message" rows="5" class="form-control border-0" placeholder="How can we help you? , Tell us about your project..." required></textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="col-12 text-center mt-3">
+                  <button type="submit" class="btn btn-primary-custom px-4" style="box-shadow: none !important;">Send Message <i class="bi bi-arrow-right-circle-fill"></i></button>
+                </div>
+
+                <!-- google-recaptcha -->
+                <div class="col-12 text-center mt-2 recaptcha-inline small text-muted">
+                  <img class="img-fluid rounded-2" src="https://www.achabazar.com/images/google-recaptcha.webp" alt="google-recaptcha">
+                </div>
+
+                <!-- Security Note -->
+                <div class="secure-note text-center small text-secondary text-opacity-50 mt-2">
+                  <i class="bi bi-lock-fill"></i>
+                  <span>Your data is protected by reCAPTCHA <a class="small" href="https://policies.google.com/privacy" target="_blank">Privacy</a> ·
+                    <a class="small" href="https://policies.google.com/terms" target="_blank">Terms</a></span>
+                </div>
+
+              </div>
+            </form>
+            <!-- End of form -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="https://www.google.com/recaptcha/api.js?render=6Led3dQsAAAAAJ3gbHohRpri-isc6Y8LcG1RwI4H"></script>
+<script>
+const leadForm = document.getElementById("leadForm");
+const leadFormAlert = document.getElementById("leadFormAlert");
+
+// Set minimum date if needed, similar to your first code, if you have date fields
+
+leadForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  grecaptcha.ready(async function () {
+    const token = await grecaptcha.execute("6Led3dQsAAAAAJ3gbHohRpri-isc6Y8LcG1RwI4H", { action: "submit" });
+
+    const data = {
+      ...Object.fromEntries(new FormData(leadForm)),
+      token: token,
+      site: window.location.hostname
+    };
+
+    try {
+      const res = await fetch("https://silent-hall-cc73.chentamil1988.workers.dev", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || "Failed");
+      }
+
+      leadFormAlert.className = "alert alert-success";
+      leadFormAlert.innerHTML = "✅ Message sent successfully!";
+      leadFormAlert.classList.remove("d-none");
+      alert("✅ Message sent success!");
+      leadForm.reset();
+
+    } catch (err) {
+      leadFormAlert.className = "alert alert-danger";
+      leadFormAlert.innerHTML = "❌ Error sending message";
+      leadFormAlert.classList.remove("d-none");
+      alert("❌ Error sending message");
+      console.error(err);
+    }
+  });
+});
+</script>
+
+<style>
+ .btn-primary-custom {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 14px 32px !important;
+    border-radius: 50px !important;
+    background: #0ea5e9 !important;
+    color: #fff !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+    box-shadow: 0 8px 24px 
+ color-mix(in srgb, #0ea5e9, transparent 60%) !important;
+}
+
+.grecaptcha-badge {
+  visibility: hidden !important;
+}
+</style>
   </main>
 
    <!-- FOOTER -->

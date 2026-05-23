@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title> Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap 5.2.3 -->
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body { background: #f5f5f5; }
+    .table img { width: 60px; height: 60px; object-fit: cover; }
+  </style>
+
+</head>
+<body>
+
+<div class="container py-4">
+  <h2 class="mb-4">Product Dashboard</h2>
+
+<button class="btn btn-primary mb-3" onclick="openForm()">+ Add Product</button>
+
+  <table class="table table-bordered bg-white">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Image</th>
+        <th>Category</th>
+        <th>Code</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+</div>
+
+<!-- Modal -->
+
+<div class="modal fade" id="productModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Product</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+
+  <div class="modal-body">
+    <input type="hidden" id="index">
+
+    <div class="row g-2">
+      <div class="col-md-6">
+        <input class="form-control" id="name" placeholder="Name">
+      </div>
+      <div class="col-md-6">
+        <input class="form-control" id="price" type="number" placeholder="Price">
+      </div>
+
+      <div class="col-md-4">
+        <input class="form-control" id="image1" placeholder="Image1 URL">
+      </div>
+      <div class="col-md-4">
+        <input class="form-control" id="image2" placeholder="Image2 URL">
+      </div>
+      <div class="col-md-4">
+        <input class="form-control" id="image3" placeholder="Image3 URL">
+      </div>
+
+      <div class="col-md-4">
+        <input class="form-control" id="color" placeholder="Color">
+      </div>
+      <div class="col-md-4">
+        <input class="form-control" id="category" placeholder="Category">
+      </div>
+      <div class="col-md-4">
+        <input class="form-control" id="code" placeholder="Code">
+      </div>
+
+      <div class="col-md-12">
+        <textarea class="form-control" id="desc" placeholder="Description"></textarea>
+      </div>
+
+      <div class="col-md-12">
+        <input class="form-control" id="paymentlink" placeholder="Payment Link">
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-success" onclick="saveProduct()">Save</button>
+  </div>
+</div>
+```
+
+  </div>
+</div>
+
+<script>
+let products = [];
+
+// 🔹 LOAD DATA (replace with /api/products later)
+async function loadData() {
+  const res = await fetch("https://script.googleusercontent.com/macros/echo?user_content_key=AUk");
+  products = await res.json();
+  renderTable();
+}
+
+// 🔹 RENDER TABLE
+function renderTable() {
+  const tbody = document.getElementById("tableBody");
+  tbody.innerHTML = "";
+
+  products.forEach((p, i) => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${p.name}</td>
+        <td>${p.price}</td>
+        <td><img src="${p.image1}"></td>
+        <td>${p.category}</td>
+        <td>${p.code}</td>
+        <td>
+          <button class="btn btn-sm btn-warning" onclick="editProduct(${i})">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteProduct(${i})">Delete</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+// 🔹 OPEN FORM
+function openForm() {
+  document.getElementById("index").value = "";
+  document.querySelectorAll("#productModal input, #productModal textarea").forEach(e => e.value = "");
+  new bootstrap.Modal(document.getElementById("productModal")).show();
+}
+
+// 🔹 EDIT
+function editProduct(i) {
+  const p = products[i];
+  document.getElementById("index").value = i;
+
+  for (let key in p) {
+    if (document.getElementById(key)) {
+      document.getElementById(key).value = p[key];
+    }
+  }
+
+  new bootstrap.Modal(document.getElementById("productModal")).show();
+}
+
+// 🔹 SAVE
+function saveProduct() {
+  const i = document.getElementById("index").value;
+
+  const p = {
+    name: document.getElementById("name").value,
+    price: Number(document.getElementById("price").value),
+    image1: document.getElementById("image1").value,
+    image2: document.getElementById("image2").value,
+    image3: document.getElementById("image3").value,
+    color: document.getElementById("color").value,
+    category: document.getElementById("category").value,
+    code: document.getElementById("code").value,
+    desc: document.getElementById("desc").value,
+    paymentlink: document.getElementById("paymentlink").value
+  };
+
+  if (i === "") {
+    products.push(p);
+  } else {
+    products[i] = p;
+  }
+
+  renderTable();
+  sendToServer();
+  bootstrap.Modal.getInstance(document.getElementById("productModal")).hide();
+}
+
+// 🔹 DELETE
+function deleteProduct(i) {
+  if (confirm("Delete this product?")) {
+    products.splice(i, 1);
+    renderTable();
+    sendToServer();
+  }
+}
+
+// 🔹 SEND TO YOUR API (IMPORTANT)
+async function sendToServer() {
+  await fetch("/api/products", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ products })
+  });
+}
+
+loadData();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
