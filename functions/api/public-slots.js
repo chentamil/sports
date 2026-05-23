@@ -3,6 +3,18 @@ export async function onRequest(context) {
   const SUPABASE_URL = context.env.SUPABASE_URL;
   const SUPABASE_KEY = context.env.SUPABASE_ANON_KEY;
 
+    return new Response(
+    JSON.stringify({
+      SUPABASE_URL: context.env.SUPABASE_URL || null,
+      HAS_KEY: !!context.env.SUPABASE_ANON_KEY
+    }),
+    {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }
+  );
+
   try {
 
     const res = await fetch(

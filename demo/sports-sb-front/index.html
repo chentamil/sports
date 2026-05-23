@@ -11,7 +11,8 @@
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
   <style>
     body {
@@ -54,19 +55,9 @@
 <div class="container py-4">
   <h2 class="mb-4 text-center">🏓 Victory Pickle Court Booking</h2>
 
-<div class="mb-3 text-center d-flex justify-content-center align-items-center gap-3">
-  
-  <button id="prev-day" class="btn btn-outline-primary">
-    <i class="bi bi-chevron-left"></i>
-  </button>
-
-  <input type="date" id="selected-date" class="form-control w-auto">
-
-  <button id="next-day" class="btn btn-outline-primary">
-    <i class="bi bi-chevron-right"></i>
-  </button>
-
-</div>
+  <div class="mb-3 text-center">
+    <input type="date" id="selected-date" class="form-control w-50 mx-auto">
+  </div>
 
   <p class="text-center text-muted">
     📍 Kanchipuram | Live slot availability below
@@ -136,48 +127,25 @@
 </footer>
 
 <script>
-
+  const SUPABASE_URL = "https://rgofooqlsvmjsdajkbmk.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_Li3PoRYyTjQxVC-ecvWDeg_NQzrpokf";
+  const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   const PHONE = "919597547118";
   let allData = [];
 
   async function loadSlots() {
-
-    const res = await fetch('/api/public-slots');
-
-    const data = await res.json();
-
+    const { data, error } = await client
+      .from("slots")
+      .select(`*, courts (id, name)`)
+      .order("court_id", { ascending: true })
+      .order("date", { ascending: true });
+    if (error) { console.log("Supabase Error:", error); return; }
     allData = data || [];
-
     setToday();
   }
-  
   loadSlots();
 
   const dateInput = document.getElementById("selected-date");
-
-document.getElementById('prev-day').addEventListener('click', () => {
-
-  const currentDate = new Date(dateInput.value);
-
-  currentDate.setDate(currentDate.getDate() - 1);
-
-  dateInput.value = currentDate.toISOString().split('T')[0];
-
-  renderSlots(dateInput.value);
-
-});
-
-document.getElementById('next-day').addEventListener('click', () => {
-
-  const currentDate = new Date(dateInput.value);
-
-  currentDate.setDate(currentDate.getDate() + 1);
-
-  dateInput.value = currentDate.toISOString().split('T')[0];
-
-  renderSlots(dateInput.value);
-
-});
   const today = new Date().toISOString().split("T")[0];
   dateInput.setAttribute("min", today);
 
