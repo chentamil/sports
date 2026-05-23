@@ -1,0 +1,952 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+
+  <title>
+    Victory Pickle Admin
+  </title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+
+<style>
+  @media (max-width: 767.98px) {
+
+    input.form-control,
+    select.form-select {
+      min-width: 5rem;
+      /* or 10vw, see below */
+      margin-bottom: 0.5rem;
+    }
+
+    select.form-select {
+      min-width: 7.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    td.date-td {
+      min-width: 7.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+  }
+</style>
+
+<body class="bg-light">
+
+  <!-- TOAST -->
+  <div id="toast" style="
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 99999;
+"></div>
+
+  <div class="container py-5">
+
+    <h2 class="mb-4 text-center">
+      🛠 Admin Dashboard
+    </h2>
+
+    <!-- LOGIN -->
+
+    <div id="login-box" class="card p-4 mx-auto w-100" style="max-width: 400px;">
+
+      <input type="email" id="email" class="form-control mb-3" placeholder="Email">
+
+      <input type="password" id="password" class="form-control mb-3" placeholder="Password">
+
+      <button class="btn btn-primary btn-lg w-100" onclick="login()">
+        Login
+      </button>
+
+    </div>
+
+    <!-- DASHBOARD -->
+
+    <div id="dashboard" style="display:none;">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button class="btn btn-danger" onclick="logout()">Logout</button>
+      </div>
+
+      <!-- ANALYTICS -->
+      <div class="row my-4">
+
+        <div class="col-12 col-sm-6 col-md-3 mb-3">
+          <div class="card p-3 text-center">
+            Revenue Today
+            <h4 id="revToday">0</h4>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-3 mb-3">
+          <div class="card p-3 text-center">
+            Bookings Today
+            <h4 id="bookToday">0</h4>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-3 mb-3">
+          <div class="card p-3 text-center">
+            Monthly Revenue
+            <h4 id="revMonth">0</h4>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-3 mb-3">
+          <div class="card p-3 text-center">
+            Peak Hour
+            <h4 id="peakHour">-</h4>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h4>
+          Slot Management
+        </h4>
+
+      </div>
+
+      <!-- ADD SLOT -->
+
+      <div class="card p-3 mb-4">
+
+        <h5>Add Slot Manually One By One</h5>
+
+        <div class="row g-2">
+
+          <div class="col-md-2">
+
+            <input type="date" id="slot-date" class="form-control">
+
+          </div>
+
+          <div class="col-md-2">
+
+            <select id="slot-court" class="form-select">
+
+              <option value="1">
+                Court 1
+              </option>
+
+              <option value="2">
+                Court 2
+              </option>
+
+            </select>
+
+          </div>
+
+          <div class="col-md-2">
+
+            <input type="text" id="slot-start" class="form-control" placeholder="6AM">
+
+          </div>
+
+          <div class="col-md-2">
+
+            <input type="text" id="slot-end" class="form-control" placeholder="7AM">
+
+          </div>
+
+          <div class="col-md-2">
+
+            <input type="number" id="slot-price" class="form-control" placeholder="400">
+
+          </div>
+
+          <div class="col-md-1">
+
+            <select id="slot-status" class="form-select">
+
+              <option value="available">
+                Available
+              </option>
+
+              <option value="booked">
+                Booked
+              </option>
+
+              <option value="closed">
+                Closed
+              </option>
+
+              <option value="disabled">
+                Disabled
+              </option>
+
+            </select>
+
+          </div>
+
+          <div class="col-md-1">
+
+            <button class="btn btn-success w-100" onclick="addSlot()">
+              Add
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+      <!-- Manuall slot ends here -->
+
+      <!-- ===================== -->
+      <!-- Standalone Slot Generator (1-hour strict) -->
+      <!-- ===================== -->
+      <div class="card p-3 mb-4">
+        <h5>Auto Slot Generator (Standalone)</h5>
+        <div class="row g-2 align-items-end">
+
+          <div class="col-md-2">
+            <label class="form-label">Date</label>
+            <input type="date" id="gen-slot-date" class="form-control">
+          </div>
+
+          <div class="col-md-2">
+            <label class="form-label">Court</label>
+            <select id="gen-slot-court" class="form-select">
+              <option value="1">Court 1</option>
+              <option value="2">Court 2</option>
+            </select>
+          </div>
+
+          <div class="col-md-2">
+            <label class="form-label">From</label>
+            <input type="text" id="gen-slot-from" class="form-control" placeholder="6AM or 6:30AM">
+          </div>
+
+          <div class="col-md-2">
+            <label class="form-label">To</label>
+            <input type="text" id="gen-slot-to" class="form-control" placeholder="10AM or 10:30AM">
+          </div>
+
+          <div class="col-md-2">
+            <label class="form-label">Price</label>
+            <input type="number" id="gen-slot-price" class="form-control" value="400">
+          </div>
+
+          <div class="col-md-2">
+            <button class="btn btn-warning text-dark w-100" onclick="generateSlotsStandalone()">Generate Slots</button>
+          </div>
+
+        </div>
+      </div>
+      <!-- Auto generate slots ends here,script added at bottom citation:script236 -->
+
+      <!-- ===================== -->
+      <!-- Bulk actions Multiselect (Responsive) -->
+      <!-- ===================== -->
+      <div class="card p-3 mb-4">
+        <h5 class="mb-3">Multi Select Options</h5>
+
+        <div class="row g-2 align-items-center">
+          <!-- Delete Button -->
+          <div class="col-12 col-sm-auto">
+            <button class="btn btn-danger w-100" onclick="bulkDelete()">Delete Selected</button>
+          </div>
+
+          <!-- Status Dropdown -->
+          <div class="col-12 col-sm-auto">
+            <select id="bulk-status" class="form-select w-100">
+              <option value="">Change Status...</option>
+              <option value="available">Available</option>
+              <option value="booked">Booked</option>
+              <option value="closed">Closed</option>
+              <option value="disabled">Disabled</option>
+            </select>
+          </div>
+
+          <!-- Apply Button -->
+          <div class="col-12 col-sm-auto">
+            <button class="btn btn-primary w-100" onclick="bulkChangeStatus()">Apply</button>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        // Toggle all checkboxes
+        function toggleAllCheckboxes(master) {
+          document.querySelectorAll(".slot-checkbox").forEach(cb => {
+            cb.checked = master.checked;
+          });
+        }
+
+        // Get selected slot IDs
+        function getSelectedSlots() {
+          const selected = [];
+          document.querySelectorAll(".slot-checkbox:checked").forEach(cb => {
+            selected.push(cb.dataset.id);
+          });
+          return selected;
+        }
+
+        // Bulk delete
+        async function bulkDelete() {
+          const ids = getSelectedSlots();
+          if (ids.length === 0) {
+            showToast("No slots selected");
+            return;
+          }
+          if (!confirm(`Delete ${ids.length} selected slots?`)) return;
+
+          const { error } = await client.from("slots").delete().in("id", ids);
+          if (error) {
+            showToast("Delete failed");
+            console.log(error);
+            return;
+          }
+
+          showToast(`${ids.length} slots deleted`);
+          loadSlots();
+        }
+
+        // Bulk change status
+        async function bulkChangeStatus() {
+          const status = document.getElementById("bulk-status").value;
+          if (!status) return;
+
+          const ids = getSelectedSlots();
+          if (ids.length === 0) {
+            showToast("No slots selected");
+            return;
+          }
+
+          const { error } = await client.from("slots").update({ status }).in("id", ids);
+          if (error) {
+            showToast("Status update failed");
+            console.log(error);
+            return;
+          }
+
+          showToast(`Status updated to "${status}" for ${ids.length} slots`);
+          loadSlots();
+        }
+      </script>
+      <!-- Multi Select ends here -->
+
+      <!-- TABLE -->
+      <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+        <table class="table table-bordered bg-white w-100">
+
+          <thead class="sticky-top bg-dark text-light">
+
+            <tr class="text-center">
+
+              <th><input type="checkbox" id="select-all" onclick="toggleAllCheckboxes(this)"></th>
+
+              <th>ID</th>
+
+              <th>Court</th>
+
+              <th>Date</th>
+
+              <th>Start</th>
+
+              <th>End</th>
+
+              <th>Price</th>
+
+              <th>Status</th>
+
+              <th>Actions</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody id="table-body"></tbody>
+
+        </table>
+      </div>
+
+      <!-- Save All Changes -->
+      <div class="d-grid gap-2 col-6 mx-auto mt-4">
+        <button class="btn btn-success btn-lg" onclick="saveAllChanges()">
+          Save All
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <footer class="pt-5 pb-3 text-white fw-light" style="background:#111;">
+    <div class="container">
+      <div class="row">
+
+        <!-- Brand -->
+        <div class="col-12 col-md-4 mb-3">
+          <h5 class="text-warning">🏓 Victory Pickle Court</h5>
+          <p class="text-secondary">
+            Premium pickleball experience in Kanchipuram.
+            Book your slots easily and play hassle-free.
+          </p>
+        </div>
+
+        <!-- Location -->
+        <div class="col-12 col-md-4 mb-3">
+          <h5 class="text-warning">Location</h5>
+
+          <a href="https://www.google.com/maps/place/Victory+Pickle+ball+court/@12.8658768,79.6910657,17z/data=!4m14!1m7!3m6!1s0x3a52c3a45d1ca8bb:0x3b234e9a9a2b5f0!2sVictory+Pickle+ball+court!8m2!3d12.8658768!4d79.6910657!16s%2Fg%2F11z4b173ty!3m5!1s0x3a52c3a45d1ca8bb:0x3b234e9a9a2b5f0!8m2!3d12.8658768!4d79.6910657!16s%2Fg%2F11z4b173ty?entry=ttu&g_ep=EgoyMDI2MDQyMi4wIKXMDSoASAFQAw%3D%3D"
+            target="_blank" class="text-white text-decoration-none">
+
+            <p class="mb-0">
+              Swami Gardens, 39<br>
+              Near Karungate Crossing<br>
+              Jina Kanchi Nagar<br>
+              Kanchipuram, Tamil Nadu 631502
+              <i class="bi bi-box-arrow-up-right ms-1"></i>
+            </p>
+          </a>
+        </div>
+
+        <!-- Social -->
+        <div class="col-12 col-md-4 mb-3">
+          <h5 class="text-warning">Connect</h5>
+
+          <p class="mb-1">Victory Sports</p>
+
+          <a href="https://www.instagram.com/victorysports_kpm/" target="_blank"
+            class="text-decoration-none text-light">
+
+            <i class="bi bi-instagram fs-4 me-2" style="color:#E1306C;"></i>
+            victorysports_kpm
+          </a>
+
+          <p class="text-secondary mt-2 mb-0">
+            9 posts • 66 followers • 4 following
+          </p>
+        </div>
+
+      </div>
+
+      <hr style="border-color: rgba(255,255,255,0.2);">
+
+          <div class="text-center mb-3 social-icons">
+            <i class="bi bi-facebook fs-3 me-3" style="color:#1877F2; cursor:pointer;" onclick="window.open('https://www.facebook.com/victorysports_kpm','_blank')"></i>
+
+            <i class="bi bi-instagram fs-3 me-3" style="color:#E1306C; cursor:pointer;" onclick="window.open('https://www.instagram.com/victorysports_kpm/','_blank')"></i>
+
+            <i class="bi bi-youtube fs-3" style="color:#FF0000; cursor:pointer;" onclick="window.open('https://www.youtube.com/@victorysports_kpm','_blank')"></i>
+
+            <!-- <i class="bi bi-twitter fs-3 me-3" style="color:#1DA1F2; cursor:pointer;"
+                onclick="window.open('https://www.twitter.com/victorysports_kpm','_blank')"></i>     -->
+    </div>
+
+    <hr style="border-color: rgba(255,255,255,0.2);">
+
+      <!-- Bottom -->
+      <div class="text-center">
+        <p class="mb-0">© 2026 Victory Pickle Court • All rights reserved</p>
+      </div>
+    </div>
+
+    <!-- Floating WhatsApp -->
+    <a href="https://wa.me/919597547118" target="_blank" class="btn btn-success btn-lg shadow"
+      style="position:fixed;bottom:20px;right:20px;border-radius:50px;">
+      <i class="bi bi-whatsapp"></i>
+    </a>
+
+  </footer>
+
+  <script>
+
+    // =========================
+    // SUPABASE CONFIG
+    // =========================
+
+    const SUPABASE_URL = "https://icdiykwunftdzdoiwkkd.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_nyOci0wrkzdeDoOX2qKaRg_JkRtRsFR";
+
+    const client = supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+    let allData = [];
+    let editedSlots = {};
+
+    // =========================
+    // TOAST
+    // =========================
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+
+      const el = document.createElement("div");
+      el.className = "alert alert-success shadow";
+      el.innerText = msg;
+
+      toast.appendChild(el);
+
+      setTimeout(() => el.remove(), 5000);
+    }
+
+    // =========================
+    // AUTH
+    // =========================
+    checkUser();
+
+    async function checkUser() {
+
+      const {
+        data: { session }
+      } = await client.auth.getSession();
+
+      if (session) {
+
+        showDashboard();
+
+      }
+
+    }
+
+    async function login() {
+
+      const email =
+        document.getElementById("email").value;
+
+      const password =
+        document.getElementById("password").value;
+
+      const { error } =
+        await client.auth.signInWithPassword({
+          email,
+          password
+        });
+
+      if (error) {
+
+        showToast(error.message);
+        return;
+      }
+
+      showDashboard();
+    }
+
+    async function logout() {
+
+      await client.auth.signOut();
+
+      location.reload();
+    }
+
+    function showDashboard() {
+
+      document.getElementById("login-box").style.display = "none";
+
+      document.getElementById("dashboard").style.display = "block";
+
+      loadSlots();
+    }
+
+    // =========================
+    // LOAD & RENDER
+    // =========================
+    async function loadSlots() {
+
+      const { data, error } =
+        await client
+          .from("slots")
+          .select("*")
+          .order("date", { ascending: true })
+          .order("court_id", { ascending: true })
+          .order("start_time", { ascending: true });
+      // table is sorted by date → court → time.
+
+      if (error) {
+
+        console.log(error);
+
+        return;
+      }
+
+      allData = data;
+
+      renderTable(data);
+
+      updateAnalytics(data);
+    }
+
+    function renderTable(data) {
+
+      const body =
+        document.getElementById("table-body");
+
+      body.innerHTML = "";
+
+      data.forEach(slot => {
+
+        body.innerHTML += `
+
+        <tr>
+          <td><input type="checkbox" class="slot-checkbox" data-id="${slot.id}"></td>
+
+          <td>${slot.id}</td>
+
+          <td>
+            <select class="form-select"
+              onchange="trackEdit(${slot.id},'court_id',this.value)">
+              <option value="1" ${slot.court_id == 1 ? 'selected' : ''}>Court 1</option>
+              <option value="2" ${slot.court_id == 2 ? 'selected' : ''}>Court 2</option>
+            </select>
+          </td>
+
+          <td class="date-td">${slot.date}</td>
+
+          <td>
+            <input class="form-control" value="${slot.start_time || ''}"
+            onchange="trackEdit(${slot.id},'start_time',this.value)">
+          </td>
+
+          <td>
+            <input class="form-control" value="${slot.end_time || ''}"
+            onchange="trackEdit(${slot.id},'end_time',this.value)">
+          </td>
+
+          <td>
+            <input class="form-control" value="${slot.price || 0}"
+            onchange="trackEdit(${slot.id},'price',this.value)">
+          </td>
+
+          <td>
+            <select class="form-select"
+            onchange="trackEdit(${slot.id},'status',this.value)">
+              <option value="available" ${slot.status == 'available' ? 'selected' : ''}>Available</option>
+              <option value="booked" ${slot.status == 'booked' ? 'selected' : ''}>Booked</option>
+              <option value="closed" ${slot.status == 'closed' ? 'selected' : ''}>Closed</option>
+              <option value="disabled" ${slot.status == 'disabled' ? 'selected' : ''}>Disabled</option>
+            </select>
+          </td>
+
+          <td>
+            <button class="btn btn-danger btn-sm btn-lg w-100"
+            onclick="deleteSlot(${slot.id})">Delete</button>
+          </td>
+
+        </tr>
+
+      `;
+
+      });
+
+    }
+
+    // =========================
+    // EDIT TRACK
+    // =========================
+    function trackEdit(id, field, value) {
+
+      if (!editedSlots[id]) {
+
+        editedSlots[id] = {};
+
+      }
+
+      editedSlots[id][field] = value;
+
+    }
+
+    // =========================
+    // SAVE ALL
+    // =========================
+    async function saveAllChanges() {
+
+      const updates =
+        Object.keys(editedSlots);
+
+      if (updates.length === 0) {
+
+        showToast("No changes made");
+
+        return;
+      }
+
+      for (const id of updates) {
+
+        const updateData =
+          editedSlots[id];
+
+        // auto rebuild time field
+
+        if (
+          updateData.start_time
+          ||
+          updateData.end_time
+        ) {
+
+          const existing =
+            allData.find(
+              s => s.id == id
+            );
+
+          const start =
+            updateData.start_time
+            || existing.start_time;
+
+          const end =
+            updateData.end_time
+            || existing.end_time;
+
+          updateData.time =
+            `${start} - ${end}`;
+
+        }
+
+        const { error } =
+          await client
+            .from("slots")
+            .update(updateData)
+            .eq("id", id);
+
+        if (error) {
+
+          console.log(error);
+
+          showToast("Update failed");
+
+          return;
+        }
+
+      }
+
+      editedSlots = {};
+
+      showToast("All changes saved!");
+
+      loadSlots();
+
+    }
+
+    // =========================
+    // ADD SLOT
+    // =========================
+    async function addSlot() {
+
+      const date =
+        document.getElementById("slot-date").value;
+
+      const court_id =
+        document.getElementById("slot-court").value;
+
+      const start_time =
+        document.getElementById("slot-start").value;
+
+      const end_time =
+        document.getElementById("slot-end").value;
+
+      const price =
+        document.getElementById("slot-price").value;
+
+      const status =
+        document.getElementById("slot-status").value;
+
+      const time =
+        `${start_time} - ${end_time}`;
+
+      const { error } =
+        await client
+          .from("slots")
+          .insert([
+            {
+              date,
+              court_id,
+              start_time,
+              end_time,
+              time,
+              price,
+              status
+            }
+          ]);
+
+      if (error) {
+
+        showToast(error.message);
+
+        return;
+      }
+
+      showToast("Slot added successfully!");  // ✅ success toast
+      loadSlots();
+
+    }
+
+    // =========================
+    // DELETE SLOT
+    // =========================
+    async function deleteSlot(id) {
+
+      if (!confirm("Delete slot?")) return;
+
+      await client
+        .from("slots")
+        .delete()
+        .eq("id", id);
+
+      showToast("Slot deleted");
+      loadSlots();
+    }
+
+    // =========================
+    // ANALYTICS
+    // =========================
+    function updateAnalytics(data) {
+
+      const today = new Date().toISOString().slice(0, 10);
+      const month = today.slice(0, 7);
+
+      let todayRev = 0, todayBook = 0;
+      let monthRev = 0;
+
+      let hourMap = {};
+
+      data.forEach(s => {
+
+        if (s.status !== "booked") return;
+
+        const price = Number(s.price || 0);
+
+        if (s.date === today) {
+          todayRev += price;
+          todayBook++;
+        }
+
+        if (s.date.startsWith(month)) {
+          monthRev += price;
+        }
+
+        const h = s.start_time || "Unknown";
+        hourMap[h] = (hourMap[h] || 0) + 1;
+      });
+
+      let peak = "-", max = 0;
+
+      Object.keys(hourMap).forEach(h => {
+        if (hourMap[h] > max) {
+          max = hourMap[h];
+          peak = h;
+        }
+      });
+
+      document.getElementById("revToday").innerText = todayRev;
+      document.getElementById("bookToday").innerText = todayBook;
+      document.getElementById("revMonth").innerText = monthRev;
+      document.getElementById("peakHour").innerText = peak;
+    }
+
+  </script>
+
+
+  <!-- script236 -->
+  <!-- ===================== -->
+  <!-- Standalone Slot Generator (1-hour strict) -->
+  <!-- ===================== -->
+
+  <script>
+    function generateSlotsStandalone() {
+      const date = document.getElementById("gen-slot-date").value;
+      const court_id = document.getElementById("gen-slot-court").value;
+      const from = document.getElementById("gen-slot-from").value;
+      const to = document.getElementById("gen-slot-to").value;
+      const price = Number(document.getElementById("gen-slot-price").value) || 400;
+
+      if (!date || !from || !to) {
+        showToast("Please enter date, from and to time");
+        return;
+      }
+
+      // Convert time string to number (24h format)
+      function timeToNumber(t) {
+        const match = t.match(/^(\d+)(?::(\d+))?\s*(AM|PM)$/i);
+        if (!match) return null;
+        let h = parseInt(match[1]);
+        const m = parseInt(match[2] || 0);
+        const period = match[3].toUpperCase();
+        if (period === "PM" && h !== 12) h += 12;
+        if (period === "AM" && h === 12) h = 0;
+        if (m !== 0 && m !== 30) return null; // Only 0 or 30 minutes allowed
+        return h + m / 60;
+      }
+
+      // Convert number back to string
+      function numberToTime(n) {
+        const h = Math.floor(n);
+        const m = Math.round((n - h) * 60);
+        const period = h >= 12 ? "PM" : "AM";
+        let hh = h % 12;
+        if (hh === 0) hh = 12;
+        return m === 0 ? `${hh}${period}` : `${hh}:${m}${period}`;
+      }
+
+      const startNum = timeToNumber(from);
+      const endNum = timeToNumber(to);
+
+      if (startNum === null || endNum === null) {
+        showToast("Invalid time format. Use hAM/PM or h:30AM/PM");
+        return;
+      }
+
+      if (startNum >= endNum) {
+        showToast("Start time must be before end time");
+        return;
+      }
+
+      const totalHours = endNum - startNum;
+      if (totalHours % 1 !== 0) {
+        showToast("Time range must be a multiple of 1 hour (e.g., 6-7, 6:30-7:30)");
+        return;
+      }
+
+      const slots = [];
+      let current = startNum;
+
+      while (current < endNum) {
+        const slotStart = numberToTime(current);
+        const slotEnd = numberToTime(current + 1); // 1-hour slots only
+        slots.push({
+          date,
+          court_id,
+          start_time: slotStart,
+          end_time: slotEnd,
+          time: `${slotStart} - ${slotEnd}`,
+          price: price,
+          status: "available"
+        });
+        current += 1; // 1-hour step
+      }
+
+      slots.forEach(async s => {
+        const { error } = await client.from("slots").insert([s]);
+        if (error) console.log(error);
+      });
+
+      showToast(`Generated ${slots.length} slots for Court ${court_id}`);
+      setTimeout(loadSlots, 500);
+    }
+
+    // =====================
+    // Hide Past Slots in Table
+    // =====================
+    const originalRenderTable = renderTable;
+    renderTable = function (data) {
+      const today = new Date().toISOString().slice(0, 10);
+      const futureData = data.filter(slot => slot.date >= today);
+      originalRenderTable(futureData);
+    };
+  </script>
+
+</body>
+
+</html>

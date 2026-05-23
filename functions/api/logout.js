@@ -1,0 +1,17 @@
+export async function onRequest() {
+
+  return new Response(
+    JSON.stringify({
+      success: true
+    }),
+    {
+      headers: {
+        "Content-Type": "application/json",
+
+        "Set-Cookie":
+          "acha_access_token=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0"
+      }
+    }
+  );
+
+}
