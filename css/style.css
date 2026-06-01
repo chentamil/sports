@@ -40,7 +40,7 @@ img:hover {
    NAVBAR
 ========================= */
   .offcanvas {
-    background-color:#023b6d;
+    background-color:#023b6d !important;
     /* background-color: #111; */
     /* background: #09101f; */
     /* background: linear-gradient(360deg, #2c0a0f, #6e1b25);
@@ -160,7 +160,7 @@ img:hover {
 .carousel-indicators [data-bs-target] {
     width: 6px;
     height: 6px;
-    border-radius: 50%;
+    /* border-radius: 50%; */
     background-color: #fff;
     opacity: 0.8;
 }
