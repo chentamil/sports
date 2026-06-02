@@ -735,6 +735,11 @@ leadForm.addEventListener("submit", async (e) => {
 
 
 <script>
+function getLocalDateStr(date = new Date()) {
+  const offset = date.getTimezoneOffset();
+  const local = new Date(date.getTime() - offset * 60000);
+  return local.toISOString().split("T")[0];
+}
 
   const PHONE = "919840253589";
   let allData = [];
@@ -776,7 +781,7 @@ document.getElementById('next-day').addEventListener('click', () => {
 });
 
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = const todayStr = getLocalDateStr();
   dateInput.setAttribute("min", today);
 
   function setToday() {
@@ -802,9 +807,9 @@ document.getElementById('next-day').addEventListener('click', () => {
 
     const now = new Date();
     const currentHour = now.getHours();
-    const todayStr = now.toISOString().split("T")[0];
+    const todayStr = getLocalDateStr(now);
 
-    if (date < todayStr) {
+    if (new Date(date) < new Date(todayStr)) {
       container.innerHTML = `<p class="text-center">No slots available for past dates</p>`;
       return;
     }
