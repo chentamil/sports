@@ -797,9 +797,9 @@ document.getElementById('next-day').addEventListener('click', () => {
 });
 
 
-  const todayStr = getLocalDateStr();
+const todayStr = getLocalDateStr();
 dateInput.setAttribute("min", todayStr);
-  dateInput.setAttribute("min", today);
+
 
   function setToday() {
     const todayStr = new Date().toLocaleDateString("en-CA");
