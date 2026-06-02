@@ -310,41 +310,41 @@
             <i class="bi bi-chevron-left"></i>
         </button>
 
-          <!-- Date picker with custom calendar icon -->
-            <div class="position-relative" style="cursor:pointer;"
-            onclick="document.getElementById('selected-date').showPicker()">
+        <!-- Date picker with custom calendar icon -->
+          <div class="position-relative" style="cursor:pointer;" onclick="document.getElementById('selected-date').showPicker()">
 
-            <!-- <input type="date" id="selected-date" class="form-control w-auto pe-5" min="2026-06-02"> -->
-            <input type="date" id="selected-date" class="form-control w-auto pe-5">
+              <!-- <input type="date" id="selected-date" class="form-control w-auto pe-5" min="2026-06-02"> -->
+              <input type="date" id="selected-date" class="form-control w-auto pe-5">
 
-            <i class="bi bi-calendar3 position-absolute top-50 end-0 translate-middle-y me-3 text-primary"></i>
+              <i class="bi bi-calendar3 position-absolute top-50 end-0 translate-middle-y me-3 text-primary"></i>
 
-            </div>
-            <style>
+          </div>
+
+          <style>
               /* Extra space for icon */
               #selected-date {
-                padding-right: 2.5rem;
-                appearance: none;
-                -webkit-appearance: none;
-                -moz-appearance: none;
+                  padding-right: 2.5rem;
+                  appearance: none;
+                  -webkit-appearance: none;
+                  -moz-appearance: none;
               }
 
               /* Hide browser's default calendar icon */
               #selected-date::-webkit-calendar-picker-indicator {
-                opacity: 0;
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                cursor: pointer;
+                  opacity: 0;
+                  position: absolute;
+                  width: 100%;
+                  height: 100%;
+                  cursor: pointer;
               }
 
               /* Prevent icon from blocking clicks */
               .position-relative .bi-calendar3 {
-                pointer-events: none;
-                font-size: 1.1rem;
+                  pointer-events: none;
+                  font-size: 1.1rem;
               }
-            </style>
-           <!-- Date picker with custom calendar icon ends-->  
+          </style>
+        <!-- Date picker with custom calendar icon ends here -->
 
         <button id="next-day" class="btn btn-outline-primary">
             <i class="bi bi-chevron-right"></i>
@@ -355,28 +355,10 @@
     <p class="text-center text-muted">
         📍 Kanchipuram | Live slot availability below
     </p>
-
-    <!-- Date label citation245 -->
     <h5 id="selected-date-label" class="text-center fw-bold text-primary mb-4"></h5>
+
     <div id="slots-container" class="row g-4"></div>
 
-
-        <!-- Booking Rules -->
-        <div class="card my-4 shadow-sm">
-          <div class="card-body">
-
-            <h5>Booking Rules :</h5>
-
-            <ul>
-              <li>Arrive 10 minutes early</li>
-              <li>Non-marking shoes only</li>
-              <li>No refunds after booking</li>
-              <li>WhatsApp/call confirmation required</li>
-              <li>Refer t&C</li>
-            </ul>
-
-          </div>
-        </div>
 
     <!-- Amenities Section -->
     <section class="mb-5">
@@ -735,26 +717,16 @@ leadForm.addEventListener("submit", async (e) => {
 
 
 <script>
-function normalizeDate(d) {
-  if (!d) return null;
+//date label Full format Wednesday, 03 June 2026
+function updateDateLabel(dateStr) {
+  const date = new Date(dateStr);
 
-  // if Date object
-  if (d instanceof Date) {
-    return d.toISOString().split("T")[0];
-  }
+  // Options for day name, month name etc.
+  const options = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
 
-  // if string already YYYY-MM-DD
-  if (typeof d === "string" && d.length >= 10) {
-    return d.slice(0, 10);
-  }
+  const formatted = date.toLocaleDateString('en-GB', options); // e.g., Wednesday, 03 June 2026
 
-  return null;
-}
-
-function getLocalDateStr() {
-  const d = new Date();
-  const offset = d.getTimezoneOffset() * 60000;
-  return new Date(d - offset).toISOString().split("T")[0];
+  document.getElementById('selected-date-label').innerText = formatted;
 }
 
   const PHONE = "919840253589";
@@ -768,45 +740,76 @@ function getLocalDateStr() {
 
     allData = data || [];
 
-    
+    setToday();
   }
   
   loadSlots();
 
   const dateInput = document.getElementById("selected-date");
 
+//  document.getElementById('prev-day').addEventListener('click', () => {
+
+//   const currentDate = new Date(dateInput.value);
+
+//   currentDate.setDate(currentDate.getDate() - 1);
+
+//   dateInput.value = currentDate.toISOString().split('T')[0];
+
+//   renderSlots(dateInput.value);
+
+// });
+
 document.getElementById('prev-day').addEventListener('click', () => {
 
-  const current = fp.selectedDates[0] || new Date();
+  const today = new Date().toISOString().split("T")[0];
 
-  const newDate = new Date(current);
-  newDate.setDate(newDate.getDate() - 1);
+  const currentDate = new Date(dateInput.value);
 
-  fp.setDate(newDate, true); // true = trigger onChange
+  currentDate.setDate(currentDate.getDate() - 1);
 
+  const prevStr = currentDate.toISOString().split('T')[0];
+
+  if (prevStr < today) return; // 🚫 block past
+
+  dateInput.value = prevStr;
+
+  renderSlots(prevStr);
+
+  updatePrevButtonState();
+  updateDateLabel(prevStr); // ✅ Add this
 });
+
 
 document.getElementById('next-day').addEventListener('click', () => {
 
-  const current = fp.selectedDates[0] || new Date();
+  const currentDate = new Date(dateInput.value);
 
-  const newDate = new Date(current);
-  newDate.setDate(newDate.getDate() + 1);
+  currentDate.setDate(currentDate.getDate() + 1);
 
-  fp.setDate(newDate, true); // IMPORTANT
+  dateInput.value = currentDate.toISOString().split('T')[0];
+
+  renderSlots(dateInput.value);
+
+    updatePrevButtonState();
+  updateDateLabel(nextStr); // ✅ Add this
+
 });
-
-
-const todayStr = getLocalDateStr();
-dateInput.setAttribute("min", todayStr);
-
+  const today = new Date().toISOString().split("T")[0];
+  dateInput.setAttribute("min", today);
 
   function setToday() {
     const todayStr = new Date().toLocaleDateString("en-CA");
-
+    dateInput.value = todayStr;
+    renderSlots(todayStr);
+    
+    updatePrevButtonState();
+    updateDateLabel(todayStr); // ✅ Add this
   }
 
-
+  dateInput.addEventListener("change", function() {
+    renderSlots(this.value);
+     updateDateLabel(this.value); // ✅ Add this
+  });
 
   function getSlotHour(slot) {
     const raw = slot.start_time || slot.time || "";
@@ -819,87 +822,75 @@ dateInput.setAttribute("min", todayStr);
   }
 
   function renderSlots(date) {
-  const container = document.getElementById("slots-container");
-  container.innerHTML = "";
+    const container = document.getElementById("slots-container");
+    container.innerHTML = "";
 
-  const now = new Date();
-  const currentHour = now.getHours();
+    const now = new Date();
+    const currentHour = now.getHours();
+    const todayStr = now.toISOString().split("T")[0];
 
-  const todayStr = getLocalDateStr();
+    if (date < todayStr) {
+      container.innerHTML = `<p class="text-center text-danger">No slots available for past dates</p>`;
+      return;
+    }
 
-  // 🔥 FIX 1: ALWAYS compare strings safely
-const cleanDate = normalizeDate(date);
-const today = getLocalDateStr();
+    const filtered = allData.filter(r => r.date === date);
+    if (!filtered.length) {
+      container.innerHTML = `<div class="card border-0 shadow-sm p-4 text-center">
+    <h5>No Slots Available</h5>
+    <p class="text-muted">
+        Please try another date.
+    </p>
+</div>`;
+      return;
+    }
 
-const selectedDate = new Date(cleanDate + "T00:00:00");
-const todayDate = new Date(today + "T00:00:00");
+    // Group slots by court
+    const groupedCourts = {};
+    filtered.forEach(slot => {
+      const courtName = slot.courts?.name || `Court No ${slot.court_id}`;
+      if (!groupedCourts[courtName]) groupedCourts[courtName] = [];
+      groupedCourts[courtName].push(slot);
+    });
 
-if (selectedDate < todayDate) {
-  container.innerHTML = `<p class="text-center">No slots available for past dates</p>`;
-  return;
-}
+    // Render courts in ascending order
+    Object.keys(groupedCourts).sort().forEach(courtName => {
+      const courtSlots = groupedCourts[courtName];
 
+    // Count only available & future slots
+    const availableCount = courtSlots.filter(s => {
+        const status = (s.status || "").toLowerCase();
+        const hour = getSlotHour(s);
+        const isPast = (date === todayStr && hour < currentHour);
+        return status === "available" && !isPast;
+      }).length;
+      const badgeClass = availableCount === 0 ? "bg-danger" : "bg-warning text-dark";
 
+      // Separate morning/evening slots
+      const morningSlots = courtSlots.filter(s => getSlotHour(s) < 12).sort((a,b)=>getSlotHour(a)-getSlotHour(b));
+      const eveningSlots = courtSlots.filter(s => getSlotHour(s) >= 12).sort((a,b)=>getSlotHour(a)-getSlotHour(b));
 
-  const filtered = allData.filter(r =>
-  normalizeDate(r.date) === cleanDate
-);
-
-  if (!filtered.length) {
-    container.innerHTML = `
-      <div class="card border-0 shadow-sm p-4 text-center">
-        <h5>No Slots Available</h5>
-        <p class="text-muted">Please try another date.</p>
-      </div>`;
-    return;
-  }
-
-  const groupedCourts = {};
-
-  filtered.forEach(slot => {
-    const courtName = slot.courts?.name || `Court No ${slot.court_id}`;
-    if (!groupedCourts[courtName]) groupedCourts[courtName] = [];
-    groupedCourts[courtName].push(slot);
-  });
-
-  Object.keys(groupedCourts).sort().forEach(courtName => {
-    const courtSlots = groupedCourts[courtName];
-
-    const availableCount = courtSlots.filter(s =>
-      (s.status || "").toLowerCase() === "available"
-    ).length;
-
-    const badgeClass = availableCount === 0 ? "bg-danger" : "bg-warning text-dark";
-
-    const renderSlotGroup = (slots, title) => {
-      if (!slots.length) return "";
-
-      return `<div class="sub-header">${title}</div>` +
-        slots.map(slot => {
-          const status = (slot.status || "").toLowerCase();
+      function renderSlotGroup(slots, groupTitle) {
+        const futureSlots = slots.filter(s => {
+          const hour = getSlotHour(s);
+          return !(date===todayStr && hour<currentHour);
+        });
+        if (!futureSlots.length) return "";
+        return `<div class="sub-header">${groupTitle}</div>` + futureSlots.map(slot=>{
+          const status = (slot.status||"").toLowerCase();
           const displayTime = `${slot.start_time || slot.time} - ${slot.end_time || ""}`;
-
-          let badgeText = "", badgeClass = "", btnHTML = "";
-
-          if (status === "available") {
-            badgeText = "Available";
-            badgeClass = "text-success-small";
-
-            const msg = encodeURIComponent(
-              `Hi, I want to book ${displayTime} at ${courtName} for ₹${slot.price}`
-            );
-
-            btnHTML = `<a href="https://wa.me/${PHONE}?text=${msg}" target="_blank" class="btn btn-sm btn-primary">Book</a>`;
-          } else if (status === "booked") {
-            badgeText = "Booked";
-            badgeClass = "text-danger-small";
-            btnHTML = `<button class="btn btn-sm btn-danger" disabled>Booked</button>`;
+          let badgeText="", badgeClass="", btnHTML="";
+          if (status==="available") {
+            badgeText="Available"; badgeClass="text-success-small";
+            const msg = encodeURIComponent(`Hi, I want to book ${displayTime} at ${courtName} for ₹${slot.price}`);
+            btnHTML=`<a href="https://wa.me/${PHONE}?text=${msg}" target="_blank" class="btn btn-sm btn-primary">Book</a>`;
+          } else if (status==="booked") {
+            badgeText="Booked"; badgeClass="text-danger-small";
+            btnHTML=`<button class="btn btn-sm btn-danger" disabled>Booked</button>`;
           } else {
-            badgeText = "Unavailable";
-            badgeClass = "text-dark";
-            btnHTML = `<button class="btn btn-sm btn-dark" disabled>Unavailable</button>`;
+            badgeText="Unavailable"; badgeClass="text-dark";
+            btnHTML=`<button class="btn btn-sm btn-dark" disabled>Unavailable</button>`;
           }
-
           return `
             <li class="list-group-item d-flex justify-content-between align-items-center slot-row">
               <div>
@@ -907,18 +898,16 @@ if (selectedDate < todayDate) {
                 <small class="${badgeClass}">${badgeText}</small>
               </div>
               <div class="d-flex align-items-center gap-2">
-                <span class="fw-bold">₹${slot.price || 0}</span>
+                <span class="fw-bold">₹${slot.price||0}</span>
                 ${btnHTML}
               </div>
             </li>
           `;
         }).join("");
-    };
+      }
 
-    const morningSlots = courtSlots.filter(s => getSlotHour(s) < 12);
-    const eveningSlots = courtSlots.filter(s => getSlotHour(s) >= 12);
-
-    container.innerHTML += `
+      // Render court card
+      const courtHTML = `
       <div class="col-md-6 col-lg-4">
         <div class="card shadow mb-4 rounded-4 border-0">
           <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center acha-bg">
@@ -927,15 +916,16 @@ if (selectedDate < todayDate) {
           </div>
           <div class="card-body p-0">
             <ul class="list-group list-group-flush">
-              ${renderSlotGroup(morningSlots, "🌅 Morning Slots")}
-              ${renderSlotGroup(eveningSlots, "🌙 Evening Slots")}
+              ${renderSlotGroup(morningSlots," 🌅 Morning Slots")}
+              ${renderSlotGroup(eveningSlots," 🌙 Evening Slots")}
             </ul>
           </div>
         </div>
       </div>
-    `;
-  });
-}
+      `;
+      container.innerHTML += courtHTML;
+    });
+  }
 </script>
 
 <!-- Toast Container -->
@@ -954,55 +944,6 @@ if (selectedDate < todayDate) {
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Date ui only added/changed by altFormat,Not an original date change,Js only,no html changed -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script>
-    // Date label citation245 ,search to see html for label
-    function updateDateLabel(date) {
-
-      const d = new Date(date + "T00:00:00");
-
-      document.getElementById("selected-date-label").innerHTML =
-        d.toLocaleDateString("en-IN", {
-          weekday: "long",
-          day: "2-digit",
-          month: "long",
-          year: "numeric"
-        });
-    }
-
-// 1. helper function (ADD HERE)
-function getDateStr(selectedDates, dateStr) {
-  return selectedDates?.[0]
-    ? selectedDates[0].toISOString().split("T")[0]
-    : dateStr;
-}
-
-
-// 2. then flatpickr init
-const fp = flatpickr("#selected-date", {
-  altInput: true,
-  altFormat: "d-m-Y",
-  dateFormat: "Y-m-d",
-  minDate: "today",
-  defaultDate: "today",
-
-  onReady: function (selectedDates, dateStr) {
-    const date = (selectedDates[0] || new Date()).toISOString().split("T")[0];
-    updateDateLabel(date);
-    renderSlots(date);
-  },
-
-  onChange: function (selectedDates, dateStr) {
-    const date = (selectedDates[0] || new Date()).toISOString().split("T")[0];
-    updateDateLabel(date);
-    renderSlots(date);
-  }
-});
-  </script>
-
 </body>
 </html>
 
