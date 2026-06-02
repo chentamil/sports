@@ -735,30 +735,35 @@ leadForm.addEventListener("submit", async (e) => {
 
   const dateInput = document.getElementById("selected-date");
 
-<!-- document.getElementById('prev-day').addEventListener('click', () => {
+//  document.getElementById('prev-day').addEventListener('click', () => {
 
-  const currentDate = new Date(dateInput.value);
+//   const currentDate = new Date(dateInput.value);
 
-  currentDate.setDate(currentDate.getDate() - 1);
+//   currentDate.setDate(currentDate.getDate() - 1);
 
-  dateInput.value = currentDate.toISOString().split('T')[0];
+//   dateInput.value = currentDate.toISOString().split('T')[0];
 
-  renderSlots(dateInput.value);
+//   renderSlots(dateInput.value);
 
-}); -->
-document.getElementById('prev-day').addEventListener('click', () => {  
+// });
 
-  const currentDate = new Date(dateInput.value);
-  currentDate.setDate(currentDate.getDate() - 1);
-  const prevStr = currentDate.toISOString().split('T')[0];
-  
-  // improvised blocking past dates
+document.getElementById('prev-day').addEventListener('click', () => {
+
   const today = new Date().toISOString().split("T")[0];
+
+  const currentDate = new Date(dateInput.value);
+
+  currentDate.setDate(currentDate.getDate() - 1);
+
+  const prevStr = currentDate.toISOString().split('T')[0];
+
   if (prevStr < today) return; // 🚫 block past
+
   dateInput.value = prevStr;
 
   renderSlots(prevStr);
 });
+
 
 document.getElementById('next-day').addEventListener('click', () => {
 
