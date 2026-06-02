@@ -804,75 +804,79 @@ dateInput.setAttribute("min", todayStr);
   }
 
   function renderSlots(date) {
-    const container = document.getElementById("slots-container");
-    container.innerHTML = "";
+  const container = document.getElementById("slots-container");
+  container.innerHTML = "";
 
-    const now = new Date();
-    const currentHour = now.getHours();
-    const todayStr = getLocalDateStr();
+  const now = new Date();
+  const currentHour = now.getHours();
 
-    if (date < todayStr) {
-      container.innerHTML = `<p class="text-center">No slots available for past dates</p>`;
-      return;
-    }
+  const todayStr = getLocalDateStr(now);
 
-    const filtered = allData.filter(r => r.date === date);
-    if (!filtered.length) {
-      container.innerHTML = `<div class="card border-0 shadow-sm p-4 text-center">
-    <h5>No Slots Available</h5>
-    <p class="text-muted">
-        Please try another date.
-    </p>
-</div>`;
-      return;
-    }
+  // 🔥 FIX 1: ALWAYS compare strings safely
+  const isPastDate = date < todayStr;
 
-    // Group slots by court
-    const groupedCourts = {};
-    filtered.forEach(slot => {
-      const courtName = slot.courts?.name || `Court No ${slot.court_id}`;
-      if (!groupedCourts[courtName]) groupedCourts[courtName] = [];
-      groupedCourts[courtName].push(slot);
-    });
+  if (isPastDate) {
+    container.innerHTML = `<p class="text-center">No slots available for past dates</p>`;
+    return;
+  }
 
-    // Render courts in ascending order
-    Object.keys(groupedCourts).sort().forEach(courtName => {
-      const courtSlots = groupedCourts[courtName];
+  const filtered = allData.filter(r => r.date === date);
 
-    // Count only available & future slots
-    const availableCount = courtSlots.filter(s => {
-        const status = (s.status || "").toLowerCase();
-        const hour = getSlotHour(s);
-        const isPast = (date === todayStr && hour < currentHour);
-        return status === "available" && !isPast;
-      }).length;
-      const badgeClass = availableCount === 0 ? "bg-danger" : "bg-warning text-dark";
+  if (!filtered.length) {
+    container.innerHTML = `
+      <div class="card border-0 shadow-sm p-4 text-center">
+        <h5>No Slots Available</h5>
+        <p class="text-muted">Please try another date.</p>
+      </div>`;
+    return;
+  }
 
-      // Separate morning/evening slots
-      const morningSlots = courtSlots.filter(s => getSlotHour(s) < 12).sort((a,b)=>getSlotHour(a)-getSlotHour(b));
-      const eveningSlots = courtSlots.filter(s => getSlotHour(s) >= 12).sort((a,b)=>getSlotHour(a)-getSlotHour(b));
+  const groupedCourts = {};
 
-      function renderSlotGroup(slots, groupTitle) {
-        const futureSlots = slots.filter(s => {
-          const hour = getSlotHour(s);
-          return !(date===todayStr && hour<currentHour);
-        });
-        if (!futureSlots.length) return "";
-        return `<div class="sub-header">${groupTitle}</div>` + futureSlots.map(slot=>{
-          const status = (slot.status||"").toLowerCase();
+  filtered.forEach(slot => {
+    const courtName = slot.courts?.name || `Court No ${slot.court_id}`;
+    if (!groupedCourts[courtName]) groupedCourts[courtName] = [];
+    groupedCourts[courtName].push(slot);
+  });
+
+  Object.keys(groupedCourts).sort().forEach(courtName => {
+    const courtSlots = groupedCourts[courtName];
+
+    const availableCount = courtSlots.filter(s =>
+      (s.status || "").toLowerCase() === "available"
+    ).length;
+
+    const badgeClass = availableCount === 0 ? "bg-danger" : "bg-warning text-dark";
+
+    const renderSlotGroup = (slots, title) => {
+      if (!slots.length) return "";
+
+      return `<div class="sub-header">${title}</div>` +
+        slots.map(slot => {
+          const status = (slot.status || "").toLowerCase();
           const displayTime = `${slot.start_time || slot.time} - ${slot.end_time || ""}`;
-          let badgeText="", badgeClass="", btnHTML="";
-          if (status==="available") {
-            badgeText="Available"; badgeClass="text-success-small";
-            const msg = encodeURIComponent(`Hi, I want to book ${displayTime} at ${courtName} for ₹${slot.price}`);
-            btnHTML=`<a href="https://wa.me/${PHONE}?text=${msg}" target="_blank" class="btn btn-sm btn-primary">Book</a>`;
-          } else if (status==="booked") {
-            badgeText="Booked"; badgeClass="text-danger-small";
-            btnHTML=`<button class="btn btn-sm btn-danger" disabled>Booked</button>`;
+
+          let badgeText = "", badgeClass = "", btnHTML = "";
+
+          if (status === "available") {
+            badgeText = "Available";
+            badgeClass = "text-success-small";
+
+            const msg = encodeURIComponent(
+              `Hi, I want to book ${displayTime} at ${courtName} for ₹${slot.price}`
+            );
+
+            btnHTML = `<a href="https://wa.me/${PHONE}?text=${msg}" target="_blank" class="btn btn-sm btn-primary">Book</a>`;
+          } else if (status === "booked") {
+            badgeText = "Booked";
+            badgeClass = "text-danger-small";
+            btnHTML = `<button class="btn btn-sm btn-danger" disabled>Booked</button>`;
           } else {
-            badgeText="Unavailable"; badgeClass="text-dark";
-            btnHTML=`<button class="btn btn-sm btn-dark" disabled>Unavailable</button>`;
+            badgeText = "Unavailable";
+            badgeClass = "text-dark";
+            btnHTML = `<button class="btn btn-sm btn-dark" disabled>Unavailable</button>`;
           }
+
           return `
             <li class="list-group-item d-flex justify-content-between align-items-center slot-row">
               <div>
@@ -880,16 +884,18 @@ dateInput.setAttribute("min", todayStr);
                 <small class="${badgeClass}">${badgeText}</small>
               </div>
               <div class="d-flex align-items-center gap-2">
-                <span class="fw-bold">₹${slot.price||0}</span>
+                <span class="fw-bold">₹${slot.price || 0}</span>
                 ${btnHTML}
               </div>
             </li>
           `;
         }).join("");
-      }
+    };
 
-      // Render court card
-      const courtHTML = `
+    const morningSlots = courtSlots.filter(s => getSlotHour(s) < 12);
+    const eveningSlots = courtSlots.filter(s => getSlotHour(s) >= 12);
+
+    container.innerHTML += `
       <div class="col-md-6 col-lg-4">
         <div class="card shadow mb-4 rounded-4 border-0">
           <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center acha-bg">
@@ -898,16 +904,15 @@ dateInput.setAttribute("min", todayStr);
           </div>
           <div class="card-body p-0">
             <ul class="list-group list-group-flush">
-              ${renderSlotGroup(morningSlots," 🌅 Morning Slots")}
-              ${renderSlotGroup(eveningSlots," 🌙 Evening Slots")}
+              ${renderSlotGroup(morningSlots, "🌅 Morning Slots")}
+              ${renderSlotGroup(eveningSlots, "🌙 Evening Slots")}
             </ul>
           </div>
         </div>
       </div>
-      `;
-      container.innerHTML += courtHTML;
-    });
-  }
+    `;
+  });
+}
 </script>
 
 <!-- Toast Container -->
