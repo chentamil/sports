@@ -753,9 +753,8 @@ function normalizeDate(d) {
 
 function getLocalDateStr() {
   const d = new Date();
-  return d.getFullYear() + "-" +
-    String(d.getMonth() + 1).padStart(2, "0") + "-" +
-    String(d.getDate()).padStart(2, "0");
+  const offset = d.getTimezoneOffset() * 60000;
+  return new Date(d - offset).toISOString().split("T")[0];
 }
 
   const PHONE = "919840253589";
@@ -826,7 +825,7 @@ dateInput.setAttribute("min", todayStr);
   const now = new Date();
   const currentHour = now.getHours();
 
-  const todayStr = getLocalDateStr(now);
+  const todayStr = getLocalDateStr();
 
   // 🔥 FIX 1: ALWAYS compare strings safely
 const cleanDate = normalizeDate(date);
@@ -837,10 +836,7 @@ if (cleanDate < today) {
   return;
 }
 
-  if (isPastDate) {
-    container.innerHTML = `<p class="text-center">No slots available for past dates</p>`;
-    return;
-  }
+
 
   const filtered = allData.filter(r => r.date === cleanDate);
 
@@ -989,13 +985,13 @@ const fp = flatpickr("#selected-date", {
   defaultDate: "today",
 
   onReady: function (selectedDates, dateStr) {
-    const date = normalizeDate(selectedDates[0] || dateStr || new Date());
+    const date = (selectedDates[0] || new Date()).toISOString().split("T")[0];
     updateDateLabel(date);
     renderSlots(date);
   },
 
   onChange: function (selectedDates, dateStr) {
-    const date = normalizeDate(selectedDates[0] || dateStr || new Date());
+    const date = (selectedDates[0] || new Date()).toISOString().split("T")[0];
     updateDateLabel(date);
     renderSlots(date);
   }

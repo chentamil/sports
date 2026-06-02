@@ -310,7 +310,41 @@
             <i class="bi bi-chevron-left"></i>
         </button>
 
-        <input type="date" id="selected-date" class="form-control w-auto">
+        <!-- Date picker with custom calendar icon -->
+          <div class="position-relative" style="cursor:pointer;" onclick="document.getElementById('selected-date').showPicker()">
+
+              <!-- <input type="date" id="selected-date" class="form-control w-auto pe-5" min="2026-06-02"> -->
+              <input type="date" id="selected-date" class="form-control w-auto pe-5">
+
+              <i class="bi bi-calendar3 position-absolute top-50 end-0 translate-middle-y me-3 text-primary"></i>
+
+          </div>
+
+          <style>
+              /* Extra space for icon */
+              #selected-date {
+                  padding-right: 2.5rem;
+                  appearance: none;
+                  -webkit-appearance: none;
+                  -moz-appearance: none;
+              }
+
+              /* Hide browser's default calendar icon */
+              #selected-date::-webkit-calendar-picker-indicator {
+                  opacity: 0;
+                  position: absolute;
+                  width: 100%;
+                  height: 100%;
+                  cursor: pointer;
+              }
+
+              /* Prevent icon from blocking clicks */
+              .position-relative .bi-calendar3 {
+                  pointer-events: none;
+                  font-size: 1.1rem;
+              }
+          </style>
+        <!-- Date picker with custom calendar icon ends here -->
 
         <button id="next-day" class="btn btn-outline-primary">
             <i class="bi bi-chevron-right"></i>
@@ -762,7 +796,12 @@ document.getElementById('next-day').addEventListener('click', () => {
 
     const filtered = allData.filter(r => r.date === date);
     if (!filtered.length) {
-      container.innerHTML = `<p class="text-center">No slots found</p>`;
+      container.innerHTML = `<div class="card border-0 shadow-sm p-4 text-center">
+    <h5>No Slots Available</h5>
+    <p class="text-muted">
+        Please try another date.
+    </p>
+</div>`;
       return;
     }
 
