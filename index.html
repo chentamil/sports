@@ -745,7 +745,7 @@ leadForm.addEventListener("submit", async (e) => {
 
     allData = data || [];
 
-    setToday();
+    
   }
   
   loadSlots();
@@ -754,37 +754,35 @@ leadForm.addEventListener("submit", async (e) => {
 
 document.getElementById('prev-day').addEventListener('click', () => {
 
-  const current = fp.selectedDates[0];
+  const current = fp.selectedDates[0] || new Date();
 
   const newDate = new Date(current);
   newDate.setDate(newDate.getDate() - 1);
 
-  fp.setDate(newDate);
+  fp.setDate(newDate, true); // true = trigger onChange
 
 });
 
 document.getElementById('next-day').addEventListener('click', () => {
 
-  const current = fp.selectedDates[0];
+  const current = fp.selectedDates[0] || new Date();
 
   const newDate = new Date(current);
   newDate.setDate(newDate.getDate() + 1);
 
-  fp.setDate(newDate);
-
+  fp.setDate(newDate, true); // IMPORTANT
 });
+
+
   const today = new Date().toISOString().split("T")[0];
   dateInput.setAttribute("min", today);
 
   function setToday() {
     const todayStr = new Date().toLocaleDateString("en-CA");
-    dateInput.value = todayStr;
-    renderSlots(todayStr);
+
   }
 
-  dateInput.addEventListener("change", function() {
-    renderSlots(this.value);
-  });
+
 
   function getSlotHour(slot) {
     const raw = slot.start_time || slot.time || "";
@@ -933,18 +931,23 @@ document.getElementById('next-day').addEventListener('click', () => {
         });
     }
 
-  const fp = flatpickr("#selected-date", {
-      altInput: true,
-      altFormat: "d-m-Y",
-      dateFormat: "Y-m-d",
-      minDate: "today",
-      defaultDate: "today",
+const fp = flatpickr("#selected-date", {
+  altInput: true,
+  altFormat: "d-m-Y",
+  dateFormat: "Y-m-d",
+  minDate: "today",
+  defaultDate: "today",
 
-      onChange: function (selectedDates, dateStr) {
-        updateDateLabel(dateStr);
-        renderSlots(dateStr);
-      }
-    });
+  onReady: function (selectedDates, dateStr) {
+    updateDateLabel(dateStr);
+    renderSlots(dateStr);
+  },
+
+  onChange: function (selectedDates, dateStr) {
+    updateDateLabel(dateStr);
+    renderSlots(dateStr);
+  }
+});
   </script>
 
 </body>
