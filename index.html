@@ -774,8 +774,7 @@ document.getElementById('prev-day').addEventListener('click', () => {
   dateInput.value = prevStr;
 
   renderSlots(prevStr);
-
-  updatePrevButtonState();
+  
   updateDateLabel(prevStr); // ✅ Add this
 });
 
@@ -790,7 +789,7 @@ document.getElementById('next-day').addEventListener('click', () => {
 
   renderSlots(dateInput.value);
 
-    updatePrevButtonState();
+    
   updateDateLabel(nextStr); // ✅ Add this
 
 });
@@ -802,7 +801,7 @@ document.getElementById('next-day').addEventListener('click', () => {
     dateInput.value = todayStr;
     renderSlots(todayStr);
     
-    updatePrevButtonState();
+    
     updateDateLabel(todayStr); // ✅ Add this
   }
 
