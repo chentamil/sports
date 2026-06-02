@@ -735,6 +735,22 @@ leadForm.addEventListener("submit", async (e) => {
 
 
 <script>
+function normalizeDate(d) {
+  if (!d) return null;
+
+  // if Date object
+  if (d instanceof Date) {
+    return d.toISOString().split("T")[0];
+  }
+
+  // if string already YYYY-MM-DD
+  if (typeof d === "string" && d.length >= 10) {
+    return d.slice(0, 10);
+  }
+
+  return null;
+}
+
 function getLocalDateStr() {
   const d = new Date();
   return d.getFullYear() + "-" +
@@ -813,14 +829,20 @@ dateInput.setAttribute("min", todayStr);
   const todayStr = getLocalDateStr(now);
 
   // 🔥 FIX 1: ALWAYS compare strings safely
-  const isPastDate = date < todayStr;
+const cleanDate = normalizeDate(date);
+const today = getLocalDateStr(new Date());
+
+if (cleanDate < today) {
+  container.innerHTML = `<p class="text-center">No slots available for past dates</p>`;
+  return;
+}
 
   if (isPastDate) {
     container.innerHTML = `<p class="text-center">No slots available for past dates</p>`;
     return;
   }
 
-  const filtered = allData.filter(r => r.date === date);
+  const filtered = allData.filter(r => r.date === cleanDate);
 
   if (!filtered.length) {
     container.innerHTML = `
@@ -939,7 +961,7 @@ dateInput.setAttribute("min", todayStr);
     // Date label citation245 ,search to see html for label
     function updateDateLabel(date) {
 
-      const d = new Date(date);
+      const d = new Date(date + "T00:00:00");
 
       document.getElementById("selected-date-label").innerHTML =
         d.toLocaleDateString("en-IN", {
@@ -967,13 +989,13 @@ const fp = flatpickr("#selected-date", {
   defaultDate: "today",
 
   onReady: function (selectedDates, dateStr) {
-    const date = getDateStr(selectedDates, dateStr);
+    const date = normalizeDate(selectedDates[0] || dateStr || new Date());
     updateDateLabel(date);
     renderSlots(date);
   },
 
   onChange: function (selectedDates, dateStr) {
-    const date = getDateStr(selectedDates, dateStr);
+    const date = normalizeDate(selectedDates[0] || dateStr || new Date());
     updateDateLabel(date);
     renderSlots(date);
   }
