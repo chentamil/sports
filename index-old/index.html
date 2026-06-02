@@ -735,7 +735,7 @@ leadForm.addEventListener("submit", async (e) => {
 
   const dateInput = document.getElementById("selected-date");
 
-document.getElementById('prev-day').addEventListener('click', () => {
+<!-- document.getElementById('prev-day').addEventListener('click', () => {
 
   const currentDate = new Date(dateInput.value);
 
@@ -745,6 +745,19 @@ document.getElementById('prev-day').addEventListener('click', () => {
 
   renderSlots(dateInput.value);
 
+}); -->
+document.getElementById('prev-day').addEventListener('click', () => {  
+
+  const currentDate = new Date(dateInput.value);
+  currentDate.setDate(currentDate.getDate() - 1);
+  const prevStr = currentDate.toISOString().split('T')[0];
+  
+  // improvised blocking past dates
+  const today = new Date().toISOString().split("T")[0];
+  if (prevStr < today) return; // 🚫 block past
+  dateInput.value = prevStr;
+
+  renderSlots(prevStr);
 });
 
 document.getElementById('next-day').addEventListener('click', () => {
@@ -790,7 +803,7 @@ document.getElementById('next-day').addEventListener('click', () => {
     const todayStr = now.toISOString().split("T")[0];
 
     if (date < todayStr) {
-      container.innerHTML = `<p class="text-center">No slots available for past dates</p>`;
+      container.innerHTML = `<p class="text-center text-danger">No slots available for past dates</p>`;
       return;
     }
 
