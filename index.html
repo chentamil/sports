@@ -778,10 +778,13 @@ document.getElementById('next-day').addEventListener('click', () => {
 
   function setToday() {
     const todayStr = new Date().toLocaleDateString("en-CA");
-
+    dateInput.value = todayStr;
+    renderSlots(todayStr);
   }
 
-
+  dateInput.addEventListener("change", function() {
+    renderSlots(this.value);
+  });
 
   function getSlotHour(slot) {
     const raw = slot.start_time || slot.time || "";
