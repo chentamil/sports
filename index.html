@@ -938,6 +938,15 @@ document.getElementById('next-day').addEventListener('click', () => {
         });
     }
 
+// 1. helper function (ADD HERE)
+function getDateStr(selectedDates, dateStr) {
+  return selectedDates?.[0]
+    ? selectedDates[0].toISOString().split("T")[0]
+    : dateStr;
+}
+
+
+// 2. then flatpickr init
 const fp = flatpickr("#selected-date", {
   altInput: true,
   altFormat: "d-m-Y",
@@ -946,13 +955,15 @@ const fp = flatpickr("#selected-date", {
   defaultDate: "today",
 
   onReady: function (selectedDates, dateStr) {
-    updateDateLabel(dateStr);
-    renderSlots(dateStr);
+    const date = getDateStr(selectedDates, dateStr);
+    updateDateLabel(date);
+    renderSlots(date);
   },
 
   onChange: function (selectedDates, dateStr) {
-    updateDateLabel(dateStr);
-    renderSlots(dateStr);
+    const date = getDateStr(selectedDates, dateStr);
+    updateDateLabel(date);
+    renderSlots(date);
   }
 });
   </script>
