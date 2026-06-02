@@ -754,25 +754,23 @@ leadForm.addEventListener("submit", async (e) => {
 
 document.getElementById('prev-day').addEventListener('click', () => {
 
-  const currentDate = new Date(dateInput.value);
+  const current = fp.selectedDates[0];
 
-  currentDate.setDate(currentDate.getDate() - 1);
+  const newDate = new Date(current);
+  newDate.setDate(newDate.getDate() - 1);
 
-  dateInput.value = currentDate.toISOString().split('T')[0];
-
-  renderSlots(dateInput.value);
+  fp.setDate(newDate);
 
 });
 
 document.getElementById('next-day').addEventListener('click', () => {
 
-  const currentDate = new Date(dateInput.value);
+  const current = fp.selectedDates[0];
 
-  currentDate.setDate(currentDate.getDate() + 1);
+  const newDate = new Date(current);
+  newDate.setDate(newDate.getDate() + 1);
 
-  dateInput.value = currentDate.toISOString().split('T')[0];
-
-  renderSlots(dateInput.value);
+  fp.setDate(newDate);
 
 });
   const today = new Date().toISOString().split("T")[0];
@@ -780,13 +778,10 @@ document.getElementById('next-day').addEventListener('click', () => {
 
   function setToday() {
     const todayStr = new Date().toLocaleDateString("en-CA");
-    dateInput.value = todayStr;
-    renderSlots(todayStr);
+
   }
 
-  dateInput.addEventListener("change", function() {
-    renderSlots(this.value);
-  });
+
 
   function getSlotHour(slot) {
     const raw = slot.start_time || slot.time || "";
@@ -935,7 +930,7 @@ document.getElementById('next-day').addEventListener('click', () => {
         });
     }
 
-    flatpickr("#selected-date", {
+  const fp = flatpickr("#selected-date", {
       altInput: true,
       altFormat: "d-m-Y",
       dateFormat: "Y-m-d",
