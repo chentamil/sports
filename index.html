@@ -829,16 +829,21 @@ dateInput.setAttribute("min", todayStr);
 
   // 🔥 FIX 1: ALWAYS compare strings safely
 const cleanDate = normalizeDate(date);
-const today = getLocalDateStr(new Date());
+const today = getLocalDateStr();
 
-if (cleanDate < today) {
+const selectedDate = new Date(cleanDate + "T00:00:00");
+const todayDate = new Date(today + "T00:00:00");
+
+if (selectedDate < todayDate) {
   container.innerHTML = `<p class="text-center">No slots available for past dates</p>`;
   return;
 }
 
 
 
-  const filtered = allData.filter(r => r.date === cleanDate);
+  const filtered = allData.filter(r =>
+  normalizeDate(r.date) === cleanDate
+);
 
   if (!filtered.length) {
     container.innerHTML = `
