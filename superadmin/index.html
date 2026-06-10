@@ -569,6 +569,16 @@
         </div>
 
         <div class="col-md-2">
+        <label class="form-label">Status</label>
+        <select id="gen-slot-status" class="form-select">
+          <option value="available">Available</option>
+          <option value="booked">Booked</option>
+          <option value="closed">Closed</option>
+          <option value="disabled">Disabled</option>
+        </select>
+      </div>
+
+        <div class="col-md-2">
           <button class="btn btn-warning text-dark w-100" onclick="generateSlotsStandalone()">Generate Slots</button>
         </div>
 
@@ -957,6 +967,19 @@
             <div class="mb-3">
               <label>Price</label>
               <input type="number" id="m-gen-slot-price" class="form-control" value="400">
+            </div>
+
+            <div class="mb-3">
+              <label>Status</label>
+
+              <select id="m-gen-slot-status" class="form-select">
+
+                <option value="available">Available</option>
+                <option value="booked">Booked</option>
+                <option value="closed">Closed</option>
+                <option value="disabled">Disabled</option>
+
+              </select>
             </div>
 
           </div>
@@ -1560,6 +1583,9 @@
     document.getElementById("gen-slot-price").value =
       document.getElementById("m-gen-slot-price").value;
 
+    document.getElementById("gen-slot-status").value =
+      document.getElementById("m-gen-slot-status").value;  
+
     //   await generateSlotsStandalone();
 
     //   bootstrap.Modal
@@ -1594,6 +1620,7 @@
       document.getElementById("gen-slot-end-period").value
     );
     const price = Number(document.getElementById("gen-slot-price").value) || 400;
+    const status = document.getElementById("gen-slot-status").value;
 
     if (!date || !from || !to) {
       showToast("Please enter date, from and to time");
@@ -1655,7 +1682,7 @@
         end_time: slotEnd,
         time: `${slotStart} - ${slotEnd}`,
         price: price,
-        status: "available"
+        status
       });
       current += 1; // 1-hour step
     }
