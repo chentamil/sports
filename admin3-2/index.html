@@ -239,12 +239,12 @@
         </div>
       </div>
 
-      <!-- <div class="col-12 col-sm-6 col-md-3 mb-3">
+      <div class="col-12 col-sm-6 col-md-3 mb-3">
         <div class="card p-3 text-center border border-primary">
           Monthly Revenue
           <h4 id="revMonth">0</h4>
         </div>
-      </div> -->
+      </div>
 
       <div class="col-12 col-sm-6 col-md-3 mb-3">
         <div class="card p-3 text-center">
@@ -584,9 +584,9 @@
 
       <div class="row g-2 align-items-center">
         <!-- Delete Button -->
-        <!-- <div class="col-12 col-sm-auto">
+        <div class="col-12 col-sm-auto">
           <button class="btn btn-danger w-100" onclick="bulkDelete()">Delete Selected</button>
-        </div> -->
+        </div>
 
         <!-- Status Dropdown -->
         <div class="col-12 col-sm-auto">
@@ -604,7 +604,7 @@
           <button class="btn btn-primary w-100" onclick="bulkChangeStatus()">Apply</button>
         </div>
       </div>
-    
+    </div>
 
     <script>
       // Toggle all checkboxes
@@ -687,7 +687,7 @@
     <!-- Multi Select ends here -->
 
     <!-- TABLE -->
-    <div class="table-responsive shadow-sm bg-white mt-3" style="
+    <div class="table-responsive shadow-sm bg-white" style="
     max-height: 420px;
     overflow-y: auto;
     border-radius:20px;
@@ -705,9 +705,9 @@
 
             <th>ID</th>
 
-             <th>Date</th>
+            <th>Court</th>
 
-            <th>Court</th>           
+            <th>Date</th>
 
             <th>Start</th>
 
@@ -716,6 +716,8 @@
             <th>Price</th>
 
             <th>Status</th>
+
+            <th>Actions</th>
 
           </tr>
 
@@ -759,7 +761,6 @@
         Disabled
       </div>
     </div>
-    </div> <!-- Multiselect options end here -->
 
     <!-- MOBILE ADD SLOT MODAL -->
     <div class="modal fade" id="addSlotModal" tabindex="-1">
@@ -1192,8 +1193,6 @@
 
           <td>${slot.id}</td>
 
-          <td class="date-td">${slot.date}</td>
-
           <td>
             <select class="form-select"
               onchange="trackEdit(${slot.id},'court_id',this.value)">
@@ -1202,6 +1201,8 @@
               <option value="3" ${slot.court_id == 3 ? 'selected' : ''}>Court 3</option>
             </select>
           </td>
+
+          <td class="date-td">${slot.date}</td>
 
           <td>
             <input class="form-control" value="${slot.start_time || ''}"
@@ -1226,6 +1227,11 @@
               <option value="closed" ${slot.status == 'closed' ? 'selected' : ''}>Closed</option>
               <option value="disabled" ${slot.status == 'disabled' ? 'selected' : ''}>Disabled</option>
             </select>
+          </td>
+
+          <td>
+            <button class="btn btn-danger btn-sm btn-lg w-100"
+            onclick="deleteSlot(${slot.id})">Delete</button>
           </td>
 
         </tr>

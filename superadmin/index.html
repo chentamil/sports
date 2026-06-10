@@ -726,9 +726,9 @@
 
               <th>ID</th>
 
-              <th>Court</th>
-
               <th>Date</th>
+
+              <th>Court</th>              
 
               <th>Start</th>
 
@@ -1228,6 +1228,8 @@
 
           <td>${slot.id}</td>
 
+          <td class="date-td">${slot.date}</td>
+
           <td>
             <select class="form-select"
               onchange="trackEdit(${slot.id},'court_id',this.value)">
@@ -1235,9 +1237,7 @@
               <option value="2" ${slot.court_id == 2 ? 'selected' : ''}>Court 2</option>
               <option value="3" ${slot.court_id == 3 ? 'selected' : ''}>Court 3</option>
             </select>
-          </td>
-
-          <td class="date-td">${slot.date}</td>
+          </td>          
 
           <td>
             <input class="form-control" value="${slot.start_time || ''}"
