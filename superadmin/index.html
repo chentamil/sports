@@ -648,7 +648,7 @@
         async function bulkDelete() {
           const ids = getSelectedSlots();
           if (ids.length === 0) {
-            showToast("No slots selected");
+            showToast("No slots selected", "warning");
             return;
           }
           if (!confirm(`Delete ${ids.length} selected slots?`)) return;
@@ -680,7 +680,7 @@
 
           const ids = getSelectedSlots();
           if (ids.length === 0) {
-            showToast("No slots selected");
+            showToast("No slots selected", "warning");
             return;
           }
 
@@ -1021,17 +1021,40 @@
   // =========================
   // TOAST
   // =========================
-  function showToast(msg) {
-    const toast = document.getElementById("toast");
+function showToast(msg, type = "success") {
 
-    const el = document.createElement("div");
-    el.className = "alert alert-success shadow";
-    el.innerText = msg;
+  const toast =
+    document.getElementById("toast");
 
-    toast.appendChild(el);
+  const el =
+    document.createElement("div");
 
-    setTimeout(() => el.remove(), 5000);
-  }
+  const classes = {
+    success: "alert alert-success shadow",
+    error: "alert alert-danger shadow",
+    warning: "alert alert-warning shadow",
+    info: "alert alert-info shadow"
+  };
+
+  el.className =
+    classes[type] || classes.success;
+
+  // el.innerText = msg;
+  const icons = {
+  success: "✅",
+  error: "❌",
+  warning: "⚠️",
+  info: "ℹ️"
+};
+
+el.innerHTML = `${icons[type] || "✅"} ${msg}`;
+
+  toast.appendChild(el);
+
+  setTimeout(() => {
+    el.remove();
+  }, 5000);
+}
 
   // remove toast in mobile bug
   function clearModalArtifacts() {
@@ -1069,7 +1092,7 @@
 
     if (!response.ok) {
 
-      showToast("Invalid login");
+      showToast("Invalid login", "error");
 
       return;
     }
@@ -1193,9 +1216,7 @@
 
       console.error(err);
 
-      showToast(
-        "Unable to load slots"
-      );
+      showToast("Unable to load slots", "error");
     }
   }
 
@@ -1493,7 +1514,7 @@
     });
 
     if (!response.ok) {
-      showToast("Delete failed");
+      showToast("Delete failed", "error");
       return;
     }
 
@@ -1623,7 +1644,7 @@
     const status = document.getElementById("gen-slot-status").value;
 
     if (!date || !from || !to) {
-      showToast("Please enter date, from and to time");
+      showToast("Please enter date, from and to time", "warning");
       return;
     }
 
@@ -1654,7 +1675,7 @@
     const endNum = timeToNumber(to);
 
     if (startNum === null || endNum === null) {
-      showToast("Invalid time format. Use hAM/PM or h:30AM/PM");
+      showToast("Invalid time format. Use hAM/PM or h:30AM/PM", "error");
       return;
     }
 
@@ -1665,7 +1686,7 @@
 
     const totalHours = endNum - startNum;
     if (totalHours % 1 !== 0) {
-      showToast("Time range must be a multiple of 1 hour (e.g., 6-7, 6:30-7:30)");
+      showToast("Time range must be a multiple of 1 hour (e.g., 6-7, 6:30-7:30)", "info");
       return;
     }
 
@@ -1714,7 +1735,7 @@
       });
 
       if (!response.ok) {
-        showToast("Failed creating slot");
+        showToast("Failed creating slot", "error");
         return;
       }
     }
