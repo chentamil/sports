@@ -1207,109 +1207,82 @@ el.innerHTML = `${icons[type] || "✅"} ${msg}`;
 
 
 
-function renderTable(data) {
+  function renderTable(data) {
 
-  const body = document.getElementById("table-body");
-  body.innerHTML = "";
+    const body =
+      document.getElementById("table-body");
 
-  data.forEach(slot => {
+    body.innerHTML = "";
 
-    let rowClass = "";
+    data.forEach(slot => {
 
-    if (slot.status === "booked") {
-      rowClass = "bg-danger text-white opacity-75";
-    }
-    else if (slot.status === "disabled") {
-      rowClass = "bg-secondary text-white opacity-75";
-    }
-    else if (slot.status === "closed") {
-      rowClass = "table-warning";
-    }
+      let rowClass = "";
 
-    const tr = document.createElement("tr");
-    tr.className = rowClass;
+      if (slot.status === "booked") {
+        rowClass = "bg-danger text-white opacity-75";
+      }
+      else if (slot.status === "disabled") {
+        rowClass = "bg-secondary text-white opacity-75";
+      }
+      else if (slot.status === "closed") {
+        rowClass = "table-warning";
+      }
 
-    // checkbox
-    const tdCheck = document.createElement("td");
-    tdCheck.innerHTML = `<input type="checkbox" class="slot-checkbox" data-id="${slot.id}">`;
-    tr.appendChild(tdCheck);
+      body.innerHTML += `
 
-    // ID
-    const tdId = document.createElement("td");
-    tdId.textContent = slot.id;
-    tr.appendChild(tdId);
+        <tr class="${rowClass}">
+          <td><input type="checkbox" class="slot-checkbox" data-id="${slot.id}"></td>
 
-    // DATE (IMPORTANT FIX)
-    const tdDate = document.createElement("td");
-    tdDate.className = "date-td";
-    tdDate.textContent = slot.date;
-    tr.appendChild(tdDate);
+          <td>${slot.id}</td>
 
-    // COURT (still needs HTML because select)
-    const tdCourt = document.createElement("td");
-    tdCourt.innerHTML = `
-      <select class="form-select"
-        onchange="trackEdit(${slot.id},'court_id',this.value)">
-        <option value="1" ${slot.court_id == 1 ? 'selected' : ''}>Court 1</option>
-        <option value="2" ${slot.court_id == 2 ? 'selected' : ''}>Court 2</option>
-        <option value="3" ${slot.court_id == 3 ? 'selected' : ''}>Court 3</option>
-      </select>
-    `;
-    tr.appendChild(tdCourt);
+          <td class="date-td">${slot.date}</td>
 
-    // START TIME (SAFE INPUT VALUE)
-    const tdStart = document.createElement("td");
-    tdStart.innerHTML = `
-      <input class="form-control"
-        value="${slot.start_time || ''}"
-        onchange="trackEdit(${slot.id},'start_time',this.value)">
-    `;
-    tr.appendChild(tdStart);
+          <td>
+            <select class="form-select"
+              onchange="trackEdit(${slot.id},'court_id',this.value)">
+              <option value="1" ${slot.court_id == 1 ? 'selected' : ''}>Court 1</option>
+              <option value="2" ${slot.court_id == 2 ? 'selected' : ''}>Court 2</option>
+              <option value="3" ${slot.court_id == 3 ? 'selected' : ''}>Court 3</option>
+            </select>
+          </td>          
 
-    // END TIME
-    const tdEnd = document.createElement("td");
-    tdEnd.innerHTML = `
-      <input class="form-control"
-        value="${slot.end_time || ''}"
-        onchange="trackEdit(${slot.id},'end_time',this.value)">
-    `;
-    tr.appendChild(tdEnd);
+          <td>
+            <input class="form-control" value="${slot.start_time || ''}"
+            onchange="trackEdit(${slot.id},'start_time',this.value)">
+          </td>
 
-    // PRICE
-    const tdPrice = document.createElement("td");
-    tdPrice.innerHTML = `
-      <input class="form-control"
-        value="${slot.price || 0}"
-        onchange="trackEdit(${slot.id},'price',this.value)">
-    `;
-    tr.appendChild(tdPrice);
+          <td>
+            <input class="form-control" value="${slot.end_time || ''}"
+            onchange="trackEdit(${slot.id},'end_time',this.value)">
+          </td>
 
-    // STATUS
-    const tdStatus = document.createElement("td");
-    tdStatus.innerHTML = `
-      <select class="form-select"
-        onchange="trackEdit(${slot.id},'status',this.value)">
-        <option value="available" ${slot.status == 'available' ? 'selected' : ''}>Available</option>
-        <option value="booked" ${slot.status == 'booked' ? 'selected' : ''}>Booked</option>
-        <option value="closed" ${slot.status == 'closed' ? 'selected' : ''}>Closed</option>
-        <option value="disabled" ${slot.status == 'disabled' ? 'selected' : ''}>Disabled</option>
-      </select>
-    `;
-    tr.appendChild(tdStatus);
+          <td>
+            <input class="form-control" value="${slot.price || 0}"
+            onchange="trackEdit(${slot.id},'price',this.value)">
+          </td>
 
-    // DELETE
-    const tdDelete = document.createElement("td");
-    tdDelete.innerHTML = `
-      <button class="btn btn-danger btn-sm btn-lg w-100"
-        onclick="deleteSlot(${slot.id})">
-        Delete
-      </button>
-    `;
-    tr.appendChild(tdDelete);
+          <td>
+            <select class="form-select"
+            onchange="trackEdit(${slot.id},'status',this.value)">
+              <option value="available" ${slot.status == 'available' ? 'selected' : ''}>Available</option>
+              <option value="booked" ${slot.status == 'booked' ? 'selected' : ''}>Booked</option>
+              <option value="closed" ${slot.status == 'closed' ? 'selected' : ''}>Closed</option>
+              <option value="disabled" ${slot.status == 'disabled' ? 'selected' : ''}>Disabled</option>
+            </select>
+          </td>
 
-    body.appendChild(tr);
-  });
-}
+          <td>
+            <button class="btn btn-danger btn-sm btn-lg w-100"
+            onclick="deleteSlot(${slot.id})">Delete</button>
+          </td>
+
+        </tr>
+
+      `;
+
+    });
+
+  }
 
   // =========================
   // EDIT TRACK
