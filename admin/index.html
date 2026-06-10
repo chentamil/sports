@@ -1404,15 +1404,12 @@
       document.getElementById("slot-status").value =
         document.getElementById("m-slot-status").value;
 
-        try {
-        await addSlot();
-      } finally {
-        const modal = bootstrap.Modal.getInstance(
-          document.getElementById('addSlotModal')
-        );
+      await addSlot();
 
-        if (modal) modal.hide();
-      }
+      bootstrap.Modal
+        .getInstance(document.getElementById('addSlotModal'))
+        .hide();
+
     }
 
     // =========================
@@ -1523,16 +1520,13 @@
       document.getElementById("gen-slot-price").value =
         document.getElementById("m-gen-slot-price").value;
 
-        try {
-          await generateSlotsStandalone();
-        } finally {
-          const modal = bootstrap.Modal.getInstance(
-            document.getElementById('generatorModal')
-          );
+      await generateSlotsStandalone();
 
-          if (modal) modal.hide();
-        }
-      }
+      bootstrap.Modal
+        .getInstance(document.getElementById('generatorModal'))
+        .hide();
+
+    }
 
 
     function generateSlotsStandalone() {
@@ -1630,22 +1624,6 @@
       showToast(`Generated ${slots.length} slots for Court ${court_id}`);
       setTimeout(loadSlots, 500);
     }
-    // =====================
-    // Clear all toast modals,No stuck dark backdrop bug
-    // =====================
-      function clearModalArtifacts() {
-      document
-        .querySelectorAll('.modal-backdrop')
-        .forEach(el => el.remove());
-
-      document.body.classList.remove('modal-open');
-      document.body.style.removeProperty('overflow');
-      document.body.style.removeProperty('padding-right');
-    }
-
-    document.addEventListener('hidden.bs.modal', function () {
-      clearModalArtifacts();
-    });
 
     // =====================
     // Hide Past Slots in Table
