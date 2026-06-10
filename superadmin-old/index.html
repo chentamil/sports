@@ -253,13 +253,6 @@
         </div>
       </div>
 
-      <div class="col-12 col-sm-6 col-md-3 mb-3">
-      <div class="card p-3 text-center border border-success">
-        Court Utilisation
-        <h4 id="utilization">0%</h4>
-      </div>
-    </div>
-
     </div>
 
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -765,8 +758,30 @@
     </div> <!-- Multi Select ends here -->
 
       <!-- Booking Status colour Explain -->
-      <div id="statusSummary"
-          class="d-flex justify-content-center flex-wrap gap-2 mt-3 mb-3">
+      <div class="d-flex justify-content-center flex-wrap gap-2 mt-3 mb-3 small">
+        <div class="d-flex align-items-center gap-1 px-2 py-1 rounded border bg-white">
+          <span class="rounded-circle border" style="width:12px;height:12px;background:white;">
+          </span>
+          Available
+        </div>
+
+        <div class="d-flex align-items-center gap-1 px-2 py-1 rounded border border-danger">
+          <span class="rounded-circle" style="width:12px;height:12px;background:#dc3545;">
+          </span>
+          Booked
+        </div>
+
+        <div class="d-flex align-items-center gap-1 px-2 py-1 rounded border border-warning">
+          <span class="rounded-circle" style="width:12px;height:12px;background:#ffc107;">
+          </span>
+          Closed
+        </div>
+
+        <div class="d-flex align-items-center gap-1 px-2 py-1 rounded border border-dark">
+          <span class="rounded-circle" style="width:12px;height:12px;background:#6c757d;">
+          </span>
+          Disabled
+        </div>
       </div>
     
 
@@ -1401,19 +1416,6 @@ el.innerHTML = `${icons[type] || "✅"} ${msg}`;
     const status =
       document.getElementById("slot-status").value;
 
-      //Duplicate Slot Warning 
-      const duplicate = allData.find(s =>
-        s.date === date &&
-        String(s.court_id) === String(court_id) &&
-        s.start_time === start_time
-      );
-
-      if (duplicate) {
-        showToast("Slot already exists", "warning");
-        return;
-      } 
-      //Duplicate Slot Warning  ends 
-
     const time =
       `${start_time} - ${end_time}`;
 
@@ -1535,19 +1537,7 @@ el.innerHTML = `${icons[type] || "✅"} ${msg}`;
 
     let hourMap = {};
 
-    let todayTotal = 0;
-    let todayBooked = 0;
-
     data.forEach(s => {
-
-      if (s.date === today) {
-  todayTotal++;
-
-  if (s.status === "booked") {
-    todayBooked++;
-  }
-}
-
 
       if (s.status !== "booked") return;
 
@@ -1579,46 +1569,6 @@ el.innerHTML = `${icons[type] || "✅"} ${msg}`;
     document.getElementById("bookToday").innerText = todayBook;
     document.getElementById("revMonth").innerText = monthRev;
     document.getElementById("peakHour").innerText = peak;
-
-    // Live slot Status Counts
-    const available =
-      data.filter(s => s.status === "available").length;
-
-    const booked =
-      data.filter(s => s.status === "booked").length;
-
-    const closed =
-      data.filter(s => s.status === "closed").length;
-
-    const disabled =
-      data.filter(s => s.status === "disabled").length;
-
-    document.getElementById("statusSummary").innerHTML = `
-      <span class="badge bg-success fs-6">
-        🟢 Available (${available})
-      </span>
-
-      <span class="badge bg-danger fs-6">
-        🔴 Booked (${booked})
-      </span>
-
-      <span class="badge bg-warning text-dark fs-6">
-        🟡 Closed (${closed})
-      </span>
-
-      <span class="badge bg-secondary fs-6">
-        ⚫ Disabled (${disabled})
-      </span>
-    `;
-
-    // 
-    const utilization =
-      todayTotal === 0
-        ? 0
-        : Math.round((todayBooked / todayTotal) * 100);
-
-    document.getElementById("utilization").innerText =
-      utilization + "%";
   }
 
 </script>
@@ -1746,19 +1696,6 @@ el.innerHTML = `${icons[type] || "✅"} ${msg}`;
     while (current < endNum) {
       const slotStart = numberToTime(current);
       const slotEnd = numberToTime(current + 1); // 1-hour slots only
-      //Duplicate Slot Warning 
-      const duplicate = allData.find(s =>
-        s.date === date &&
-        String(s.court_id) === String(court_id) &&
-        s.start_time === slotStart
-      );
-
-      if (duplicate) {
-        current += 1;
-        continue;
-      }
-      //Duplicate Slot Warning ends 
-
       slots.push({
         date,
         court_id,
