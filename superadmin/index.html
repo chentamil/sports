@@ -240,6 +240,13 @@
       </div>
 
       <div class="col-12 col-sm-6 col-md-3 mb-3">
+        <div class="card p-3 text-center border border-success">
+          Court Utilisation
+          <h4 id="utilization">0%</h4>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-md-3 mb-3">
         <div class="card p-3 text-center border border-primary">
           Monthly Revenue
           <h4 id="revMonth">0</h4>
@@ -252,13 +259,6 @@
           <h4 id="peakHour">-</h4>
         </div>
       </div>
-
-      <div class="col-12 col-sm-6 col-md-3 mb-3">
-      <div class="card p-3 text-center border border-success">
-        Court Utilisation
-        <h4 id="utilization">0%</h4>
-      </div>
-    </div>
 
     </div>
 
@@ -1580,18 +1580,36 @@ el.innerHTML = `${icons[type] || "✅"} ${msg}`;
     document.getElementById("revMonth").innerText = monthRev;
     document.getElementById("peakHour").innerText = peak;
 
-    // Live slot Status Counts
+    // Live slot Status Counts for whole historic datas
+    // const available =
+    //   data.filter(s => s.status === "available").length;
+
+    // const booked =
+    //   data.filter(s => s.status === "booked").length;
+
+    // const closed =
+    //   data.filter(s => s.status === "closed").length;
+
+    // const disabled =
+    //   data.filter(s => s.status === "disabled").length;
+    //-------------------------------------------------------------- 
+
+    // Upcoming Slots Only (Today + Future)
+    const upcoming =
+      data.filter(s => s.date >= today);
+
     const available =
-      data.filter(s => s.status === "available").length;
+      upcoming.filter(s => s.status === "available").length;
 
     const booked =
-      data.filter(s => s.status === "booked").length;
+      upcoming.filter(s => s.status === "booked").length;
 
     const closed =
-      data.filter(s => s.status === "closed").length;
+      upcoming.filter(s => s.status === "closed").length;
 
     const disabled =
-      data.filter(s => s.status === "disabled").length;
+      upcoming.filter(s => s.status === "disabled").length;
+  // 
 
     document.getElementById("statusSummary").innerHTML = `
       <span class="badge bg-success fs-6">
