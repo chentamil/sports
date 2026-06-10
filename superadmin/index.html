@@ -1611,23 +1611,41 @@ el.innerHTML = `${icons[type] || "✅"} ${msg}`;
       upcoming.filter(s => s.status === "disabled").length;
   // 
 
-    document.getElementById("statusSummary").innerHTML = `
-      <span class="badge bg-success fs-6">
-        🟢 Available (${available})
-      </span>
+document.getElementById("statusSummary").innerHTML = `
 
-      <span class="badge bg-danger fs-6">
-        🔴 Booked (${booked})
-      </span>
+<div class="d-flex justify-content-center flex-wrap gap-2 mt-3 mb-3 small">
 
-      <span class="badge bg-warning text-dark fs-6">
-        🟡 Closed (${closed})
-      </span>
+  <div class="d-flex align-items-center gap-1 px-2 py-1 rounded border bg-white">
+    <span class="rounded-circle border"
+      style="width:12px;height:12px;background:white;">
+    </span>
+    Available (${available})
+  </div>
 
-      <span class="badge bg-secondary fs-6">
-        ⚫ Disabled (${disabled})
-      </span>
-    `;
+  <div class="d-flex align-items-center gap-1 px-2 py-1 rounded border border-danger">
+    <span class="rounded-circle"
+      style="width:12px;height:12px;background:#dc3545;">
+    </span>
+    Booked (${booked})
+  </div>
+
+  <div class="d-flex align-items-center gap-1 px-2 py-1 rounded border border-warning">
+    <span class="rounded-circle"
+      style="width:12px;height:12px;background:#ffc107;">
+    </span>
+    Closed (${closed})
+  </div>
+
+  <div class="d-flex align-items-center gap-1 px-2 py-1 rounded border border-dark">
+    <span class="rounded-circle"
+      style="width:12px;height:12px;background:#6c757d;">
+    </span>
+    Disabled (${disabled})
+  </div>
+
+</div>
+
+`;
 
     // 
     const utilization =
