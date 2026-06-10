@@ -239,12 +239,12 @@
         </div>
       </div>
 
-      <!-- <div class="col-12 col-sm-6 col-md-3 mb-3">
+      <div class="col-12 col-sm-6 col-md-3 mb-3">
         <div class="card p-3 text-center border border-primary">
           Monthly Revenue
-          <h4 id="revMonth">0</h4>
+          <!-- <h4 id="revMonth">0</h4> -->
         </div>
-      </div> -->
+      </div>
 
       <div class="col-12 col-sm-6 col-md-3 mb-3">
         <div class="card p-3 text-center">
@@ -732,6 +732,7 @@
         Save All
       </button>
     </div>
+    </div> <!-- Multiselect options end here -->
 
     <!-- Booking Status colour Explain -->
     <div class="d-flex justify-content-center flex-wrap gap-2 mt-3 mb-3 small">
@@ -759,7 +760,7 @@
         Disabled
       </div>
     </div>
-    </div> <!-- Multiselect options end here -->
+    
 
     <!-- MOBILE ADD SLOT MODAL -->
     <div class="modal fade" id="addSlotModal" tabindex="-1">
@@ -984,17 +985,39 @@
   // =========================
   // TOAST
   // =========================
-  function showToast(msg) {
-    const toast = document.getElementById("toast");
+function showToast(msg, type = "success") {
 
-    const el = document.createElement("div");
-    el.className = "alert alert-success shadow";
-    el.innerText = msg;
+  const toast =
+    document.getElementById("toast");
 
-    toast.appendChild(el);
+  const el =
+    document.createElement("div");
 
-    setTimeout(() => el.remove(), 5000);
-  }
+  const classes = {
+    success: "alert alert-success shadow",
+    error: "alert alert-danger shadow",
+    warning: "alert alert-warning shadow",
+    info: "alert alert-info shadow"
+  };
+
+  el.className =
+    classes[type] || classes.success;
+
+  const icons = {
+  success: "✅",
+  error: "❌",
+  warning: "⚠️",
+  info: "ℹ️"
+};
+
+el.innerHTML = `${icons[type] || "✅"} ${msg}`;
+
+  toast.appendChild(el);
+
+  setTimeout(() => {
+    el.remove();
+  }, 5000);
+}
 
   // remove toast in mobile bug
   function clearModalArtifacts() {
@@ -1032,7 +1055,7 @@
 
     if (!response.ok) {
 
-      showToast("Invalid login");
+      showToast("Invalid login", "error");
 
       return;
     }
@@ -1156,9 +1179,7 @@
 
       console.error(err);
 
-      showToast(
-        "Unable to load slots"
-      );
+      showToast("Unable to load slots", "error");
     }
   }
 
@@ -1451,7 +1472,7 @@
     });
 
     if (!response.ok) {
-      showToast("Delete failed");
+      showToast("Delete failed", "error");
       return;
     }
 
