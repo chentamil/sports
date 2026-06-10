@@ -888,6 +888,9 @@ document.getElementById('next-day').addEventListener('click', () => {
           } else if (status==="booked") {
             badgeText="Booked"; badgeClass="text-danger-small";
             btnHTML=`<button class="btn btn-sm btn-danger" disabled>Booked</button>`;
+          } else if (status==="closed") {
+            badgeText="Closed"; badgeClass="text-danger-small";
+            btnHTML=`<button class="btn btn-sm btn-dark" disabled>Tournament</button>`;
           } else {
             badgeText="Unavailable"; badgeClass="text-dark";
             btnHTML=`<button class="btn btn-sm btn-dark" disabled>Unavailable</button>`;
