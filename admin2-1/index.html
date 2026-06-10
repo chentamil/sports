@@ -1382,8 +1382,14 @@
       document.getElementById("slot-start").value =
         document.getElementById("m-slot-start").value;
 
+      document.getElementById("slot-start-period").value =
+        document.getElementById("m-slot-start-period").value;
+
       document.getElementById("slot-end").value =
         document.getElementById("m-slot-end").value;
+
+      document.getElementById("slot-end-period").value =
+        document.getElementById("m-slot-end-period").value;
 
       document.getElementById("slot-price").value =
         document.getElementById("m-slot-price").value;
@@ -1391,17 +1397,17 @@
       document.getElementById("slot-status").value =
         document.getElementById("m-slot-status").value;
 
-        await addSlot();
+      await addSlot();
 
-        const modal = bootstrap.Modal.getInstance(
-          document.getElementById('addSlotModal')
-        );
+      const modal = bootstrap.Modal.getInstance(
+        document.getElementById('addSlotModal')
+      );
 
-        if (modal) modal.hide();
+      if (modal) modal.hide();
 
-        setTimeout(() => {
-          clearModalArtifacts();
-        }, 300);
+      setTimeout(() => {
+        clearModalArtifacts();
+      }, 300);
 
       // await addSlot();
 
