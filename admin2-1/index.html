@@ -145,8 +145,6 @@
   }
 </style>
 
-<body>
-
   <!-- TOAST -->
   <div id="toast" style="
   position: fixed;
@@ -1128,9 +1126,17 @@
 
       try {
 
-        const response = await fetch('/api/admin');
+        const response =
+          await fetch('/api/admin');
 
-        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(
+            'Server Error'
+          );
+        }
+
+        const data =
+          await response.json();
 
         allData = data;
 
@@ -1140,10 +1146,15 @@
 
       } catch (err) {
 
-        console.log(err);
+        console.error(err);
 
+        showToast(
+          "Unable to load slots"
+        );
       }
     }
+
+    
 
     function renderTable(data) {
 
@@ -1405,9 +1416,9 @@
 
       if (modal) modal.hide();
 
-      setTimeout(() => {
-        clearModalArtifacts();
-      }, 300);
+      // setTimeout(() => {
+      //   clearModalArtifacts();
+      // }, 300);
 
       // await addSlot();
 
@@ -1450,7 +1461,8 @@
     // =========================
     function updateAnalytics(data) {
 
-      const today = new Date().toISOString().slice(0, 10);
+      // const today = new Date().toISOString().slice(0, 10);
+      const today = new Date().toLocaleDateString('sv-SE');
       const month = today.slice(0, 7);
 
       let todayRev = 0, todayBook = 0;
@@ -1540,12 +1552,12 @@ const modal = bootstrap.Modal.getInstance(
 
 if (modal) modal.hide();
 
-setTimeout(() => {
-  clearModalArtifacts();
-}, 300);}
+// setTimeout(() => {
+//   clearModalArtifacts();
+// }, 300);}
 
 
-    function generateSlotsStandalone() {
+    async function generateSlotsStandalone() {
       const date = document.getElementById("gen-slot-date").value;
       const court_id = document.getElementById("gen-slot-court").value;
       const from = convertTo12Hour(
@@ -1624,18 +1636,37 @@ setTimeout(() => {
         current += 1; // 1-hour step
       }
 
-      slots.forEach(async s => {
-        await fetch('/api/admin', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            action: 'add',
-            data: s
-          })
-        });
+      // slots.forEach(async s => {
+      //   await fetch('/api/admin', {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json'
+      //     },
+      //     body: JSON.stringify({
+      //       action: 'add',
+      //       data: s
+      //     })
+      //   });
+      // });
+
+      for (const s of slots) {
+
+      const response = await fetch('/api/admin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'add',
+          data: s
+        })
       });
+
+      if (!response.ok) {
+        showToast("Failed creating slot");
+        return;
+      }
+    }
 
       showToast(`Generated ${slots.length} slots for Court ${court_id}`);
       setTimeout(loadSlots, 500);
@@ -1646,7 +1677,8 @@ setTimeout(() => {
     // =====================
     const originalRenderTable = renderTable;
     renderTable = function (data) {
-      const today = new Date().toISOString().slice(0, 10);
+      // const today = new Date().toISOString().slice(0, 10);
+      const today = new Date().toLocaleDateString('sv-SE');
       const futureData = data.filter(slot => slot.date >= today);
       originalRenderTable(futureData);
     };
@@ -1656,9 +1688,6 @@ setTimeout(() => {
       clearModalArtifacts();
     });
   </script>
-</body>
-
-</html>
   </main>
 
    <!-- FOOTER -->
