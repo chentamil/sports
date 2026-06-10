@@ -569,14 +569,14 @@
         </div>
 
         <div class="col-md-2">
-        <label class="form-label">Status</label>
-        <select id="gen-slot-status" class="form-select">
-          <option value="available">Available</option>
-          <option value="booked">Booked</option>
-          <option value="closed">Closed</option>
-          <option value="disabled">Disabled</option>
-        </select>
-      </div>
+          <label class="form-label">Status</label>
+          <select id="gen-slot-status" class="form-select">
+            <option value="available">Available</option>
+            <option value="booked">Booked</option>
+            <option value="closed">Closed</option>
+            <option value="disabled">Disabled</option>
+          </select>
+        </div>
 
         <div class="col-md-2">
           <button class="btn btn-warning text-dark w-100" onclick="generateSlotsStandalone()">Generate Slots</button>
@@ -592,13 +592,9 @@
     <div class="card p-3 mb-4">
       <h5 class="mb-3">Multi Select Options</h5>
 
-       <!-- Past slots checkbox toggle -->
-       <div class="form-check mb-3">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          id="showPastSlots"
-          onchange="loadSlots()">
+      <!-- Past slots checkbox toggle -->
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="showPastSlots" onchange="loadSlots()">
 
         <label class="form-check-label" for="showPastSlots">
           Show Past Slots
@@ -627,163 +623,166 @@
           <button class="btn btn-primary w-100" onclick="bulkChangeStatus()">Apply</button>
         </div>
       </div>
-    </div>
 
-    <script>
-      // Toggle all checkboxes
-      function toggleAllCheckboxes(master) {
-        document.querySelectorAll(".slot-checkbox").forEach(cb => {
-          cb.checked = master.checked;
-        });
-      }
 
-      // Get selected slot IDs
-      function getSelectedSlots() {
-        const selected = [];
-        document.querySelectorAll(".slot-checkbox:checked").forEach(cb => {
-          selected.push(cb.dataset.id);
-        });
-        return selected;
-      }
 
-      // Bulk delete
-      async function bulkDelete() {
-        const ids = getSelectedSlots();
-        if (ids.length === 0) {
-          showToast("No slots selected");
-          return;
-        }
-        if (!confirm(`Delete ${ids.length} selected slots?`)) return;
 
-        const response = await fetch('/api/admin', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            action: 'bulkDelete',
-            ids
-          })
-        });
-
-        if (!response.ok) {
-          showToast("Delete failed");
-          return;
+      <script>
+        // Toggle all checkboxes
+        function toggleAllCheckboxes(master) {
+          document.querySelectorAll(".slot-checkbox").forEach(cb => {
+            cb.checked = master.checked;
+          });
         }
 
-        showToast(`${ids.length} slots deleted`);
-        loadSlots();
-      }
-
-      // Bulk change status
-      async function bulkChangeStatus() {
-        const status = document.getElementById("bulk-status").value;
-        if (!status) return;
-
-        const ids = getSelectedSlots();
-        if (ids.length === 0) {
-          showToast("No slots selected");
-          return;
+        // Get selected slot IDs
+        function getSelectedSlots() {
+          const selected = [];
+          document.querySelectorAll(".slot-checkbox:checked").forEach(cb => {
+            selected.push(cb.dataset.id);
+          });
+          return selected;
         }
 
-        const response = await fetch('/api/admin', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            action: 'bulkStatus',
-            ids,
-            status
-          })
-        });
+        // Bulk delete
+        async function bulkDelete() {
+          const ids = getSelectedSlots();
+          if (ids.length === 0) {
+            showToast("No slots selected");
+            return;
+          }
+          if (!confirm(`Delete ${ids.length} selected slots?`)) return;
 
-        if (!response.ok) {
-          showToast("Status update failed");
-          return;
+          const response = await fetch('/api/admin', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              action: 'bulkDelete',
+              ids
+            })
+          });
+
+          if (!response.ok) {
+            showToast("Delete failed");
+            return;
+          }
+
+          showToast(`${ids.length} slots deleted`);
+          loadSlots();
         }
 
-        showToast(`Status updated to "${status}" for ${ids.length} slots`);
-        loadSlots();
-      }
-    </script>
-    <!-- Multi Select ends here -->
+        // Bulk change status
+        async function bulkChangeStatus() {
+          const status = document.getElementById("bulk-status").value;
+          if (!status) return;
 
-    <!-- TABLE -->
-    <div class="table-responsive shadow-sm bg-white" style="
+          const ids = getSelectedSlots();
+          if (ids.length === 0) {
+            showToast("No slots selected");
+            return;
+          }
+
+          const response = await fetch('/api/admin', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              action: 'bulkStatus',
+              ids,
+              status
+            })
+          });
+
+          if (!response.ok) {
+            showToast("Status update failed");
+            return;
+          }
+
+          showToast(`Status updated to "${status}" for ${ids.length} slots`);
+          loadSlots();
+        }
+      </script>
+      <!-- Multi Select js ends here -->
+
+      <!-- TABLE -->
+      <div class="table-responsive shadow-sm bg-white mt-3" style="
     max-height: 420px;
     overflow-y: auto;
     border-radius:20px;
   ">
-      <table class="table table-bordered bg-white w-100">
+        <table class="table table-bordered bg-white w-100">
 
-        <thead class="sticky-top text-white" style="
+          <thead class="sticky-top text-white" style="
     background:
     linear-gradient(135deg,#0f172a,#1e293b);
   ">
 
-          <tr class="text-center">
+            <tr class="text-center">
 
-            <th><input type="checkbox" id="select-all" onclick="toggleAllCheckboxes(this)"></th>
+              <th><input type="checkbox" id="select-all" onclick="toggleAllCheckboxes(this)"></th>
 
-            <th>ID</th>
+              <th>ID</th>
 
-            <th>Court</th>
+              <th>Court</th>
 
-            <th>Date</th>
+              <th>Date</th>
 
-            <th>Start</th>
+              <th>Start</th>
 
-            <th>End</th>
+              <th>End</th>
 
-            <th>Price</th>
+              <th>Price</th>
 
-            <th>Status</th>
+              <th>Status</th>
 
-            <th>Actions</th>
+              <th>Actions</th>
 
-          </tr>
+            </tr>
 
-        </thead>
+          </thead>
 
-        <tbody id="table-body"></tbody>
+          <tbody id="table-body"></tbody>
 
-      </table>
-    </div>
-
-    <!-- Save All Changes -->
-    <div class="d-grid gap-2 col-6 mx-auto mt-4">
-      <button class="btn btn-success btn-lg" onclick="saveAllChanges()">
-        Save All
-      </button>
-    </div>
-
-    <!-- Booking Status colour Explain -->
-    <div class="d-flex justify-content-center flex-wrap gap-2 mt-3 mb-3 small">
-      <div class="d-flex align-items-center gap-1 px-2 py-1 rounded border bg-white">
-        <span class="rounded-circle border" style="width:12px;height:12px;background:white;">
-        </span>
-        Available
+        </table>
       </div>
 
-      <div class="d-flex align-items-center gap-1 px-2 py-1 rounded border border-danger">
-        <span class="rounded-circle" style="width:12px;height:12px;background:#dc3545;">
-        </span>
-        Booked
+      <!-- Save All Changes -->
+      <div class="d-grid gap-2 col-6 mx-auto mt-4">
+        <button class="btn btn-success btn-lg" onclick="saveAllChanges()">
+          Save All
+        </button>
       </div>
 
-      <div class="d-flex align-items-center gap-1 px-2 py-1 rounded border border-warning">
-        <span class="rounded-circle" style="width:12px;height:12px;background:#ffc107;">
-        </span>
-        Closed
-      </div>
+      <!-- Booking Status colour Explain -->
+      <div class="d-flex justify-content-center flex-wrap gap-2 mt-3 mb-3 small">
+        <div class="d-flex align-items-center gap-1 px-2 py-1 rounded border bg-white">
+          <span class="rounded-circle border" style="width:12px;height:12px;background:white;">
+          </span>
+          Available
+        </div>
 
-      <div class="d-flex align-items-center gap-1 px-2 py-1 rounded border border-dark">
-        <span class="rounded-circle" style="width:12px;height:12px;background:#6c757d;">
-        </span>
-        Disabled
+        <div class="d-flex align-items-center gap-1 px-2 py-1 rounded border border-danger">
+          <span class="rounded-circle" style="width:12px;height:12px;background:#dc3545;">
+          </span>
+          Booked
+        </div>
+
+        <div class="d-flex align-items-center gap-1 px-2 py-1 rounded border border-warning">
+          <span class="rounded-circle" style="width:12px;height:12px;background:#ffc107;">
+          </span>
+          Closed
+        </div>
+
+        <div class="d-flex align-items-center gap-1 px-2 py-1 rounded border border-dark">
+          <span class="rounded-circle" style="width:12px;height:12px;background:#6c757d;">
+          </span>
+          Disabled
+        </div>
       </div>
-    </div>
+    </div> <!-- Multi Select ends here -->
 
     <!-- MOBILE ADD SLOT MODAL -->
     <div class="modal fade" id="addSlotModal" tabindex="-1">
@@ -1584,7 +1583,7 @@
       document.getElementById("m-gen-slot-price").value;
 
     document.getElementById("gen-slot-status").value =
-      document.getElementById("m-gen-slot-status").value;  
+      document.getElementById("m-gen-slot-status").value;
 
     //   await generateSlotsStandalone();
 
@@ -1726,25 +1725,25 @@
   // =====================
   // Hide/Show Past Slots in Table
   // =====================
-const originalRenderTable = renderTable;
+  const originalRenderTable = renderTable;
 
-renderTable = function (data) {
+  renderTable = function (data) {
 
-  const showPast =
-    document.getElementById("showPastSlots")?.checked;
+    const showPast =
+      document.getElementById("showPastSlots")?.checked;
 
-  if (showPast) {
-    originalRenderTable(data);
-    return;
-  }
+    if (showPast) {
+      originalRenderTable(data);
+      return;
+    }
 
-  const today = new Date().toLocaleDateString('sv-SE');
+    const today = new Date().toLocaleDateString('sv-SE');
 
-  const futureData =
-    data.filter(slot => slot.date >= today);
+    const futureData =
+      data.filter(slot => slot.date >= today);
 
-  originalRenderTable(futureData);
-};
+    originalRenderTable(futureData);
+  };
 
   // This automatically removes stuck backdrops whenever any Bootstrap modal closes.
   document.addEventListener('hidden.bs.modal', function () {
