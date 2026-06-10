@@ -239,12 +239,12 @@
         </div>
       </div>
 
-      <div class="col-12 col-sm-6 col-md-3 mb-3">
+      <!-- <div class="col-12 col-sm-6 col-md-3 mb-3">
         <div class="card p-3 text-center border border-primary">
           Monthly Revenue
-          <!-- <h4 id="revMonth">0</h4> -->
+          <h4 id="revMonth">0</h4>
         </div>
-      </div>
+      </div> -->
 
       <div class="col-12 col-sm-6 col-md-3 mb-3">
         <div class="card p-3 text-center">
@@ -473,11 +473,11 @@
 
         <div class="col-md-2">
           <label class="form-label">Price</label>
-          <input type="number" id="slot-price" class="form-control" placeholder="400">
+          <input type="number" id="slot-price" class="form-control" placeholder="400" value="400">
 
         </div>
 
-        <div class="col-md-1">
+        <div class="col-md-2">
           <label class="form-label">Status</label>
           <select id="slot-status" class="form-select">
 
@@ -501,7 +501,7 @@
 
         </div>
 
-        <div class="col-md-1">
+        <div class="col-md-2">
 
           <button class="btn btn-success w-100" onclick="addSlot()">
             Add
@@ -1525,7 +1525,7 @@ el.innerHTML = `${icons[type] || "✅"} ${msg}`;
 
     document.getElementById("revToday").innerText = todayRev;
     document.getElementById("bookToday").innerText = todayBook;
-    document.getElementById("revMonth").innerText = monthRev;
+    //document.getElementById("revMonth").innerText = monthRev;
     document.getElementById("peakHour").innerText = peak;
   }
 
@@ -1598,7 +1598,7 @@ el.innerHTML = `${icons[type] || "✅"} ${msg}`;
     const price = Number(document.getElementById("gen-slot-price").value) || 400;
 
     if (!date || !from || !to) {
-      showToast("Please enter date, from and to time");
+      showToast("Please enter date, from and to time", "warning");
       return;
     }
 
@@ -1629,18 +1629,18 @@ el.innerHTML = `${icons[type] || "✅"} ${msg}`;
     const endNum = timeToNumber(to);
 
     if (startNum === null || endNum === null) {
-      showToast("Invalid time format. Use hAM/PM or h:30AM/PM");
+      showToast("Invalid time format. Use hAM/PM or h:30AM/PM", "error");
       return;
     }
 
     if (startNum >= endNum) {
-      showToast("Start time must be before end time");
+      showToast("Start time must be before end time", "warning");
       return;
     }
 
     const totalHours = endNum - startNum;
     if (totalHours % 1 !== 0) {
-      showToast("Time range must be a multiple of 1 hour (e.g., 6-7, 6:30-7:30)");
+      showToast("Time range must be a multiple of 1 hour (e.g., 6-7, 6:30-7:30)", "info");
       return;
     }
 
@@ -1689,7 +1689,7 @@ el.innerHTML = `${icons[type] || "✅"} ${msg}`;
       });
 
       if (!response.ok) {
-        showToast("Failed creating slot");
+        showToast("Failed creating slot", "error");
         return;
       }
     }
