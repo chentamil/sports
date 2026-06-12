@@ -268,8 +268,7 @@
 
   <div class="col-md-6">
     <div class="card p-3">
-      <!-- <h5>Revenue By Court</h5> -->
-       <h5>Current Month Revenue By Court</h5>
+      <h5>Revenue By Court</h5>
 
       <div style="height:300px;">
         <canvas id="courtRevenueChart"></canvas>
@@ -280,8 +279,7 @@
 
   <div class="col-md-6">
     <div class="card p-3">
-      <!-- <h5>Booking Distribution</h5> -->
-       <h5>Upcoming Slot Distribution</h5>
+      <h5>Booking Distribution</h5>
 
       <div style="height:300px;">
         <canvas id="statusChart"></canvas>
@@ -1664,75 +1662,26 @@ function filterSlots(type) {
     let closed = 0;
     let disabled = 0;
 
-// This shows Revenue By Court = for all datas,past Historic 
-    // data.forEach(slot => {
+    data.forEach(slot => {
 
-    //   if (slot.status === "booked") {
+      if (slot.status === "booked") {
 
-    //     revenueByCourt[slot.court_id] +=
-    //       Number(slot.price || 0);
+        revenueByCourt[slot.court_id] +=
+          Number(slot.price || 0);
 
-    //     booked++;
-    //   }
+        booked++;
+      }
 
-    //   if (slot.status === "available")
-    //     available++;
+      if (slot.status === "available")
+        available++;
 
-    //   if (slot.status === "closed")
-    //     closed++;
+      if (slot.status === "closed")
+        closed++;
 
-    //   if (slot.status === "disabled")
-    //     disabled++;
+      if (slot.status === "disabled")
+        disabled++;
 
-    // });
-
-    // Shows Revenue By Court = Current Month Only
-  const month =
-  new Date()
-  .toLocaleDateString('sv-SE')
-  .slice(0, 7);
-
-  // monthly 266
-    const today =
-    new Date()
-    .toLocaleDateString('sv-SE');
-
-  const chartData =
-    data.filter(
-      s => s.date >= today
-    ); //
-
-data.forEach(slot => {
-
-  // Revenue Chart = Current Month Only
-
-  if (
-    slot.status === "booked" &&
-    slot.date.startsWith(month)
-  ) {
-
-    revenueByCourt[slot.court_id] +=
-      Number(slot.price || 0);
-  }
-
-});
-
-// monthly 266
-chartData.forEach(slot => {
-
-  if (slot.status === "available")
-    available++;
-
-  if (slot.status === "booked")
-    booked++;
-
-  if (slot.status === "closed")
-    closed++;
-
-  if (slot.status === "disabled")
-    disabled++;
-
-}); //
+    });
 
     // Destroy old charts
 
@@ -1797,10 +1746,10 @@ chartData.forEach(slot => {
 
           data: {
             labels: [
-              `Available (${available})`,
-              `Booked (${booked})`,
-              `Closed (${closed})`,
-              `Disabled (${disabled})`
+              "Available",
+              "Booked",
+              "Closed",
+              "Disabled"
             ],
 
             datasets: [{
