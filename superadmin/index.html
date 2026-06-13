@@ -274,8 +274,8 @@
       <div style="height:300px;">
         <canvas id="courtRevenueChart"></canvas>
       </div>
-
-      <div class="form-check form-switch mt-3 text-center">
+      <!-- Toggle btn -->
+      <!-- <div class="form-check form-switch mt-3 text-center">
         <input
           class="form-check-input mx-auto"
           type="checkbox"
@@ -285,6 +285,49 @@
         <label class="form-check-label">
           Show All Historical Revenue
         </label>
+      </div> -->
+
+      <!-- Hidden checkbox (keep existing logic) -->
+      <input
+        type="checkbox"
+        id="revenueHistoryToggle"
+        hidden
+        onchange="renderCharts(allData)">
+
+      <!-- Revenue Toggle -->
+      <div class="btn-group w-100 mt-3 shadow-sm" role="group">
+
+        <input
+          type="radio"
+          class="btn-check"
+          name="revenueMode"
+          id="monthRevenue"
+          checked
+          onchange="setRevenueMode(false)">
+
+        <label
+          class="btn btn-outline-primary fw-semibold"
+          for="monthRevenue">
+
+          📅 Current Month
+
+        </label>
+
+        <input
+          type="radio"
+          class="btn-check"
+          name="revenueMode"
+          id="allRevenue"
+          onchange="setRevenueMode(true)">
+
+        <label
+          class="btn btn-outline-success fw-semibold"
+          for="allRevenue">
+
+          💰 Lifetime Revenue
+
+        </label>
+
       </div>
 
     </div>
@@ -298,8 +341,8 @@
       <div style="height:300px;">
         <canvas id="statusChart"></canvas>
       </div>
-
-      <div class="form-check form-switch mt-3 text-center">
+      <!-- Toggle btn -->
+      <!-- <div class="form-check form-switch mt-3 text-center">
         <input
           class="form-check-input mx-auto"
           type="checkbox"
@@ -309,6 +352,49 @@
         <label class="form-check-label">
           Show All Historical Slots
         </label>
+      </div> -->
+
+      <!-- Hidden checkbox (keep existing JS working) -->
+      <input
+        type="checkbox"
+        id="statusHistoryToggle"
+        hidden
+        onchange="renderCharts(allData)">
+
+      <!-- Professional Toggle -->
+      <div class="btn-group w-100 mt-3 shadow-sm" role="group">
+
+        <input
+          type="radio"
+          class="btn-check"
+          name="statusMode"
+          id="upcomingSlots"
+          checked
+          onchange="setStatusMode(false)">
+
+        <label
+          class="btn btn-outline-primary fw-semibold"
+          for="upcomingSlots">
+
+          ⏳ Upcoming Slots
+
+        </label>
+
+        <input
+          type="radio"
+          class="btn-check"
+          name="statusMode"
+          id="allSlots"
+          onchange="setStatusMode(true)">
+
+        <label
+          class="btn btn-outline-success fw-semibold"
+          for="allSlots">
+
+          📊 All Time (Past Slots) 
+
+        </label>
+
       </div>
 
     </div>
@@ -1658,6 +1744,26 @@ function filterSlots(type) {
   // =========================
   // ANALYTICS
   // =========================
+  function setRevenueMode(value) {
+
+  document.getElementById(
+    "revenueHistoryToggle"
+  ).checked = value;
+
+  renderCharts(allData);
+
+}
+
+function setStatusMode(value) {
+
+  document.getElementById(
+    "statusHistoryToggle"
+  ).checked = value;
+
+  renderCharts(allData);
+
+}
+
   function renderCharts(data) {
 
     const revenueByCourt = {
@@ -2213,7 +2319,7 @@ document.getElementById("statusSummary").innerHTML = `
   });
 </script>
 </main>
-
+  </main>
 
    <!-- FOOTER -->
 <footer class="pt-5 pb-3 text-white fw-light">
