@@ -779,12 +779,8 @@
   </div>
 
   <!-- Right Side: Filters -->
-  <div class="d-flex flex-wrap gap-2">
-    <button class="btn btn-outline-primary btn-sm" onclick="filterSlots('today')">Today</button>
-    <button class="btn btn-outline-success btn-sm" onclick="filterSlots('available')">Available</button>
-    <button class="btn btn-outline-danger btn-sm" onclick="filterSlots('booked')">Booked</button>
-    <button class="btn btn-outline-warning btn-sm" onclick="filterSlots('closed')">Closed</button>
-    <button class="btn btn-outline-dark btn-sm" onclick="filterSlots('all')">Reset</button>
+  <div id="slotFilterBar"
+     class="d-flex flex-wrap gap-2 justify-content-center">
   </div>
 </div>
 
@@ -920,13 +916,7 @@
           Save All
         </button>
       </div>
-    </div> <!-- Multi Select ends here -->
-
-      <!-- Booking Status colour Explain -->
-      <div id="statusSummary"
-          class="d-flex justify-content-center flex-wrap gap-2 mt-3 mb-3">
-      </div>
-    
+    </div> <!-- Multi Select ends here -->    
 
     <!-- MOBILE ADD SLOT MODAL -->
     <div class="modal fade" id="addSlotModal" tabindex="-1">
@@ -2054,39 +2044,55 @@ chartData.forEach(slot => {
       upcoming.filter(s => s.status === "disabled").length;
   // 
 
-document.getElementById("statusSummary").innerHTML = `
+document.getElementById("slotFilterBar").innerHTML = `
 
-<div class="d-flex justify-content-center flex-wrap gap-2 mt-3 mb-3 small">
+<button
+  class="btn btn-outline-primary btn-sm"
+  onclick="filterSlots('today')">
 
-  <div class="d-flex align-items-center gap-1 px-2 py-1 rounded border bg-white">
-    <span class="rounded-circle border"
-      style="width:12px;height:12px;background:white;">
-    </span>
-    Available (${available})
-  </div>
+  Today
 
-  <div class="d-flex align-items-center gap-1 px-2 py-1 rounded border border-danger">
-    <span class="rounded-circle"
-      style="width:12px;height:12px;background:#dc3545;">
-    </span>
-    Booked (${booked})
-  </div>
+</button>
 
-  <div class="d-flex align-items-center gap-1 px-2 py-1 rounded border border-warning">
-    <span class="rounded-circle"
-      style="width:12px;height:12px;background:#ffc107;">
-    </span>
-    Closed (${closed})
-  </div>
+<button
+  class="btn btn-outline-success btn-sm"
+  onclick="filterSlots('available')">
 
-  <div class="d-flex align-items-center gap-1 px-2 py-1 rounded border border-dark">
-    <span class="rounded-circle"
-      style="width:12px;height:12px;background:#6c757d;">
-    </span>
-    Disabled (${disabled})
-  </div>
+  Available (${available})
 
-</div>
+</button>
+
+<button
+  class="btn btn-outline-danger btn-sm"
+  onclick="filterSlots('booked')">
+
+  Booked (${booked})
+
+</button>
+
+<button
+  class="btn btn-outline-warning btn-sm"
+  onclick="filterSlots('closed')">
+
+  Closed (${closed})
+
+</button>
+
+<button
+  class="btn btn-outline-secondary btn-sm"
+  onclick="filterSlots('disabled')">
+
+  Disabled (${disabled})
+
+</button>
+
+<button
+  class="btn btn-outline-dark btn-sm"
+  onclick="filterSlots('all')">
+
+  Reset
+
+</button>
 
 `;
 
