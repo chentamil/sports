@@ -1716,7 +1716,7 @@ const chartData =
     : data.filter(
         s => s.date >= today
       ); 
-      
+
 document.getElementById(
   "statusChartTitle"
 ).innerText =
@@ -1742,9 +1742,6 @@ data.forEach(slot => {
 });
 
 // Change Revenue Heading Dynamically
-const showRevenueHistory =
-  document.getElementById("revenueHistoryToggle")?.checked;
-
 document.getElementById(
   "revenueChartTitle"
 ).innerText =
@@ -2216,7 +2213,7 @@ document.getElementById("statusSummary").innerHTML = `
   });
 </script>
 </main>
-  </main>
+
 
    <!-- FOOTER -->
 <footer class="pt-5 pb-3 text-white fw-light">
