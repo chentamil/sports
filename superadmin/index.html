@@ -269,10 +269,22 @@
   <div class="col-md-6">
     <div class="card p-3">
       <!-- <h5>Revenue By Court</h5> -->
-       <h5>Current Month Revenue By Court</h5>
+       <h5 id="revenueChartTitle">Current Month Revenue By Court</h5>
 
       <div style="height:300px;">
         <canvas id="courtRevenueChart"></canvas>
+      </div>
+
+      <div class="form-check form-switch mt-3 text-center">
+        <input
+          class="form-check-input mx-auto"
+          type="checkbox"
+          id="revenueHistoryToggle"
+          onchange="renderCharts(allData)">
+          
+        <label class="form-check-label">
+          Show All Historical Revenue
+        </label>
       </div>
 
     </div>
@@ -281,10 +293,22 @@
   <div class="col-md-6">
     <div class="card p-3">
       <!-- <h5>Booking Distribution</h5> -->
-       <h5>Upcoming Slot Distribution</h5>
+       <h5 id="statusChartTitle">Upcoming Slot Distribution</h5>
 
       <div style="height:300px;">
         <canvas id="statusChart"></canvas>
+      </div>
+
+      <div class="form-check form-switch mt-3 text-center">
+        <input
+          class="form-check-input mx-auto"
+          type="checkbox"
+          id="statusHistoryToggle"
+          onchange="renderCharts(allData)">
+          
+        <label class="form-check-label">
+          Show All Historical Slots
+        </label>
       </div>
 
     </div>
@@ -1675,30 +1699,58 @@ function filterSlots(type) {
   .toLocaleDateString('sv-SE')
   .slice(0, 7);
 
-  // monthly 266
+  const showRevenueHistory =
+  document.getElementById("revenueHistoryToggle")?.checked;
+
+  
     const today =
     new Date()
     .toLocaleDateString('sv-SE');
 
-  const chartData =
-    data.filter(
-      s => s.date >= today
-    ); //
+const showStatusHistory =
+  document.getElementById("statusHistoryToggle")?.checked;
+
+const chartData =
+  showStatusHistory
+    ? data
+    : data.filter(
+        s => s.date >= today
+      ); 
+      
+document.getElementById(
+  "statusChartTitle"
+).innerText =
+  showStatusHistory
+    ? "Total Slot Distribution"
+    : "Upcoming Slot Distribution";      
 
 data.forEach(slot => {
 
-  // Revenue Chart = Current Month Only
+  if (slot.status !== "booked")
+    return;
 
   if (
-    slot.status === "booked" &&
-    slot.date.startsWith(month)
+    !showRevenueHistory &&
+    !slot.date.startsWith(month)
   ) {
-
-    revenueByCourt[slot.court_id] +=
-      Number(slot.price || 0);
+    return;
   }
 
+  revenueByCourt[slot.court_id] +=
+    Number(slot.price || 0);
+
 });
+
+// Change Revenue Heading Dynamically
+const showRevenueHistory =
+  document.getElementById("revenueHistoryToggle")?.checked;
+
+document.getElementById(
+  "revenueChartTitle"
+).innerText =
+  showRevenueHistory
+    ? "Total Revenue By Court"
+    : "Current Month Revenue By Court";  
 
 // monthly 266
 chartData.forEach(slot => {
