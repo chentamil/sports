@@ -742,7 +742,8 @@
 
       <!-- Past slots checkbox toggle -->
       <div class="form-check mb-3">
-        <input class="form-check-input" type="checkbox" id="showPastSlots" onchange="loadSlots()">
+        <!-- <input class="form-check-input" type="checkbox" id="showPastSlots" onchange="loadSlots()"> -->
+        <input class="form-check-input" type="checkbox" id="showPastSlots" onchange="renderTable(allData); updateAnalytics(allData);">
 
         <label class="form-check-label" for="showPastSlots">
           Show Past Slots
@@ -780,7 +781,7 @@
 
   <!-- Right Side: Filters -->
   <div id="slotFilterBar"
-     class="d-flex flex-wrap gap-2 justify-content-center">
+     class="d-flex flex-wrap gap-2 justify-content-center p-3 border border-secondary border-6">
   </div>
 </div>
 
@@ -2028,21 +2029,51 @@ chartData.forEach(slot => {
     //-------------------------------------------------------------- 
 
     // Upcoming Slots Only (Today + Future)
-    const upcoming =
-      data.filter(s => s.date >= today);
+    // const upcoming =
+    //   data.filter(s => s.date >= today);
+
+    // const available =
+    //   upcoming.filter(s => s.status === "available").length;
+
+    // const booked =
+    //   upcoming.filter(s => s.status === "booked").length;
+
+    // const closed =
+    //   upcoming.filter(s => s.status === "closed").length;
+
+    // const disabled =
+    //   upcoming.filter(s => s.status === "disabled").length;
+   //-------------------------------------------------------------- 
+   
+   // Respect Show Past Slots checkbox
+    const showPast =
+      document.getElementById("showPastSlots")?.checked;
+
+    const countData =
+      showPast
+        ? data
+        : data.filter(s => s.date >= today);
 
     const available =
-      upcoming.filter(s => s.status === "available").length;
+      countData.filter(
+        s => s.status === "available"
+      ).length;
 
     const booked =
-      upcoming.filter(s => s.status === "booked").length;
+      countData.filter(
+        s => s.status === "booked"
+      ).length;
 
     const closed =
-      upcoming.filter(s => s.status === "closed").length;
+      countData.filter(
+        s => s.status === "closed"
+      ).length;
 
     const disabled =
-      upcoming.filter(s => s.status === "disabled").length;
-  // 
+      countData.filter(
+        s => s.status === "disabled"
+      ).length;
+    //--------------------------------------------------------------  
 
 document.getElementById("slotFilterBar").innerHTML = `
 
