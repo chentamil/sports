@@ -304,9 +304,6 @@
 <div class="container py-4">
     <h2 class="mb-4 text-center">Shivani Elite Badminton Academy</h2>
 
-    <!-- Messages from admin -->
-    <div id="announcementContainer"></div>
-
     <div class="mb-3 text-center d-flex justify-content-center align-items-center gap-3">
 
         <button id="prev-day" class="btn btn-outline-primary">
@@ -732,45 +729,6 @@ function updateDateLabel(dateStr) {
   document.getElementById('selected-date-label').innerText = formatted;
 }
 
-//announcement messages from admin starts here
-async function loadAnnouncements() {
-
-  const res =
-    await fetch(
-      "/api/announcements"
-    );
-
-  const announcements =
-    await res.json();
-
-  const container =
-    document.getElementById(
-      "announcementContainer"
-    );
-
-  if (!announcements.length) {
-
-    container.innerHTML = "";
-
-    return;
-  }
-
-  container.innerHTML =
-    announcements.map(a => `
-      <div class="alert alert-warning shadow-sm mb-3">
-
-        <h5 class="mb-1">
-          📢 ${a.title}
-        </h5>
-
-        <div>
-          ${a.message}
-        </div>
-
-      </div>
-    `).join("");
-}
-//announcement messages from admin ends here
   const PHONE = "919840253589";
   let allData = [];
 
@@ -784,7 +742,7 @@ async function loadAnnouncements() {
 
     setToday();
   }
-  loadAnnouncements();
+  
   loadSlots();
 
   const dateInput = document.getElementById("selected-date");
