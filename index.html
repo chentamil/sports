@@ -303,12 +303,9 @@
 
 <div class="container py-4">
     <h2 class="mb-4 text-center">Shivani Elite Badminton Academy</h2>
-
     <!-- Messages from admin -->
-    <div id="announcementContainer"></div>
-
     <!-- MARQUEE ANNOUNCEMENT -->
-    <div class="marquee-wrapper">
+    <div class="marquee-wrapper bg-dark text-white my-2">
       <div id="marquee-text" class="marquee"></div>
     </div>
     <style>
@@ -320,7 +317,7 @@
       .marquee {
         display: inline-block;
         padding-left: 100%;
-        animation: scroll 15s linear infinite;
+        animation: scroll 12s linear infinite;
       }
 
       @keyframes scroll {
@@ -328,6 +325,9 @@
         100% { transform: translateX(-100%); }
       }
     </style>
+
+    <!-- Messages from admin,dismissable alerts -->
+    <div id="announcementContainer"></div>
 
     <div class="mb-3 text-center d-flex justify-content-center align-items-center gap-3">
 
