@@ -427,10 +427,6 @@
   <div id="announcement-form"
        style="display:none;"
        class="border rounded p-3 mb-3">
-   
-    <input
-      type="hidden"
-      id="ann-id">   
 
     <input
       id="ann-title"
@@ -2277,47 +2273,6 @@ function showAnnouncementForm() {
       : "none";
 }
 
-function editAnnouncement(id) {
-
-  const ann =
-    announcements.find(
-      a => a.id === id
-    );
-
-  if(!ann) return;
-
-  document.getElementById(
-    "ann-id"
-  ).value = ann.id;
-
-  document.getElementById(
-    "ann-title"
-  ).value = ann.title || "";
-
-  document.getElementById(
-    "ann-message"
-  ).value = ann.message || "";
-
-  document.getElementById(
-    "ann-start"
-  ).value = ann.start_date || "";
-
-  document.getElementById(
-    "ann-end"
-  ).value = ann.end_date || "";
-
-  document.getElementById(
-    "ann-active"
-  ).value =
-    ann.active
-      ? "true"
-      : "false";
-
-  document.getElementById(
-    "announcement-form"
-  ).style.display = "block";
-}
-
 async function loadAnnouncements() {
 
   const res =
@@ -2361,14 +2316,6 @@ function renderAnnouncements() {
 <td>${a.end_date || ''}</td>
 
 <td>
-
-<button
- class="btn btn-primary btn-sm me-1"
- onclick="editAnnouncement(${a.id})">
-
- Edit
-
-</button>
 
 <button
  class="btn btn-danger btn-sm"
@@ -2415,11 +2362,6 @@ async function addAnnouncement() {
       "ann-active"
     ).value === "true";
 
-  const id =
-  document.getElementById(
-    "ann-id"
-  ).value;
-
   const res =
     await fetch(
       "/api/admin-announcements",
@@ -2432,11 +2374,7 @@ async function addAnnouncement() {
         },
 
         body:JSON.stringify({
-          action: id
-            ? "update"
-            : "add",
-
-            id:id,
+          action:"add",
 
           data:{
             title,
