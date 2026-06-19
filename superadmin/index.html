@@ -1024,6 +1024,7 @@
               <th>Status</th>
 
               <th>Actions</th>
+              <th>Booking</th>
 
             </tr>
 
@@ -1257,6 +1258,93 @@
 
 
     </div>
+
+    <!-- Booking Modal starts here -->
+     <div
+ class="modal fade"
+ id="bookingModal"
+ tabindex="-1">
+
+ <div class="modal-dialog">
+
+  <div class="modal-content">
+
+   <div class="modal-header">
+
+    <h5 class="modal-title">
+
+      Booking Details
+
+    </h5>
+
+    <button
+      type="button"
+      class="btn-close"
+      data-bs-dismiss="modal">
+    </button>
+
+   </div>
+
+   <div class="modal-body">
+
+    <input
+      type="hidden"
+      id="booking-slot-id">
+
+    <input
+      id="booking-name"
+      class="form-control mb-2"
+      placeholder="Customer Name">
+
+    <input
+      id="booking-mobile"
+      class="form-control mb-2"
+      placeholder="Mobile">
+
+    <input
+      id="booking-email"
+      class="form-control mb-2"
+      placeholder="Email">
+
+    <textarea
+      id="booking-notes"
+      class="form-control mb-2"
+      placeholder="Notes"></textarea>
+
+    <select
+      id="payment-status"
+      class="form-select">
+
+      <option value="pending">
+        Pending
+      </option>
+
+      <option value="paid">
+        Paid
+      </option>
+
+    </select>
+
+   </div>
+
+   <div class="modal-footer">
+
+    <button
+      class="btn btn-success"
+      onclick="saveBooking()">
+
+      Save Booking
+
+    </button>
+
+   </div>
+
+  </div>
+
+ </div>
+
+</div>
+    <!-- Booking Modal ends here -->
 
 
 
@@ -1583,6 +1671,23 @@ function renderTable(data) {
       </button>
     `;
     tr.appendChild(tdDelete);
+
+    const tdBooking =
+    document.createElement("td");
+
+    tdBooking.innerHTML = `
+
+    <button
+    class="btn btn-success btn-sm"
+    onclick="openBookingModal(${slot.id})">
+
+    Book
+
+    </button>
+
+    `;
+
+    tr.appendChild(tdBooking);
 
     body.appendChild(tr);
   });
@@ -2510,6 +2615,117 @@ async function deleteAnnouncement(id) {
 }
 
 //Announcements ends here 
+
+// Booking Modal starts here
+function openBookingModal(slotId){
+
+  document
+    .getElementById(
+      "booking-slot-id"
+    ).value = slotId;
+
+  new bootstrap.Modal(
+
+    document
+      .getElementById(
+        "bookingModal"
+      )
+
+  ).show();
+
+}
+
+async function saveBooking(){
+
+  const slot_id =
+    document
+    .getElementById(
+      "booking-slot-id"
+    ).value;
+
+  const customer_name =
+    document
+    .getElementById(
+      "booking-name"
+    ).value;
+
+  const customer_mobile =
+    document
+    .getElementById(
+      "booking-mobile"
+    ).value;
+
+  const customer_email =
+    document
+    .getElementById(
+      "booking-email"
+    ).value;
+
+  const booking_notes =
+    document
+    .getElementById(
+      "booking-notes"
+    ).value;
+
+  const payment_status =
+    document
+    .getElementById(
+      "payment-status"
+    ).value;
+
+  const res =
+    await fetch(
+      "/api/admin-bookings",
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+          "application/json"
+        },
+
+        body:JSON.stringify({
+
+          action:"add",
+
+          data:{
+
+            slot_id,
+
+            customer_name,
+
+            customer_mobile,
+
+            customer_email,
+
+            booking_notes,
+
+            payment_status
+
+          }
+
+        })
+
+      }
+    );
+
+  if(!res.ok){
+
+    showToast(
+      "Booking failed",
+      "error"
+    );
+
+    return;
+  }
+
+  showToast(
+    "Booking saved"
+  );
+
+}
+
+// Booking Modal ends here
 </script>
 
 
@@ -2727,6 +2943,7 @@ async function deleteAnnouncement(id) {
   document.addEventListener('hidden.bs.modal', function () {
     clearModalArtifacts();
   });
+
 </script>
 </main>
   </main>
