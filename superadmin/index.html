@@ -402,6 +402,125 @@
 
 </div>
 <!--  -->
+<!-- ===================== -->
+<!-- ANNOUNCEMENTS -->
+<!-- ===================== -->
+
+<div class="card p-3 mb-4 border-primary">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+
+    <h4 class="mb-0">
+      Announcement Management
+    </h4>
+
+    <button
+      class="btn btn-success"
+      onclick="showAnnouncementForm()">
+
+      + Add Announcement
+
+    </button>
+
+  </div>
+
+  <div id="announcement-form"
+       style="display:none;"
+       class="border rounded p-3 mb-3">
+
+    <input
+      id="ann-title"
+      class="form-control mb-2"
+      placeholder="Title">
+
+    <textarea
+      id="ann-message"
+      class="form-control mb-2"
+      placeholder="Message"></textarea>
+
+    <div class="row">
+
+      <div class="col-md-3">
+        <label>Start Date</label>
+        <input type="date"
+               id="ann-start"
+               class="form-control">
+      </div>
+
+      <div class="col-md-3">
+        <label>End Date</label>
+        <input type="date"
+               id="ann-end"
+               class="form-control">
+      </div>
+
+      <div class="col-md-2">
+        <label>Active</label>
+
+        <select
+          id="ann-active"
+          class="form-select">
+
+          <option value="true">
+            Yes
+          </option>
+
+          <option value="false">
+            No
+          </option>
+
+        </select>
+      </div>
+
+    </div>
+
+    <button
+      class="btn btn-primary mt-3"
+      onclick="addAnnouncement()">
+
+      Save Announcement
+
+    </button>
+
+  </div>
+
+  <div class="table-responsive">
+
+    <table class="table table-bordered">
+
+      <thead>
+
+        <tr>
+
+          <th>ID</th>
+
+          <th>Title</th>
+
+          <th>Message</th>
+
+          <th>Active</th>
+
+          <th>Start</th>
+
+          <th>End</th>
+
+          <th>Action</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody id="announcement-body">
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+
+<!-- ANNOUNCEMENTS  ends here -->
 
     <div class="d-flex justify-content-between align-items-center mb-4">
 
@@ -1150,6 +1269,7 @@
 
 
   let allData = [];
+  let announcements = [];
   let editedSlots = {};
 
   let courtRevenueChart = null;
@@ -1241,14 +1361,16 @@ function showToast(msg, type = "success") {
     location.reload();
   }
 
-  function showDashboard() {
+    function showDashboard() {
 
-    document.getElementById("login-box").style.display = "none";
+      document.getElementById("login-box").style.display="none";
 
-    document.getElementById("dashboard").style.display = "block";
+      document.getElementById("dashboard").style.display="block";
 
-    loadSlots();
-  }
+      loadSlots();
+
+      loadAnnouncements();
+    }
 
   async function checkUser() {
 
@@ -2137,6 +2259,195 @@ document.getElementById("slotFilterBar").innerHTML = `
       utilization + "%";
   }
 
+// Announcement starts here
+function showAnnouncementForm() {
+
+  const form =
+    document.getElementById(
+      "announcement-form"
+    );
+
+  form.style.display =
+    form.style.display === "none"
+      ? "block"
+      : "none";
+}
+
+async function loadAnnouncements() {
+
+  const res =
+    await fetch(
+      "/api/admin-announcements"
+    );
+
+  const data =
+    await res.json();
+
+  announcements = data;
+
+  renderAnnouncements();
+}
+
+function renderAnnouncements() {
+
+  const body =
+    document.getElementById(
+      "announcement-body"
+    );
+
+  body.innerHTML = "";
+
+  announcements.forEach(a => {
+
+    body.innerHTML += `
+
+<tr>
+
+<td>${a.id}</td>
+
+<td>${a.title}</td>
+
+<td>${a.message}</td>
+
+<td>${a.active}</td>
+
+<td>${a.start_date || ''}</td>
+
+<td>${a.end_date || ''}</td>
+
+<td>
+
+<button
+ class="btn btn-danger btn-sm"
+ onclick="deleteAnnouncement(${a.id})">
+
+ Delete
+
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+  });
+
+}
+
+async function addAnnouncement() {
+
+  const title =
+    document.getElementById(
+      "ann-title"
+    ).value;
+
+  const message =
+    document.getElementById(
+      "ann-message"
+    ).value;
+
+  const start_date =
+    document.getElementById(
+      "ann-start"
+    ).value;
+
+  const end_date =
+    document.getElementById(
+      "ann-end"
+    ).value;
+
+  const active =
+    document.getElementById(
+      "ann-active"
+    ).value === "true";
+
+  const res =
+    await fetch(
+      "/api/admin-announcements",
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+          "application/json"
+        },
+
+        body:JSON.stringify({
+          action:"add",
+
+          data:{
+            title,
+            message,
+            start_date,
+            end_date,
+            active
+          }
+        })
+      }
+    );
+
+  if(!res.ok){
+
+    showToast(
+      "Failed",
+      "error"
+    );
+
+    return;
+  }
+
+  showToast(
+    "Announcement added"
+  );
+
+  loadAnnouncements();
+}
+
+async function deleteAnnouncement(id) {
+
+  if(
+    !confirm(
+      "Delete announcement?"
+    )
+  ) return;
+
+  const res =
+    await fetch(
+      "/api/admin-announcements",
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+          "application/json"
+        },
+
+        body:JSON.stringify({
+          action:"delete",
+          id
+        })
+      }
+    );
+
+  if(!res.ok){
+
+    showToast(
+      "Delete failed",
+      "error"
+    );
+
+    return;
+  }
+
+  showToast(
+    "Deleted"
+  );
+
+  loadAnnouncements();
+}
+
+//Announcements ends here 
 </script>
 
 
