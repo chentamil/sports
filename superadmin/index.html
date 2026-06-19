@@ -514,6 +514,14 @@
         </select>
       </div>
 
+      <div class="col-md-2">
+        <label>Marquee</label>
+        <select id="ann-marquee" class="form-select">
+          <option value="false">No</option>
+          <option value="true">Yes</option>
+        </select>
+      </div>
+
     </div>
 
     <button
@@ -2588,6 +2596,23 @@ function renderAnnouncements() {
 
 }
 
+function renderMarquee(data) {
+  const marqueeItems = data
+    .filter(a => a.active && a.show_in_marquee)
+    .map(a => `⚡ ${a.title}: ${a.message}`)
+    .join("   |   ");
+
+  const container = document.getElementById("marquee-container");
+  const marquee = document.getElementById("marquee-text");
+
+  if (marqueeItems.length > 0) {
+    marquee.textContent = marqueeItems;
+    container.style.display = "block";
+  } else {
+    container.style.display = "none";
+  }
+}
+
 async function addAnnouncement() {
 
   const title =
@@ -2643,7 +2668,9 @@ async function addAnnouncement() {
             message,
             start_date,
             end_date,
-            active
+            active,
+            show_in_marquee:
+            document.getElementById("ann-marquee").value === "true"
           }
         })
       }
