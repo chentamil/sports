@@ -774,7 +774,7 @@ async function loadAnnouncements() {
 // 
 function renderMarquee(data) {
 
-  const container = document.getElementById("marquee-container");
+  const container = document.querySelector(".marquee-wrapper");
   const marquee = document.getElementById("marquee-text");
 
   const text = data
@@ -786,13 +786,7 @@ function renderMarquee(data) {
     return;
   }
 
-  // 🔥 IMPORTANT FIX: force reset animation cleanly
-  marquee.innerHTML = "";
-
-  setTimeout(() => {
-    marquee.innerHTML = text;
-  }, 50);
-
+  marquee.textContent = text;
   container.style.display = "block";
 }
 // 
@@ -1017,23 +1011,25 @@ document.getElementById('next-day').addEventListener('click', () => {
     });
   }
 
-  //marquee message from admin
-function renderMarquee(data) {
 
-  const marqueeItems = data
-    .filter(a => a.active && a.show_in_marquee)
-    .map(a => `⚡ ${a.title}: ${a.message}`)
-    .join("   |   ");
+//message from admin alerts 
+function renderAlerts(data) {
 
-  const container = document.getElementById("marquee-container");
-  const marquee = document.getElementById("marquee-text");
+  const container = document.getElementById("announcementContainer");
 
-  if (marqueeItems.length > 0) {
-    marquee.textContent = marqueeItems;
-    container.style.display = "block";
-  } else {
-    container.style.display = "none";
+  if (!data.length) {
+    container.innerHTML = "";
+    return;
   }
+
+  container.innerHTML = data.map(a => `
+    <div class="alert alert-warning alert-dismissible fade show shadow-sm mb-2">
+      <strong>📢 ${a.title}</strong><br>
+      ${a.message}
+
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  `).join("");
 }
 </script>
 
