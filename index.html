@@ -755,20 +755,22 @@ async function loadAnnouncements() {
     return;
   }
 
-  container.innerHTML =
-    announcements.map(a => `
-      <div class="alert alert-warning shadow-sm mb-3">
+container.innerHTML =
+  announcements.map(a => `
+    <div class="alert alert-info alert-dismissible fade show shadow-sm mb-2">
 
-        <h5 class="mb-1">
-          📢 ${a.title}
-        </h5>
+      <strong>📢 ${a.title}</strong><br>
 
-        <div>
-          ${a.message}
-        </div>
+      ${a.message}
 
-      </div>
-    `).join("");
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="alert">
+      </button>
+
+    </div>
+  `).join("");
 }
 //announcement messages from admin ends here
   const PHONE = "919840253589";
