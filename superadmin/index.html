@@ -1372,6 +1372,42 @@
  </div>
 
 </div>
+<!-- edid button in booking modal starts here -->
+ <div class="modal fade" id="editBookingModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Booking</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <input type="hidden" id="edit-booking-id">
+
+        <select id="edit-payment" class="form-select mb-2">
+          <option value="pending">Pending</option>
+          <option value="paid">Paid</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+
+        <input id="edit-mobile" class="form-control mb-2" placeholder="Mobile">
+        <input id="edit-email" class="form-control mb-2" placeholder="Email">
+
+        <textarea id="edit-notes" class="form-control" placeholder="Notes"></textarea>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-success" onclick="saveEditBooking()">
+          Save Changes
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
     <!-- Booking Modal ends here -->
 
 
@@ -2686,6 +2722,11 @@ async function loadBookings() {
         <td>${b.payment_status}</td>
         <td>${b.booking_notes || ""}</td>
         <td>
+          <button class="btn btn-primary btn-sm me-1"
+            onclick="editBooking(${b.id})">
+            Edit
+          </button>
+
           <button class="btn btn-danger btn-sm"
             onclick="deleteBooking(${b.id})">
             Delete
@@ -2839,6 +2880,72 @@ async function deleteBooking(id) {
   }
 
   showToast("Booking deleted");
+  loadBookings();
+}
+// booking modal EDIT JS starts
+function editBooking(id) {
+
+  const booking =
+    window.allBookings?.find(b => b.id === id);
+
+  if (!booking) return;
+
+  document.getElementById("edit-booking-id").value = id;
+  document.getElementById("edit-payment").value = booking.payment_status;
+  document.getElementById("edit-mobile").value = booking.customer_mobile;
+  document.getElementById("edit-email").value = booking.customer_email;
+  document.getElementById("edit-notes").value = booking.booking_notes || "";
+
+  new bootstrap.Modal(
+    document.getElementById("editBookingModal")
+  ).show();
+}
+// SAVE EDIT (BACKEND CALL)
+async function saveEditBooking() {
+
+  const id =
+    document.getElementById("edit-booking-id").value;
+
+  const payment_status =
+    document.getElementById("edit-payment").value;
+
+  const customer_mobile =
+    document.getElementById("edit-mobile").value;
+
+  const customer_email =
+    document.getElementById("edit-email").value;
+
+  const booking_notes =
+    document.getElementById("edit-notes").value;
+
+  const res = await fetch("/api/admin-bookings", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      action: "update",
+      id,
+      data: {
+        payment_status,
+        customer_mobile,
+        customer_email,
+        booking_notes
+      }
+    })
+  });
+
+  if (!res.ok) {
+    showToast("Update failed", "error");
+    return;
+  }
+
+  showToast("Booking updated");
+
+  bootstrap.Modal.getInstance(
+    document.getElementById("editBookingModal")
+  ).hide();
+
   loadBookings();
 }
 
