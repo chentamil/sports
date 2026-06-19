@@ -766,12 +766,19 @@ function renderMarquee(data) {
     .map(a => `⚡ ${a.title}: ${a.message}`)
     .join("   |   ");
 
-  if (text.length > 0) {
-    marquee.textContent = text;
-    container.style.display = "block";
-  } else {
+  if (!text) {
     container.style.display = "none";
+    return;
   }
+
+  // 🔥 IMPORTANT FIX: force reset animation cleanly
+  marquee.innerHTML = "";
+
+  setTimeout(() => {
+    marquee.innerHTML = text;
+  }, 50);
+
+  container.style.display = "block";
 }
 // 
 function renderAlerts(data) {
