@@ -418,6 +418,7 @@
           <th>Slot</th>
           <th>Customer</th>
           <th>Mobile</th>
+          <th>Email</th>
           <th>Payment</th>
           <th>Notes</th>
           <th>Action</th>
@@ -2720,7 +2721,16 @@ async function loadBookings() {
       <tr>
         <td>${b.slot_id}</td>
         <td>${b.customer_name}</td>
-        <td>${b.customer_mobile}</td>
+        <td>
+            <a href="tel:${b.customer_mobile}">
+              ${b.customer_mobile || ""}
+            </a>
+        </td>
+        <td>
+          <a href="mailto:${b.customer_email}">
+            ${b.customer_email || ""}
+          </a>
+        </td>
         <td>${b.payment_status}</td>
         <td>${b.booking_notes || ""}</td>
         <td>
