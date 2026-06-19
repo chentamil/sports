@@ -2705,6 +2705,8 @@ async function loadBookings() {
   const bookings =
     await res.json();
 
+  window.allBookings = bookings;  
+
   const tbody =
     document.getElementById(
       "bookingTableBody"
