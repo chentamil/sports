@@ -431,6 +431,14 @@
   </div>
 </div>
 <!--  -->
+<!-- ===================== -->
+<!-- MARQUEE ANNOUNCEMENT -->
+<!-- ===================== -->
+<div id="marquee-container" class="mb-3" style="display:none;">
+  <div class="bg-dark text-warning p-2 rounded">
+    <marquee id="marquee-text" behavior="scroll" direction="left"></marquee>
+  </div>
+</div>
 
 <!-- ===================== -->
 <!-- ANNOUNCEMENTS -->
@@ -2520,7 +2528,10 @@ async function loadAnnouncements() {
   announcements = data;
 
   renderAnnouncements();
+  renderMarquee(data);
 }
+
+
 
 function renderAnnouncements() {
 

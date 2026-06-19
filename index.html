@@ -733,6 +733,7 @@ function updateDateLabel(dateStr) {
 }
 
 //announcement messages from admin starts here
+// bs dismissable alert messages
 async function loadAnnouncements() {
 
   const res =
@@ -772,6 +773,23 @@ container.innerHTML =
     </div>
   `).join("");
 }
+//marquee messages
+function renderMarquee(data) {
+  const marqueeItems = data
+    .filter(a => a.active && a.show_in_marquee)
+    .map(a => `⚡ ${a.title}: ${a.message}`)
+    .join("   |   ");
+
+  const container = document.getElementById("marquee-container");
+  const marquee = document.getElementById("marquee-text");
+
+  if (marqueeItems.length > 0) {
+    marquee.textContent = marqueeItems;
+    container.style.display = "block";
+  } else {
+    container.style.display = "none";
+  }
+} 
 //announcement messages from admin ends here
   const PHONE = "919840253589";
   let allData = [];
