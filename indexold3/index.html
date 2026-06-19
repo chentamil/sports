@@ -307,13 +307,6 @@
     <!-- Messages from admin -->
     <div id="announcementContainer"></div>
 
-    <!-- MARQUEE ANNOUNCEMENT -->
-    <div id="marquee-container" class="mb-2" style="display:none;">
-      <div class="bg-dark text-warning p-2 rounded">
-        <marquee id="marquee-text" behavior="scroll" direction="left"></marquee>
-      </div>
-    </div>
-
     <div class="mb-3 text-center d-flex justify-content-center align-items-center gap-3">
 
         <button id="prev-day" class="btn btn-outline-primary">
@@ -750,9 +743,6 @@ async function loadAnnouncements() {
   const announcements =
     await res.json();
 
-  renderAnnouncements(announcements);   
-renderMarquee(announcements);         
-
   const container =
     document.getElementById(
       "announcementContainer"
@@ -984,25 +974,6 @@ document.getElementById('next-day').addEventListener('click', () => {
       container.innerHTML += courtHTML;
     });
   }
-
-  //marquee message from admin
-function renderMarquee(data) {
-
-  const marqueeItems = data
-    .filter(a => a.active && a.show_in_marquee)
-    .map(a => `⚡ ${a.title}: ${a.message}`)
-    .join("   |   ");
-
-  const container = document.getElementById("marquee-container");
-  const marquee = document.getElementById("marquee-text");
-
-  if (marqueeItems.length > 0) {
-    marquee.textContent = marqueeItems;
-    container.style.display = "block";
-  } else {
-    container.style.display = "none";
-  }
-}
 </script>
 
 <!-- Toast Container -->
