@@ -308,11 +308,26 @@
     <div id="announcementContainer"></div>
 
     <!-- MARQUEE ANNOUNCEMENT -->
-    <div id="marquee-container" style="display:none;">
-      <div class="bg-dark text-warning p-2 rounded">
-        <marquee id="marquee-text"></marquee>
-      </div>
+    <div class="marquee-wrapper">
+      <div id="marquee-text" class="marquee"></div>
     </div>
+    <style>
+      .marquee-wrapper {
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      .marquee {
+        display: inline-block;
+        padding-left: 100%;
+        animation: scroll 15s linear infinite;
+      }
+
+      @keyframes scroll {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-100%); }
+      }
+    </style>
 
     <div class="mb-3 text-center d-flex justify-content-center align-items-center gap-3">
 
