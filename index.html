@@ -305,7 +305,8 @@
     <h2 class="mb-4 text-center">Shivani Elite Badminton Academy</h2>
 
     <!-- Messages from admin -->
-    <div id="announcementContainer"></div>
+    <div id="announcementContainer my-2"></div>
+    <div id="marqueeContainer" class="mb-2"></div>
 
     <div class="mb-3 text-center d-flex justify-content-center align-items-center gap-3">
 
@@ -771,6 +772,33 @@ container.innerHTML =
 
     </div>
   `).join("");
+}
+
+// marquee messages from admin start
+async function loadMarquee() {
+  const res = await fetch("/api/announcements");
+  const announcements = await res.json();
+
+  const marqueeData = announcements
+    .filter(a => a.active && a.show_in_marquee)
+    .map(a => `⚡ ${a.title}: ${a.message}`)
+    .join("   |   ");
+
+  const container = document.getElementById("marqueeContainer");
+
+  if (!marqueeData) {
+    container.innerHTML = "";
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="bg-dark text-warning p-2 rounded">
+      <marquee behavior="scroll" direction="left">
+        ${marqueeData}
+      </marquee>
+    </div>
+  `;
+   loadMarquee();
 }
 //announcement messages from admin ends here
   const PHONE = "919840253589";
