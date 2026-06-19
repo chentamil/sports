@@ -1672,20 +1672,36 @@ function renderTable(data) {
     `;
     tr.appendChild(tdDelete);
 
-    const tdBooking =
-    document.createElement("td");
+const tdBooking =
+document.createElement("td");
 
-    tdBooking.innerHTML = `
+if (
+  slot.status === "booked"
+) {
 
+  tdBooking.innerHTML = `
     <button
-    class="btn btn-success btn-sm"
-    onclick="openBookingModal(${slot.id})">
+      class="btn btn-secondary btn-sm"
+      disabled>
 
-    Book
+      Booked
 
     </button>
+  `;
 
-    `;
+} else {
+
+  tdBooking.innerHTML = `
+    <button
+      class="btn btn-success btn-sm"
+      onclick="openBookingModal(${slot.id})">
+
+      Book
+
+    </button>
+  `;
+
+}
 
     tr.appendChild(tdBooking);
 
@@ -2722,6 +2738,16 @@ async function saveBooking(){
   showToast(
     "Booking saved"
   );
+
+  bootstrap.Modal
+    .getInstance(
+      document.getElementById(
+        "bookingModal"
+      )
+    )
+    .hide();
+
+  loadSlots();
 
 }
 
