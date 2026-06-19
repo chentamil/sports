@@ -403,6 +403,34 @@
 </div>
 <!--  -->
 <!-- ===================== -->
+<!-- BOOKING MANAGEMENT -->
+<!-- ===================== -->
+
+<div class="card p-3 mt-4 border-success">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">Booking Management</h4>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Slot</th>
+          <th>Customer</th>
+          <th>Mobile</th>
+          <th>Payment</th>
+          <th>Notes</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody id="bookingTableBody"></tbody>
+    </table>
+  </div>
+</div>
+<!--  -->
+
+<!-- ===================== -->
 <!-- ANNOUNCEMENTS -->
 <!-- ===================== -->
 
@@ -1462,6 +1490,8 @@ function showToast(msg, type = "success") {
       loadSlots();
 
       loadAnnouncements();
+
+      loadBookings();
     }
 
   async function checkUser() {
@@ -2630,6 +2660,43 @@ async function deleteAnnouncement(id) {
   loadAnnouncements();
 }
 
+// 
+async function loadBookings() {
+
+  const res =
+    await fetch("/api/admin-bookings");
+
+  const bookings =
+    await res.json();
+
+  const tbody =
+    document.getElementById(
+      "bookingTableBody"
+    );
+
+  tbody.innerHTML = "";
+
+  bookings.forEach(b => {
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${b.slot_id}</td>
+        <td>${b.customer_name}</td>
+        <td>${b.customer_mobile}</td>
+        <td>${b.payment_status}</td>
+        <td>${b.booking_notes || ""}</td>
+        <td>
+          <button class="btn btn-danger btn-sm"
+            onclick="deleteBooking(${b.id})">
+            Delete
+          </button>
+        </td>
+      </tr>
+    `;
+
+  });
+
+}
 //Announcements ends here 
 
 // Booking Modal starts here
@@ -2749,6 +2816,30 @@ async function saveBooking(){
 
   loadSlots();
 
+}
+// 
+async function deleteBooking(id) {
+
+  if (!confirm("Delete booking?")) return;
+
+  const res = await fetch("/api/admin-bookings", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      action: "delete",
+      id
+    })
+  });
+
+  if (!res.ok) {
+    showToast("Delete failed", "error");
+    return;
+  }
+
+  showToast("Booking deleted");
+  loadBookings();
 }
 
 // Booking Modal ends here
