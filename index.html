@@ -308,9 +308,9 @@
     <div id="announcementContainer"></div>
 
     <!-- MARQUEE ANNOUNCEMENT -->
-    <div id="marquee-container" class="mb-2" style="display:none;">
+    <div id="marquee-container" style="display:none;">
       <div class="bg-dark text-warning p-2 rounded">
-        <marquee id="marquee-text" behavior="scroll" direction="left"></marquee>
+        <marquee id="marquee-text"></marquee>
       </div>
     </div>
 
@@ -742,42 +742,53 @@ function updateDateLabel(dateStr) {
 //announcement messages from admin starts here
 async function loadAnnouncements() {
 
-  const res =
-    await fetch(
-      "/api/announcements"
-    );
+  const res = await fetch("/api/announcements");
+  const data = await res.json();
 
-  const announcements =
-    await res.json();
-  
-renderMarquee(announcements);         
+  // STEP 1: only active announcements
+  const active = data.filter(a => a.active);
 
-  const container =
-    document.getElementById(
-      "announcementContainer"
-    );
+  // STEP 2: split properly
+  const marqueeData = active.filter(a => a.show_in_marquee);
+  const alertData = active.filter(a => a.show_as_alert);
 
-  if (!announcements.length) {
+  // STEP 3: render separately
+  renderMarquee(marqueeData);
+  renderAlerts(alertData);
+}
+// 
+function renderMarquee(data) {
 
+  const container = document.getElementById("marquee-container");
+  const marquee = document.getElementById("marquee-text");
+
+  const text = data
+    .map(a => `⚡ ${a.title}: ${a.message}`)
+    .join("   |   ");
+
+  if (text.length > 0) {
+    marquee.textContent = text;
+    container.style.display = "block";
+  } else {
+    container.style.display = "none";
+  }
+}
+// 
+function renderAlerts(data) {
+
+  const container = document.getElementById("announcementContainer");
+
+  if (!data.length) {
     container.innerHTML = "";
-
     return;
   }
 
-container.innerHTML =
-  announcements.map(a => `
+  container.innerHTML = data.map(a => `
     <div class="alert alert-info alert-dismissible fade show shadow-sm mb-2">
-
       <strong>📢 ${a.title}</strong><br>
-
       ${a.message}
 
-      <button
-        type="button"
-        class="btn-close"
-        data-bs-dismiss="alert">
-      </button>
-
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
   `).join("");
 }
