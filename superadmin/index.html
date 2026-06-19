@@ -117,6 +117,7 @@
     .table thead th:first-child {
       z-index: 4;
       background: #0f172a;
+      color: #ffffff;
     }
 
     tr.bg-danger td:first-child {
@@ -225,35 +226,35 @@
     <!-- ANALYTICS -->
     <div class="row my-4">
 
-      <div class="col-12 col-sm-6 col-md-3 mb-3">
+      <div class="col-12 col-sm-6 col-md-2 mb-3">
         <div class="card p-3 text-center">
           Revenue Today
           <h4 id="revToday">0</h4>
         </div>
       </div>
 
-      <div class="col-12 col-sm-6 col-md-3 mb-3">
+      <div class="col-12 col-sm-6 col-md-2 mb-3">
         <div class="card p-3 text-center">
           Bookings Today
           <h4 id="bookToday">0</h4>
         </div>
       </div>
 
-      <div class="col-12 col-sm-6 col-md-3 mb-3">
+      <div class="col-12 col-sm-6 col-md-2 mb-3">
         <div class="card p-3 text-center border border-success">
           Court Utilisation
           <h4 id="utilization">0%</h4>
         </div>
       </div>
 
-      <div class="col-12 col-sm-6 col-md-3 mb-3">
+      <div class="col-12 col-sm-6 col-md-2 mb-3">
         <div class="card p-3 text-center border border-primary">
           Monthly Revenue
           <h4 id="revMonth">0</h4>
         </div>
       </div>
 
-      <div class="col-12 col-sm-6 col-md-3 mb-3">
+      <div class="col-12 col-sm-6 col-md-2 mb-3">
         <div class="card p-3 text-center">
           Peak Hour
           <h4 id="peakHour">-</h4>
@@ -406,7 +407,7 @@
 <!-- BOOKING MANAGEMENT -->
 <!-- ===================== -->
 
-<div class="card p-3 mt-4 border-success">
+<div class="card p-3 my-4 border-success">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="mb-0">Booking Management</h4>
   </div>
@@ -557,8 +558,8 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
 
-      <h4>
-        Slot Management
+      <h4 class="text-secondary">
+        Slot Management :
       </h4>
 
     </div>
@@ -804,7 +805,7 @@
         <div class="col-md-2">
 
           <button class="btn btn-success w-100" onclick="addSlot()">
-            Add
+            + Add Slot
           </button>
 
         </div>
@@ -879,7 +880,7 @@
         </div>
 
         <div class="col-md-2">
-          <button class="btn btn-warning text-dark w-100" onclick="generateSlotsStandalone()">Generate Slots</button>
+          <button class="btn btn-warning text-dark w-100" onclick="generateSlotsStandalone()">+ Generate Slots</button>
         </div>
 
       </div>
@@ -2551,7 +2552,7 @@ function renderAnnouncements() {
 <td>
 
 <button
- class="btn btn-primary btn-sm me-1"
+ class="btn btn-primary btn-sm me-1 my-1"
  onclick="editAnnouncement(${a.id})">
 
  Edit
@@ -2559,7 +2560,7 @@ function renderAnnouncements() {
 </button>
 
 <button
- class="btn btn-danger btn-sm"
+ class="btn btn-danger btn-sm my-1"
  onclick="deleteAnnouncement(${a.id})">
 
  Delete
@@ -2734,12 +2735,12 @@ async function loadBookings() {
         <td>${b.payment_status}</td>
         <td>${b.booking_notes || ""}</td>
         <td>
-          <button class="btn btn-primary btn-sm me-1"
+          <button class="btn btn-primary btn-sm me-1 my-1"
             onclick="editBooking(${b.id})">
             Edit
           </button>
 
-          <button class="btn btn-danger btn-sm"
+          <button class="btn btn-danger btn-sm my-1"
             onclick="deleteBooking(${b.id})">
             Delete
           </button>
