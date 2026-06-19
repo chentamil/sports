@@ -173,6 +173,39 @@ export async function onRequest(context) {
       }
 
       // ==================
+      // UPDATE BOOKING
+      // ==================
+      if (
+        body.action === "update"
+      ) {
+
+        const id = body.id;
+
+        const response =
+          await fetch(
+            `${SUPABASE_URL}/rest/v1/bookings?id=eq.${id}`,
+            {
+              method: "PATCH",
+              headers: {
+                apikey:
+                  context.env.SUPABASE_ANON_KEY,
+                Authorization:
+                  `Bearer ${accessToken}`,
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(body.data)
+            }
+          );
+
+        if (!response.ok) {
+          return new Response("failed", { status: 500 });
+        }
+
+        return new Response("ok", { status: 200 });
+      }
+
+
+      // ==================
       // DELETE BOOKING
       // ==================
 
