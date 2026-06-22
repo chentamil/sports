@@ -1397,6 +1397,66 @@
  </div>
 
 </div>
+<!--  -->
+<!-- VIEW BOOKING DETAILS MODAL -->
+<div class="modal fade" id="viewBookingModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">📋 Booking Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="alert alert-info mb-3 py-2">
+          <strong>Slot:</strong> <span id="view-slot-info"></span>
+        </div>
+
+        <table class="table table-sm table-borderless mb-0">
+          <tr>
+            <td class="text-muted fw-semibold" style="width:40%">Booking ID</td>
+            <td id="view-booking-id"></td>
+          </tr>
+          <tr>
+            <td class="text-muted fw-semibold">Customer Name</td>
+            <td id="view-name"></td>
+          </tr>
+          <tr>
+            <td class="text-muted fw-semibold">Mobile</td>
+            <td><a id="view-mobile" href="#"></a></td>
+          </tr>
+          <tr>
+            <td class="text-muted fw-semibold">Email</td>
+            <td id="view-email"></td>
+          </tr>
+          <tr>
+            <td class="text-muted fw-semibold">Payment</td>
+            <td id="view-payment"></td>
+          </tr>
+          <tr>
+            <td class="text-muted fw-semibold">Notes</td>
+            <td id="view-notes"></td>
+          </tr>
+        </table>
+
+      </div>
+
+      <div class="modal-footer d-flex gap-2">
+        <button id="view-edit-btn" class="btn btn-primary flex-fill">
+          ✏️ Edit
+        </button>
+        <button id="view-delete-btn" class="btn btn-danger flex-fill">
+          🗑 Delete
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- VIEW BOOKING DETAILS MODAL ends -->
+
 <!-- edid button in booking modal starts here -->
  <div class="modal fade" id="editBookingModal" tabindex="-1">
   <div class="modal-dialog">
@@ -1773,10 +1833,8 @@ if (
   tdBooking.innerHTML = `
     <button
       class="btn btn-secondary btn-sm"
-      disabled>
-
-      Booked
-
+      onclick="viewBookingDetails(${slot.id})">
+      📋 Booked
     </button>
   `;
 
@@ -2811,6 +2869,47 @@ async function loadBookings() {
 }
 //Announcements ends here 
 
+// VIEW BOOKING DETAILS MODAL (click "Booked" button) on table
+function viewBookingDetails(slotId) {
+
+  // Find the booking that matches this slot
+  const booking = window.allBookings?.find(b => b.slot_id == slotId);
+
+  if (!booking) {
+    showToast("Booking data not loaded yet. Please wait.", "warning");
+    return;
+  }
+
+  // Find the slot for date/time info
+  const slot = allData.find(s => s.id == slotId);
+
+  // Fill the view modal fields
+  document.getElementById("view-slot-info").textContent =
+    slot ? `${slot.date} | Court ${slot.court_id} | ${slot.start_time} - ${slot.end_time}` : `Slot #${slotId}`;
+
+  document.getElementById("view-booking-id").textContent   = booking.id;
+  document.getElementById("view-name").textContent         = booking.customer_name || "-";
+  document.getElementById("view-mobile").textContent       = booking.customer_mobile || "-";
+  document.getElementById("view-email").textContent        = booking.customer_email || "-";
+  document.getElementById("view-payment").textContent      = booking.payment_status || "-";
+  document.getElementById("view-notes").textContent        = booking.booking_notes || "-";
+
+  // Wire up the Edit and Delete buttons with this booking id
+  document.getElementById("view-edit-btn").onclick   = () => {
+    bootstrap.Modal.getInstance(document.getElementById("viewBookingModal")).hide();
+    editBooking(booking.id);
+  };
+
+  document.getElementById("view-delete-btn").onclick = () => {
+    bootstrap.Modal.getInstance(document.getElementById("viewBookingModal")).hide();
+    deleteBooking(booking.id);
+  };
+
+  new bootstrap.Modal(
+    document.getElementById("viewBookingModal")
+  ).show();
+}
+
 // Booking Modal starts here
 function openBookingModal(slotId){
 
@@ -2927,6 +3026,8 @@ async function saveBooking(){
     .hide();
 
   loadSlots();
+  loadBookings(); // ← AUTO REFRESH bottom Booking Management table
+
 
 }
 // 
