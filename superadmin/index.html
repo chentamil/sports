@@ -2745,8 +2745,24 @@ async function loadBookings() {
 
   const bookings =
     await res.json();
+  // All bookings,present+past+future bookings:
 
-  window.allBookings = bookings;  
+  // window.allBookings = bookings;  
+  // const tbody =
+  //   document.getElementById(
+  //     "bookingTableBody"
+  //   );
+  // tbody.innerHTML = "";
+  // bookings.forEach(b => {
+
+  // present and future booking only
+  window.allBookings = bookings;
+
+  const today = new Date().toLocaleDateString('sv-SE');
+  const filtered = bookings.filter(b => {
+    const slotDate = b.slots?.date || "";
+    return slotDate >= today;
+  });
 
   const tbody =
     document.getElementById(
@@ -2755,11 +2771,14 @@ async function loadBookings() {
 
   tbody.innerHTML = "";
 
-  bookings.forEach(b => {
+  filtered.forEach(b => {
 
     tbody.innerHTML += `
       <tr>
-        <td>${b.slot_id}</td>
+        <td>
+          ${b.slots?.date || 'Slot #'+b.slot_id}<br>
+          <small class="text-muted">${b.slots?.start_time || ''} - ${b.slots?.end_time || ''}</small>
+        </td>
         <td>${b.customer_name}</td>
         <td>
             <a href="tel:${b.customer_mobile}">

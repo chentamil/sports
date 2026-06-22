@@ -39,7 +39,9 @@ export async function onRequest(context) {
       const response =
         await fetch(
 
-          `${SUPABASE_URL}/rest/v1/bookings?select=*&order=id.desc`,
+          // `${SUPABASE_URL}/rest/v1/bookings?select=*&order=id.desc`,
+          // WHY this update: Frontend needs slot date to filter today+future bookings.
+          `${SUPABASE_URL}/rest/v1/bookings?select=*,slots(date,start_time,end_time,court_id)&order=id.desc`,
 
           {
             headers: {
