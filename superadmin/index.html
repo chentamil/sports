@@ -1048,6 +1048,9 @@
               <th>Status</th>
 
               <th>Actions</th>
+
+              <th>Copy</th>
+              
               <th>Booking</th>
 
             </tr>
@@ -1824,6 +1827,22 @@ function renderTable(data) {
     `;
     tr.appendChild(tdDelete);
 
+    // COPY SLOT
+    const tdCopy = document.createElement("td");
+    tdCopy.innerHTML = `
+      <div class="d-flex flex-column gap-1">
+        <button class="btn btn-outline-primary btn-sm"
+          onclick="copySlot(${slot.id}, 1)">
+          +1 Day
+        </button>
+        <button class="btn btn-outline-secondary btn-sm"
+          onclick="copySlot(${slot.id}, 7)">
+          +7 Days
+        </button>
+      </div>
+    `;
+    tr.appendChild(tdCopy);
+
 const tdBooking =
 document.createElement("td");
 
@@ -1857,6 +1876,62 @@ if (
 
     body.appendChild(tr);
   });
+}
+
+// COPY SLOT to N days ahead
+async function copySlot(slotId, days) {
+
+  // Find original slot in memory
+  const original = allData.find(s => s.id == slotId);
+  if (!original) {
+    showToast("Slot not found", "error");
+    return;
+  }
+
+  // Calculate new date: add N days
+  const oldDate  = new Date(original.date);
+  oldDate.setDate(oldDate.getDate() + days);
+  const newDate  = oldDate.toLocaleDateString("sv-SE"); // YYYY-MM-DD
+
+  // Warn if duplicate already exists
+  const duplicate = allData.find(s =>
+    s.date === newDate &&
+    String(s.court_id) === String(original.court_id) &&
+    s.start_time === original.start_time
+  );
+
+  if (duplicate) {
+    showToast(`Slot already exists on ${newDate}`, "warning");
+    return;
+  }
+
+  const label = days === 1 ? "tomorrow" : `+${days} days (${newDate})`;
+  if (!confirm(`Copy this slot to ${label}?`)) return;
+
+  const res = await fetch("/api/admin", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "add",
+      data: {
+        date:       newDate,
+        court_id:   original.court_id,
+        start_time: original.start_time,
+        end_time:   original.end_time,
+        time:       `${original.start_time} - ${original.end_time}`,
+        price:      original.price,
+        status:     "available"   // always resets to available
+      }
+    })
+  });
+
+  if (!res.ok) {
+    showToast("Copy failed", "error");
+    return;
+  }
+
+  showToast(`Slot copied to ${newDate} ✅`);
+  loadSlots();
 }
 
 // Quick Filter Function
