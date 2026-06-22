@@ -1429,7 +1429,7 @@
           </tr>
           <tr>
             <td class="text-muted fw-semibold">Email</td>
-            <td id="view-email"></td>
+            <td><a id="view-email" href="#"></a></td>
           </tr>
           <tr>
             <td class="text-muted fw-semibold">Payment</td>
@@ -2889,8 +2889,14 @@ function viewBookingDetails(slotId) {
 
   document.getElementById("view-booking-id").textContent   = booking.id;
   document.getElementById("view-name").textContent         = booking.customer_name || "-";
-  document.getElementById("view-mobile").textContent       = booking.customer_mobile || "-";
-  document.getElementById("view-email").textContent        = booking.customer_email || "-";
+  // document.getElementById("view-mobile").textContent       = booking.customer_mobile || "-";
+  const mobileEl = document.getElementById("view-mobile");
+  mobileEl.textContent = booking.customer_mobile || "-";
+  mobileEl.href = booking.customer_mobile ? `tel:${booking.customer_mobile}` : "#";
+  // document.getElementById("view-email").textContent        = booking.customer_email || "-";
+  const emailEl = document.getElementById("view-email");
+  emailEl.textContent = booking.customer_email || "-";
+  emailEl.href = booking.customer_email ? `mailto:${booking.customer_email}` : "#";
   document.getElementById("view-payment").textContent      = booking.payment_status || "-";
   document.getElementById("view-notes").textContent        = booking.booking_notes || "-";
 
