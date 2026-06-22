@@ -1074,6 +1074,7 @@
     <div class="card p-3 my-4 border-success">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0">Booking Management</h4>
+          <button class="btn btn-outline-success btn-sm" onclick="exportBookingsCSV()">⬇️ Export CSV</button>
       </div>
 
       <div class="table-responsive">
@@ -3072,6 +3073,66 @@ async function deleteBooking(id) {
   showToast("Booking deleted & slot restored to Available");
   loadBookings();
   loadSlots();
+}
+
+// EXPORT BOOKINGS AS CSV
+function exportBookingsCSV() {
+
+  const bookings = window.allBookings;
+
+  if (!bookings || bookings.length === 0) {
+    showToast("No bookings to export", "warning");
+    return;
+  }
+
+  // Define columns and their labels
+  const headers = [
+    "Booking ID", "Slot ID", "Date", "Court",
+    "Start Time", "End Time",
+    "Customer Name", "Mobile", "Email",
+    "Payment Status", "Notes", "Created At"
+  ];
+
+  // Build each row
+  const rows = bookings.map(b => {
+    const slot = b.slots || {};
+
+    // Wrap value in quotes and escape any inner quotes
+    function esc(val) {
+      const v = val === null || val === undefined ? "" : String(val);
+      return `"${v.replace(/"/g, '""')}"`;
+    }
+
+    return [
+      esc(b.id),
+      esc(b.slot_id),
+      esc(slot.date || ""),
+      esc(slot.court_id ? "Court " + slot.court_id : ""),
+      esc(slot.start_time || ""),
+      esc(slot.end_time || ""),
+      esc(b.customer_name),
+      esc(b.customer_mobile),
+      esc(b.customer_email),
+      esc(b.payment_status),
+      esc(b.booking_notes),
+      esc(b.created_at ? b.created_at.slice(0, 10) : "")
+    ].join(",");
+  });
+
+  // Combine header + rows
+  const csv = [headers.join(","), ...rows].join("\n");
+
+  // Trigger download
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  const today = new Date().toLocaleDateString("sv-SE");
+  a.href     = url;
+  a.download = `bookings-${today}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  showToast(`Exported ${bookings.length} bookings`);
 }
 
 // booking modal EDIT JS starts
