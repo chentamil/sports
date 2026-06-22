@@ -1,25 +1,17 @@
 export async function onRequest(context) {
 
-  const cookie =
-    context.request.headers.get("Cookie") || "";
-
-  const tokenMatch =
-    cookie.match(/acha_access_token=([^;]+)/);
+  const cookie = context.request.headers.get("Cookie") || "";
+  const tokenMatch = cookie.match(/acha_access_token=([^;]+)/);
 
   if (!tokenMatch) {
-
-    return new Response("Unauthorized", {
-      status: 401
-    });
-
+    return new Response("Unauthorized", { status: 401 });
   }
 
-  // verify token is valid,Supabase itself validates the JWT
-  const accessToken =
-    tokenMatch[1];
+  const accessToken = tokenMatch[1];
 
   try {
 
+    // Supabase validates the JWT here — if token is expired/invalid it returns 401
     const response = await fetch(
       `${context.env.SUPABASE_URL}/auth/v1/user`,
       {
@@ -31,15 +23,10 @@ export async function onRequest(context) {
     );
 
     if (!response.ok) {
-
-      return new Response("Unauthorized", {
-        status: 401
-      });
-
+      return new Response("Unauthorized", { status: 401 });
     }
 
-    const user =
-      await response.json();
+    const user = await response.json();
 
     return Response.json({
       authenticated: true,
@@ -48,9 +35,7 @@ export async function onRequest(context) {
 
   } catch {
 
-    return new Response("Unauthorized", {
-      status: 401
-    });
+    return new Response("Unauthorized", { status: 401 });
 
   }
 

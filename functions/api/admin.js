@@ -1,68 +1,64 @@
 export async function onRequest(context) {
 
-  const SUPABASE_URL = context.env.SUPABASE_URL;
+  const SUPABASE_URL =
+    context.env.SUPABASE_URL;
 
-  const request = context.request;
+  const SUPABASE_KEY =
+    context.env.SUPABASE_ANON_KEY;
 
-    const cookie =
+  const request =
+    context.request;
+
+  // ==================
+  // AUTH CHECK
+  // ==================
+
+  const cookie =
     request.headers.get("Cookie") || "";
 
-    const tokenMatch =
+  const tokenMatch =
     cookie.match(/acha_access_token=([^;]+)/);
 
-    if (!tokenMatch) {
-
-    return new Response("Unauthorized", {
-      status: 401
-    });
-
+  if (!tokenMatch) {
+    return new Response("Unauthorized", { status: 401 });
   }
 
-    const accessToken =
-        tokenMatch[1];
+  const accessToken = tokenMatch[1];
 
-  const method = request.method;
+  // Shared headers — reused in every fetch below
+  const authHeaders = {
+    apikey: SUPABASE_KEY,
+    Authorization: `Bearer ${accessToken}`,
+  };
 
   try {
 
-    // =========================
-    // LOAD SLOTS
-    // =========================
+    // ==================
+    // GET — LOAD ALL SLOTS
+    // ==================
 
-    if (method === "GET") {
+    if (request.method === "GET") {
 
       const response = await fetch(
         `${SUPABASE_URL}/rest/v1/slots?select=*&order=date.asc,court_id.asc,start_time.asc`,
-        {
-          headers: {
-            apikey: context.env.SUPABASE_ANON_KEY,
-            Authorization: `Bearer ${accessToken}`
-          }
-        }
+        { headers: authHeaders }
       );
 
       const data = await response.json();
-
       return Response.json(data);
     }
 
-    // =========================
-    // POST ACTIONS
-    // =========================
+    // ==================
+    // POST — ALL WRITE ACTIONS
+    // ==================
 
-    if (method === "POST") {
-
-          if (!accessToken) {
-            return new Response("Unauthorized", {
-            status: 401
-            });
-        }
+    if (request.method === "POST") {
 
       const body = await request.json();
 
-      // =====================
+      // ==================
       // ADD SLOT
-      // =====================
+      // ==================
 
       if (body.action === "add") {
 
@@ -71,8 +67,7 @@ export async function onRequest(context) {
           {
             method: "POST",
             headers: {
-              apikey: context.env.SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${accessToken}`,
+              ...authHeaders,
               "Content-Type": "application/json",
               Prefer: "return=minimal"
             },
@@ -80,16 +75,15 @@ export async function onRequest(context) {
           }
         );
 
-        if (!response.ok) {
-          return new Response("Add failed", { status: 500 });
-        }
-
-        return new Response("ok");
+        return new Response(
+          response.ok ? "ok" : "Add failed",
+          { status: response.ok ? 200 : 500 }
+        );
       }
 
-      // =====================
+      // ==================
       // UPDATE SLOT
-      // =====================
+      // ==================
 
       if (body.action === "update") {
 
@@ -98,24 +92,22 @@ export async function onRequest(context) {
           {
             method: "PATCH",
             headers: {
-              apikey: context.env.SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${accessToken}`,
+              ...authHeaders,
               "Content-Type": "application/json"
             },
             body: JSON.stringify(body.data)
           }
         );
 
-        if (!response.ok) {
-          return new Response("Update failed", { status: 500 });
-        }
-
-        return new Response("ok");
+        return new Response(
+          response.ok ? "ok" : "Update failed",
+          { status: response.ok ? 200 : 500 }
+        );
       }
 
-      // =====================
+      // ==================
       // DELETE SLOT
-      // =====================
+      // ==================
 
       if (body.action === "delete") {
 
@@ -123,23 +115,19 @@ export async function onRequest(context) {
           `${SUPABASE_URL}/rest/v1/slots?id=eq.${body.id}`,
           {
             method: "DELETE",
-            headers: {
-              apikey: context.env.SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${accessToken}`
-            }
+            headers: authHeaders
           }
         );
 
-        if (!response.ok) {
-          return new Response("Delete failed", { status: 500 });
-        }
-
-        return new Response("ok");
+        return new Response(
+          response.ok ? "ok" : "Delete failed",
+          { status: response.ok ? 200 : 500 }
+        );
       }
 
-      // =====================
+      // ==================
       // BULK DELETE
-      // =====================
+      // ==================
 
       if (body.action === "bulkDelete") {
 
@@ -149,23 +137,19 @@ export async function onRequest(context) {
           `${SUPABASE_URL}/rest/v1/slots?id=in.(${ids})`,
           {
             method: "DELETE",
-            headers: {
-              apikey: context.env.SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${accessToken}`
-            }
+            headers: authHeaders
           }
         );
 
-        if (!response.ok) {
-          return new Response("Bulk delete failed", { status: 500 });
-        }
-
-        return new Response("ok");
+        return new Response(
+          response.ok ? "ok" : "Bulk delete failed",
+          { status: response.ok ? 200 : 500 }
+        );
       }
 
-      // =====================
+      // ==================
       // BULK STATUS UPDATE
-      // =====================
+      // ==================
 
       if (body.action === "bulkStatus") {
 
@@ -176,38 +160,30 @@ export async function onRequest(context) {
           {
             method: "PATCH",
             headers: {
-              apikey: context.env.SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${accessToken}`,
+              ...authHeaders,
               "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-              status: body.status
-            })
+            body: JSON.stringify({ status: body.status })
           }
         );
 
-        if (!response.ok) {
-          return new Response("Bulk update failed", { status: 500 });
-        }
-
-        return new Response("ok");
+        return new Response(
+          response.ok ? "ok" : "Bulk update failed",
+          { status: response.ok ? 200 : 500 }
+        );
       }
 
     }
 
-    return new Response("Invalid request", {
-      status: 400
-    });
+    return new Response("Invalid request", { status: 400 });
 
   } catch (err) {
 
     return new Response(
-      JSON.stringify({
-        error: err.message
-      }),
-      {
-        status: 500
-      }
+      JSON.stringify({ error: err.message }),
+      { status: 500 }
     );
+
   }
+
 }
