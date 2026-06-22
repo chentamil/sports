@@ -2913,17 +2913,16 @@ async function saveBooking(){
 // 
 async function deleteBooking(id) {
 
-  if (!confirm("Delete booking?")) return;
+  if (!confirm("Delete booking and restore slot to Available?")) return;
+
+  // Find the booking to get slot_id before deleting
+  const booking = window.allBookings?.find(b => b.id === id);
+  const slotId = booking?.slot_id;
 
   const res = await fetch("/api/admin-bookings", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      action: "delete",
-      id
-    })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "delete", id })
   });
 
   if (!res.ok) {
@@ -2931,9 +2930,24 @@ async function deleteBooking(id) {
     return;
   }
 
-  showToast("Booking deleted");
+  // Revert slot status back to available
+  if (slotId) {
+    await fetch("/api/admin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "update",
+        id: slotId,
+        data: { status: "available" }
+      })
+    });
+  }
+
+  showToast("Booking deleted & slot restored to Available");
   loadBookings();
+  loadSlots();
 }
+
 // booking modal EDIT JS starts
 function editBooking(id) {
 
