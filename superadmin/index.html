@@ -1081,7 +1081,7 @@ showToast(`Status updated to "${status}" for ${ids.length} slots`);
           }
 
           // Final summary toast
-          let msg = `✅ ${successCount} slot(s) copied to ${label}`;
+          let msg = ` ${successCount} slot(s) copied to ${label}`;
           if (skipCount > 0) msg += ` | ⚠️ ${skipCount} skipped (duplicate or error)`;
           showToast(msg);
           loadSlots();
@@ -1890,6 +1890,7 @@ function renderTable(data) {
 
     // DELETE
     const tdDelete = document.createElement("td");
+    tdDelete.className = "bg-white";
     tdDelete.innerHTML = `
       <button class="btn btn-danger btn-sm btn-lg w-100"
         onclick="deleteSlot(${slot.id})">
@@ -1898,8 +1899,10 @@ function renderTable(data) {
     `;
     tr.appendChild(tdDelete);
 
+// Book
 const tdBooking =
 document.createElement("td");
+tdBooking.className = "bg-white";
 
 if (
   slot.status === "booked"
@@ -1909,7 +1912,7 @@ if (
     <button
       class="btn btn-secondary btn-sm"
       onclick="viewBookingDetails(${slot.id})">
-      📋 Booked
+      Booked
     </button>
   `;
 
