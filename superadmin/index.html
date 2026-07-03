@@ -1025,7 +1025,6 @@ showToast(`Status updated to "${status}" for ${ids.length} slots`);
 
         // BULK COPY SLOTS to N days ahead
         async function bulkCopySlots(days) {
-
           const ids = getSelectedSlots();
 
           if (ids.length === 0) {
@@ -1033,56 +1032,77 @@ showToast(`Status updated to "${status}" for ${ids.length} slots`);
             return;
           }
 
-          const label = days === 1 ? "tomorrow (+1 day)" : `+${days} days`;
-          if (!confirm(`Copy ${ids.length} selected slot(s) to ${label}?`)) return;
-
-          let successCount = 0;
-          let skipCount    = 0;
-
-          for (const id of ids) {
-
-            // Find original slot data in memory
-            const original = allData.find(s => String(s.id) === String(id));
-            if (!original) { skipCount++; continue; }
-
-            // Calculate new date
-            const oldDate = new Date(original.date);
-            oldDate.setDate(oldDate.getDate() + days);
-            const newDate = oldDate.toLocaleDateString("sv-SE"); // YYYY-MM-DD
-
-            // Skip if duplicate already exists for same court + time + date
-            const duplicate = allData.find(s =>
-              s.date       === newDate &&
-              String(s.court_id)   === String(original.court_id) &&
-              s.start_time === original.start_time
-            );
-
-            if (duplicate) { skipCount++; continue; }
-
-            // POST new slot
-            const res = await fetch("/api/admin", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                action: "add",
-                data: {
-                  date:       newDate,
-                  court_id:   original.court_id,
-                  start_time: original.start_time,
-                  end_time:   original.end_time,
-                  time:       `${original.start_time} - ${original.end_time}`,
-                  price:      original.price,
-                  status:     "available"
-                }
-              })
-            });
-
-            if (res.ok) { successCount++; } else { skipCount++; }
+          // Determine label for confirmation message
+          let label;
+          if (days === 1) {
+            label = "tomorrow (+1 day)";
+          } else if (days === 7) {
+            label = "next 7 days (a week)";
+          } else {
+            label = `+${days} days`;
           }
 
-          // Final summary toast
-          let msg = ` ${successCount} slot(s) copied to ${label}`;
-          if (skipCount > 0) msg += ` | ⚠️ ${skipCount} skipped (duplicate or error)`;
+          if (!confirm(`Copy ${ids.length} selected slot(s) to ${label}?`)) return;
+
+          let totalSuccess = 0;
+          let totalSkipped = 0;
+
+          // If copying for 7 days, do a loop from 1 to 7
+          const daysToCopy = days === 7 ? [1, 2, 3, 4, 5, 6, 7] : [days];
+
+          for (const dayOffset of daysToCopy) {
+            for (const id of ids) {
+              // Find original slot data in memory
+              const original = allData.find(s => String(s.id) === String(id));
+              if (!original) { totalSkipped++; continue; }
+
+              // Calculate new date
+              const oldDate = new Date(original.date);
+              oldDate.setDate(oldDate.getDate() + dayOffset);
+              const newDate = oldDate.toLocaleDateString("sv-SE"); // YYYY-MM-DD
+
+              // Skip if duplicate exists
+              const duplicate = allData.find(s =>
+                s.date === newDate &&
+                String(s.court_id) === String(original.court_id) &&
+                s.start_time === original.start_time
+              );
+
+              if (duplicate) {
+                totalSkipped++;
+                continue;
+              }
+
+              // POST new slot
+              const res = await fetch("/api/admin", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  action: "add",
+                  data: {
+                    date: newDate,
+                    court_id: original.court_id,
+                    start_time: original.start_time,
+                    end_time: original.end_time,
+                    time: `${original.start_time} - ${original.end_time}`,
+                    price: original.price,
+                    status: "available"
+                  }
+                })
+              });
+
+              if (res.ok) { totalSuccess++; } else { totalSkipped++; }
+            }
+          }
+
+          // Final toast message
+          let msg = `✅ ${totalSuccess} slot(s) copied`;
+          if (days === 7) {
+            msg += ` for each day in next week`;
+          }
+          if (totalSkipped > 0) {
+            msg += ` | ⚠️ ${totalSkipped} skipped (duplicate or error)`;
+          }
           showToast(msg);
           loadSlots();
         }
