@@ -407,6 +407,78 @@
 <!--  -->
 
 <!-- ===================== -->
+<!-- STUDENT MANAGEMENT -->
+<!-- ===================== -->
+<div class="card p-3 mb-4 border-info">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">🎓 Student Management</h4>
+    <button class="btn btn-info text-white" onclick="showStudentForm()">+ Add Student</button>
+  </div>
+
+  <!-- Add/Edit Form -->
+  <div id="student-form" style="display:none;" class="border rounded p-3 mb-3">
+    <input type="hidden" id="stu-id">
+    <div class="row g-2">
+      <div class="col-md-3">
+        <input id="stu-first" class="form-control" placeholder="First Name *">
+      </div>
+      <div class="col-md-3">
+        <input id="stu-last" class="form-control" placeholder="Last Name">
+      </div>
+      <div class="col-md-2">
+        <select id="stu-gender" class="form-select">
+          <option value="">Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <input type="date" id="stu-dob" class="form-control" placeholder="Date of Birth">
+      </div>
+      <div class="col-md-2">
+        <input type="date" id="stu-join" class="form-control" placeholder="Joining Date">
+      </div>
+      <div class="col-md-3">
+        <input id="stu-mobile" class="form-control" placeholder="Mobile *">
+      </div>
+      <div class="col-md-3">
+        <input id="stu-email" class="form-control" placeholder="Email">
+      </div>
+      <div class="col-md-2">
+        <select id="stu-status" class="form-select">
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <input id="stu-notes" class="form-control" placeholder="Notes">
+      </div>
+    </div>
+    <button class="btn btn-primary mt-3" onclick="saveStudent()">Save Student</button>
+    <button class="btn btn-secondary mt-3 ms-2" onclick="document.getElementById('student-form').style.display='none'">Cancel</button>
+  </div>
+
+  <!-- Search -->
+  <input id="stu-search" class="form-control mb-3" placeholder="🔍 Search by name or mobile..."
+    oninput="filterStudents()">
+
+  <!-- Table -->
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>ID</th><th>Name</th><th>Mobile</th>
+          <th>Email</th><th>Joined</th><th>Status</th><th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="studentTableBody"></tbody>
+    </table>
+  </div>
+</div>
+<!-- STUDENT MANAGEMENT ends -->
+
+<!-- ===================== -->
 <!-- ANNOUNCEMENTS -->
 <!-- ===================== -->
 
@@ -1718,6 +1790,8 @@ function showToast(msg, type = "success") {
       loadAnnouncements();
 
       loadBookings();
+
+      loadStudents();
     }
 
   async function checkUser() {
