@@ -1171,6 +1171,16 @@ showToast(`Status updated to "${status}" for ${ids.length} slots`);
           <button class="btn btn-outline-success btn-sm" onclick="exportBookingsCSV()">⬇️ Export CSV</button>
       </div>
 
+        <!-- Payment Filter Buttons -->
+        <div class="btn-group mb-3" role="group">
+          <button class="btn btn-outline-secondary btn-sm active" id="filter-all"
+            onclick="filterBookings('all')">All</button>
+          <button class="btn btn-outline-warning btn-sm" id="filter-pending"
+            onclick="filterBookings('pending')">⏳ Pending</button>
+          <button class="btn btn-outline-success btn-sm" id="filter-paid"
+            onclick="filterBookings('paid')">✅ Paid</button>
+        </div>
+
       <div class="table-responsive">
         <table class="table table-bordered">
           <thead>
@@ -2893,6 +2903,94 @@ async function deleteAnnouncement(id) {
   loadAnnouncements();
 }
 
+
+// 
+// Mark booking as Paid with one click
+async function markPaid(bookingId) {
+
+  const res = await fetch("/api/admin-bookings", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "update",
+      id: bookingId,
+      data: { payment_status: "paid" }
+    })
+  });
+
+  if (!res.ok) { showToast("Update failed", "error"); return; }
+
+  // Update in memory so no full reload needed
+  const booking = window.allBookings?.find(b => b.id === bookingId);
+  if (booking) booking.payment_status = "paid";
+
+  showToast("Marked as Paid ✅");
+  filterBookings(document.querySelector(".btn-group .active")?.id?.replace("filter-","") || "all");
+}
+
+// Filter bookings by payment status
+function filterBookings(status) {
+
+  // Update active button style
+  ["all","pending","paid"].forEach(s => {
+    const btn = document.getElementById("filter-" + s);
+    if (btn) btn.classList.toggle("active", s === status);
+  });
+
+  const bookings = window.allBookings || [];
+  const today = new Date().toLocaleDateString("sv-SE");
+
+  const filtered = bookings.filter(b => {
+    const slotDate = b.slots?.date || "";
+    const dateOk = !slotDate || slotDate >= today;
+    const payOk = status === "all" || b.payment_status === status;
+    return dateOk && payOk;
+  });
+
+  renderBookingRows(filtered);
+}
+
+// Renders rows — called by both loadBookings and filterBookings
+function renderBookingRows(bookings) {
+
+  const tbody = document.getElementById("bookingTableBody");
+  tbody.innerHTML = "";
+
+  if (bookings.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-3">No bookings found</td></tr>`;
+    return;
+  }
+
+  bookings.forEach(b => {
+    const slot = b.slots || {};
+    const slotLabel = slot.date
+      ? `${slot.date}<br><small class="text-muted">${slot.start_time||""} - ${slot.end_time||""}</small>`
+      : `Slot #${b.slot_id}`;
+
+    const payBadge = b.payment_status === "paid"
+      ? `<span class="badge bg-success">Paid</span>`
+      : `<span class="badge bg-warning text-dark">Pending</span>`;
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${slotLabel}</td>
+        <td>${b.customer_name || ""}</td>
+        <td><a href="tel:${b.customer_mobile}">${b.customer_mobile || ""}</a></td>
+        <td><a href="mailto:${b.customer_email}">${b.customer_email || ""}</a></td>
+        <td>${payBadge}</td>
+        <td>${b.booking_notes || ""}</td>
+        <td>
+          ${b.payment_status !== "paid"
+            ? `<button class="btn btn-success btn-sm my-1 me-1" onclick="markPaid(${b.id})">✅ Paid</button>`
+            : ""}
+          <button class="btn btn-primary btn-sm me-1 my-1" onclick="editBooking(${b.id})">Edit</button>
+          <button class="btn btn-danger btn-sm my-1" onclick="deleteBooking(${b.id})">Delete</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+// 
 // 
 async function loadBookings() {
 
@@ -2912,58 +3010,8 @@ async function loadBookings() {
   // bookings.forEach(b => {
 
   // present and future booking only
-  window.allBookings = bookings;
-
-  const today = new Date().toLocaleDateString('sv-SE');
-  const filtered = bookings.filter(b => {
-    const slotDate = b.slots?.date || "";
-    return slotDate >= today;
-  });
-
-  const tbody =
-    document.getElementById(
-      "bookingTableBody"
-    );
-
-  tbody.innerHTML = "";
-
-  filtered.forEach(b => {
-
-    tbody.innerHTML += `
-      <tr>
-        <td>
-          ${b.slots?.date || 'Slot #'+b.slot_id}<br>
-          <small class="text-muted">${b.slots?.start_time || ''} - ${b.slots?.end_time || ''}</small>
-        </td>
-        <td>${b.customer_name}</td>
-        <td>
-            <a href="tel:${b.customer_mobile}">
-              ${b.customer_mobile || ""}
-            </a>
-        </td>
-        <td>
-          <a href="mailto:${b.customer_email}">
-            ${b.customer_email || ""}
-          </a>
-        </td>
-        <td>${b.payment_status}</td>
-        <td>${b.booking_notes || ""}</td>
-        <td>
-          <button class="btn btn-primary btn-sm me-1 my-1"
-            onclick="editBooking(${b.id})">
-            Edit
-          </button>
-
-          <button class="btn btn-danger btn-sm my-1"
-            onclick="deleteBooking(${b.id})">
-            Delete
-          </button>
-        </td>
-      </tr>
-    `;
-
-  });
-
+window.allBookings = bookings;
+  filterBookings("all"); // renders with current active filter
 }
 //Announcements ends here 
 
