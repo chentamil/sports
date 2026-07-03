@@ -491,7 +491,7 @@
     </h4>
 
     <button
-      class="btn btn-success d-none1"
+      class="btn btn-success d-none"
       onclick="showAnnouncementForm()">
 
       + Add Announcement
@@ -3135,6 +3135,132 @@ function viewBookingDetails(slotId) {
     document.getElementById("viewBookingModal")
   ).show();
 }
+
+//  Add the Student JS functions starts
+// ========================
+// STUDENT MANAGEMENT JS
+// ========================
+
+async function loadStudents() {
+  const res = await fetch("/api/students");
+  window.allStudents = await res.json();
+  filterStudents();
+}
+
+function filterStudents() {
+  const q = (document.getElementById("stu-search")?.value || "").toLowerCase();
+  const list = (window.allStudents || []).filter(s =>
+    (s.first_name + " " + (s.last_name||"")).toLowerCase().includes(q) ||
+    (s.mobile||"").includes(q)
+  );
+  renderStudentRows(list);
+}
+
+function renderStudentRows(students) {
+  const tbody = document.getElementById("studentTableBody");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+  if (students.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-3">No students found</td></tr>`;
+    return;
+  }
+  students.forEach(s => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${s.id}</td>
+        <td>${s.first_name} ${s.last_name||""}</td>
+        <td><a href="tel:${s.mobile}">${s.mobile||""}</a></td>
+        <td><a href="mailto:${s.email}">${s.email||""}</a></td>
+        <td>${s.joining_date||""}</td>
+        <td><span class="badge ${s.status==='active'?'bg-success':'bg-secondary'}">${s.status}</span></td>
+        <td>
+          <button class="btn btn-primary btn-sm me-1" onclick="editStudent(${s.id})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteStudent(${s.id})">Delete</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function showStudentForm() {
+  document.getElementById("stu-id").value = "";
+  document.getElementById("stu-first").value = "";
+  document.getElementById("stu-last").value = "";
+  document.getElementById("stu-gender").value = "";
+  document.getElementById("stu-dob").value = "";
+  document.getElementById("stu-mobile").value = "";
+  document.getElementById("stu-email").value = "";
+  document.getElementById("stu-join").value = new Date().toLocaleDateString("sv-SE");
+  document.getElementById("stu-status").value = "active";
+  document.getElementById("stu-notes").value = "";
+  document.getElementById("student-form").style.display = "block";
+}
+
+function editStudent(id) {
+  const s = window.allStudents?.find(x => x.id === id);
+  if (!s) return;
+  document.getElementById("stu-id").value = s.id;
+  document.getElementById("stu-first").value = s.first_name||"";
+  document.getElementById("stu-last").value = s.last_name||"";
+  document.getElementById("stu-gender").value = s.gender||"";
+  document.getElementById("stu-dob").value = s.date_of_birth||"";
+  document.getElementById("stu-mobile").value = s.mobile||"";
+  document.getElementById("stu-email").value = s.email||"";
+  document.getElementById("stu-join").value = s.joining_date||"";
+  document.getElementById("stu-status").value = s.status||"active";
+  document.getElementById("stu-notes").value = s.notes||"";
+  document.getElementById("student-form").style.display = "block";
+  document.getElementById("student-form").scrollIntoView({ behavior:"smooth" });
+}
+
+async function saveStudent() {
+  const id = document.getElementById("stu-id").value;
+  const firstName = document.getElementById("stu-first").value.trim();
+  const mobile = document.getElementById("stu-mobile").value.trim();
+
+  if (!firstName) { showToast("First name is required", "warning"); return; }
+  if (!mobile) { showToast("Mobile is required", "warning"); return; }
+
+  const data = {
+    first_name:   firstName,
+    last_name:    document.getElementById("stu-last").value.trim(),
+    gender:       document.getElementById("stu-gender").value,
+    date_of_birth: document.getElementById("stu-dob").value || null,
+    mobile:       mobile,
+    email:        document.getElementById("stu-email").value.trim(),
+    joining_date: document.getElementById("stu-join").value || null,
+    status:       document.getElementById("stu-status").value,
+    notes:        document.getElementById("stu-notes").value.trim()
+  };
+
+  const isEdit = !!id;
+  const res = await fetch("/api/students", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(isEdit
+      ? { action: "update", id: Number(id), data }
+      : { action: "add", data })
+  });
+
+  if (!res.ok) { showToast("Save failed", "error"); return; }
+
+  showToast(isEdit ? "Student updated ✅" : "Student added ✅");
+  document.getElementById("student-form").style.display = "none";
+  loadStudents();
+}
+
+async function deleteStudent(id) {
+  if (!confirm("Delete this student?")) return;
+  const res = await fetch("/api/students", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "delete", id })
+  });
+  if (!res.ok) { showToast("Delete failed", "error"); return; }
+  showToast("Student deleted");
+  loadStudents();
+}
+//  Add the Student JS functions ends
 
 // Booking Modal starts here
 function openBookingModal(slotId){
