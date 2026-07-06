@@ -605,6 +605,180 @@
 <!-- ATTENDANCE MANAGEMENT ends -->
 
 <!-- ===================== -->
+<!-- MEMBERSHIP PLANS -->
+<!-- ===================== -->
+<div class="card p-3 mb-4 border-purple" style="border-color: #8b5cf6;">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">💳 Membership Plans</h4>
+    <button class="btn btn-primary" style="background:#8b5cf6;border-color:#8b5cf6;" onclick="showPlanForm()">+ Add Plan</button>
+  </div>
+
+  <div id="plan-form" style="display:none;" class="border rounded p-3 mb-3">
+    <input type="hidden" id="plan-id">
+    <div class="row g-2">
+      <div class="col-md-3">
+        <input id="plan-name" class="form-control" placeholder="Plan Name * (e.g., Monthly)">
+      </div>
+      <div class="col-md-2">
+        <input type="number" id="plan-duration" class="form-control" placeholder="Days *">
+      </div>
+      <div class="col-md-2">
+        <input type="number" id="plan-amount" class="form-control" placeholder="Amount *">
+      </div>
+      <div class="col-md-3">
+        <input id="plan-description" class="form-control" placeholder="Description">
+      </div>
+      <div class="col-md-2">
+        <select id="plan-status" class="form-select">
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-primary mt-3" style="background:#8b5cf6;border-color:#8b5cf6;" onclick="savePlan()">Save Plan</button>
+    <button class="btn btn-secondary mt-3 ms-2" onclick="document.getElementById('plan-form').style.display='none'">Cancel</button>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>ID</th><th>Name</th><th>Duration (Days)</th>
+          <th>Amount (₹)</th><th>Description</th><th>Status</th><th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="planTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== -->
+<!-- STUDENT MEMBERSHIPS -->
+<!-- ===================== -->
+<div class="card p-3 mb-4 border-purple" style="border-color: #a78bfa;">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">📋 Student Memberships</h4>
+    <button class="btn btn-primary" style="background:#a78bfa;border-color:#a78bfa;" onclick="showStudentMembershipForm()">+ Assign Membership</button>
+  </div>
+
+  <div id="student-membership-form" style="display:none;" class="border rounded p-3 mb-3">
+    <input type="hidden" id="sm-id">
+    <div class="row g-2">
+      <div class="col-md-3">
+        <select id="sm-student" class="form-select">
+          <option value="">Select Student *</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select id="sm-plan" class="form-select">
+          <option value="">Select Plan *</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <input type="date" id="sm-start" class="form-control" placeholder="Start Date">
+      </div>
+      <div class="col-md-2">
+        <input type="number" id="sm-discount" class="form-control" placeholder="Discount (₹)" value="0">
+      </div>
+      <div class="col-md-2">
+        <input type="number" id="sm-final-amount" class="form-control" placeholder="Final Amount" readonly>
+      </div>
+      <div class="col-md-2">
+        <select id="sm-status" class="form-select">
+          <option value="active">Active</option>
+          <option value="expired">Expired</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <input id="sm-notes" class="form-control" placeholder="Notes">
+      </div>
+    </div>
+    <button class="btn btn-primary mt-3" style="background:#a78bfa;border-color:#a78bfa;" onclick="saveStudentMembership()">Save Membership</button>
+    <button class="btn btn-secondary mt-3 ms-2" onclick="document.getElementById('student-membership-form').style.display='none'">Cancel</button>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>ID</th><th>Student</th><th>Plan</th>
+          <th>Start</th><th>End</th><th>Amount (₹)</th><th>Status</th><th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="studentMembershipTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== -->
+<!-- FEE PAYMENTS -->
+<!-- ===================== -->
+<div class="card p-3 mb-4 border-purple" style="border-color: #c4b5fd;">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">💰 Fee Payments</h4>
+    <button class="btn btn-primary" style="background:#c4b5fd;border-color:#c4b5fd;color:#000;" onclick="showPaymentForm()">+ Record Payment</button>
+  </div>
+
+  <div id="payment-form" style="display:none;" class="border rounded p-3 mb-3">
+    <input type="hidden" id="payment-id">
+    <div class="row g-2">
+      <div class="col-md-3">
+        <select id="pay-student" class="form-select">
+          <option value="">Select Student *</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select id="pay-membership" class="form-select">
+          <option value="">Select Membership</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <input type="number" id="pay-amount" class="form-control" placeholder="Amount *">
+      </div>
+      <div class="col-md-2">
+        <input type="date" id="pay-date" class="form-control" placeholder="Payment Date">
+      </div>
+      <div class="col-md-2">
+        <select id="pay-mode" class="form-select">
+          <option value="cash">Cash</option>
+          <option value="upi">UPI</option>
+          <option value="bank_transfer">Bank Transfer</option>
+          <option value="card">Card</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <input id="pay-reference" class="form-control" placeholder="Reference Number">
+      </div>
+      <div class="col-md-2">
+        <select id="pay-status" class="form-select">
+          <option value="completed">Completed</option>
+          <option value="pending">Pending</option>
+          <option value="failed">Failed</option>
+        </select>
+      </div>
+      <div class="col-md-5">
+        <input id="pay-remarks" class="form-control" placeholder="Remarks">
+      </div>
+    </div>
+    <button class="btn btn-primary mt-3" style="background:#c4b5fd;border-color:#c4b5fd;color:#000;" onclick="savePayment()">Save Payment</button>
+    <button class="btn btn-secondary mt-3 ms-2" onclick="document.getElementById('payment-form').style.display='none'">Cancel</button>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Receipt #</th><th>Student</th><th>Amount (₹)</th>
+          <th>Date</th><th>Mode</th><th>Status</th><th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="paymentTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== -->
 <!-- ANNOUNCEMENTS -->
 <!-- ===================== -->
 
@@ -1896,28 +2070,31 @@ function showToast(msg, type = "success") {
     location.reload();
   }
 
-    function showDashboard() {
+  function showDashboard() {
 
-      document.getElementById("login-box").style.display="none";
+    document.getElementById("login-box").style.display="none";
 
-      document.getElementById("dashboard").style.display="block";
+    document.getElementById("dashboard").style.display="block";
 
-      loadSlots();
+    loadSlots();
 
-      loadAnnouncements();
+    loadAnnouncements();
 
-      loadBookings();
+    loadBookings();
 
-      loadStudents();
-      loadCoaches();
-      loadBatches();
-      populateBatchDropdowns();
+    loadStudents();
+    loadCoaches();
+    loadBatches();
+    loadPlans();
+    loadStudentMemberships();
+    loadPayments();
+    populateBatchDropdowns();
 
-      // Set today's date for attendance
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('attendance-date').value = today;
-      loadAttendance();
-    }
+    // Set today's date for attendance
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('attendance-date').value = today;
+    loadAttendance();
+  }
 
   async function checkUser() {
 
@@ -3792,6 +3969,410 @@ async function deleteAnnouncement(id) {
   );
 
   loadAnnouncements();
+}
+
+// =================================================
+// MEMBERSHIP PLANS JS
+// =================================================
+
+let allPlans = [];
+let allStudentMemberships = [];
+let allPayments = [];
+
+async function loadPlans() {
+  const res = await fetch("/api/membership-plans");
+  allPlans = await res.json();
+  renderPlanRows(allPlans);
+  populatePlanDropdowns();
+}
+
+function renderPlanRows(plans) {
+  const tbody = document.getElementById("planTableBody");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+  if (!plans || plans.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-3">No plans found</td></tr>`;
+    return;
+  }
+  plans.forEach(p => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${p.id}</td>
+        <td>${p.name}</td>
+        <td>${p.duration_days}</td>
+        <td>₹${p.amount}</td>
+        <td>${p.description || ""}</td>
+        <td><span class="badge ${p.status === 'active' ? 'bg-success' : 'bg-secondary'}">${p.status}</span></td>
+        <td>
+          <button class="btn btn-primary btn-sm me-1" onclick="editPlan(${p.id})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deletePlan(${p.id})">Delete</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function showPlanForm() {
+  document.getElementById("plan-id").value = "";
+  document.getElementById("plan-name").value = "";
+  document.getElementById("plan-duration").value = "";
+  document.getElementById("plan-amount").value = "";
+  document.getElementById("plan-description").value = "";
+  document.getElementById("plan-status").value = "active";
+  document.getElementById("plan-form").style.display = "block";
+}
+
+function editPlan(id) {
+  const p = allPlans.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById("plan-id").value = p.id;
+  document.getElementById("plan-name").value = p.name || "";
+  document.getElementById("plan-duration").value = p.duration_days || "";
+  document.getElementById("plan-amount").value = p.amount || "";
+  document.getElementById("plan-description").value = p.description || "";
+  document.getElementById("plan-status").value = p.status || "active";
+  document.getElementById("plan-form").style.display = "block";
+  document.getElementById("plan-form").scrollIntoView({ behavior: "smooth" });
+}
+
+async function savePlan() {
+  const id = document.getElementById("plan-id").value;
+  const name = document.getElementById("plan-name").value.trim();
+  const duration = document.getElementById("plan-duration").value;
+  const amount = document.getElementById("plan-amount").value;
+
+  if (!name) { showToast("Plan name is required", "warning"); return; }
+  if (!duration) { showToast("Duration is required", "warning"); return; }
+  if (!amount) { showToast("Amount is required", "warning"); return; }
+
+  const data = {
+    name: name,
+    duration_days: parseInt(duration),
+    amount: parseFloat(amount),
+    description: document.getElementById("plan-description").value.trim(),
+    status: document.getElementById("plan-status").value
+  };
+
+  const isEdit = !!id;
+  const res = await fetch("/api/membership-plans", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(isEdit
+      ? { action: "update", id: Number(id), data }
+      : { action: "add", data })
+  });
+
+  if (!res.ok) { showToast("Save failed", "error"); return; }
+
+  showToast(isEdit ? "Plan updated ✅" : "Plan added ✅");
+  document.getElementById("plan-form").style.display = "none";
+  loadPlans();
+}
+
+async function deletePlan(id) {
+  if (!confirm("Delete this plan?")) return;
+  const res = await fetch("/api/membership-plans", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "delete", id })
+  });
+  if (!res.ok) { showToast("Delete failed", "error"); return; }
+  showToast("Plan deleted");
+  loadPlans();
+}
+
+// =================================================
+// STUDENT MEMBERSHIPS JS
+// =================================================
+
+async function loadStudentMemberships() {
+  const res = await fetch("/api/student-memberships");
+  allStudentMemberships = await res.json();
+  renderStudentMembershipRows(allStudentMemberships);
+}
+
+function renderStudentMembershipRows(memberships) {
+  const tbody = document.getElementById("studentMembershipTableBody");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+  if (!memberships || memberships.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-3">No memberships found</td></tr>`;
+    return;
+  }
+  memberships.forEach(m => {
+    const studentName = m.students ? `${m.students.first_name} ${m.students.last_name || ""}` : "N/A";
+    const planName = m.membership_plans ? m.membership_plans.name : "N/A";
+    tbody.innerHTML += `
+      <tr>
+        <td>${m.id}</td>
+        <td>${studentName}</td>
+        <td>${planName}</td>
+        <td>${m.start_date || ""}</td>
+        <td>${m.end_date || ""}</td>
+        <td>₹${m.final_amount || 0}</td>
+        <td><span class="badge ${m.status === 'active' ? 'bg-success' : m.status === 'expired' ? 'bg-warning' : 'bg-danger'}">${m.status}</span></td>
+        <td>
+          <button class="btn btn-primary btn-sm me-1" onclick="editStudentMembership(${m.id})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteStudentMembership(${m.id})">Delete</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function showStudentMembershipForm() {
+  document.getElementById("sm-id").value = "";
+  document.getElementById("sm-start").value = new Date().toISOString().split('T')[0];
+  document.getElementById("sm-discount").value = "0";
+  document.getElementById("sm-final-amount").value = "";
+  document.getElementById("sm-status").value = "active";
+  document.getElementById("sm-notes").value = "";
+  document.getElementById("student-membership-form").style.display = "block";
+  populateStudentMembershipDropdowns();
+}
+
+function editStudentMembership(id) {
+  const m = allStudentMemberships.find(x => x.id === id);
+  if (!m) return;
+  document.getElementById("sm-id").value = m.id;
+  document.getElementById("sm-student").value = m.student_id || "";
+  document.getElementById("sm-plan").value = m.plan_id || "";
+  document.getElementById("sm-start").value = m.start_date || "";
+  document.getElementById("sm-discount").value = m.discount || 0;
+  document.getElementById("sm-final-amount").value = m.final_amount || "";
+  document.getElementById("sm-status").value = m.status || "active";
+  document.getElementById("sm-notes").value = m.notes || "";
+  document.getElementById("student-membership-form").style.display = "block";
+  populateStudentMembershipDropdowns();
+}
+
+async function saveStudentMembership() {
+  const id = document.getElementById("sm-id").value;
+  const studentId = document.getElementById("sm-student").value;
+  const planId = document.getElementById("sm-plan").value;
+  const startDate = document.getElementById("sm-start").value;
+
+  if (!studentId) { showToast("Please select a student", "warning"); return; }
+  if (!planId) { showToast("Please select a plan", "warning"); return; }
+  if (!startDate) { showToast("Start date is required", "warning"); return; }
+
+  const discount = parseFloat(document.getElementById("sm-discount").value) || 0;
+  const plan = allPlans.find(p => p.id == planId);
+  const finalAmount = plan ? plan.amount - discount : 0;
+
+  const data = {
+    student_id: parseInt(studentId),
+    plan_id: parseInt(planId),
+    start_date: startDate,
+    discount: discount,
+    final_amount: finalAmount,
+    status: document.getElementById("sm-status").value,
+    notes: document.getElementById("sm-notes").value.trim()
+  };
+
+  const isEdit = !!id;
+  const res = await fetch("/api/student-memberships", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(isEdit
+      ? { action: "update", id: Number(id), data }
+      : { action: "add", data })
+  });
+
+  if (!res.ok) { showToast("Save failed", "error"); return; }
+
+  showToast(isEdit ? "Membership updated ✅" : "Membership assigned ✅");
+  document.getElementById("student-membership-form").style.display = "none";
+  loadStudentMemberships();
+}
+
+async function deleteStudentMembership(id) {
+  if (!confirm("Delete this membership?")) return;
+  const res = await fetch("/api/student-memberships", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "delete", id })
+  });
+  if (!res.ok) { showToast("Delete failed", "error"); return; }
+  showToast("Membership deleted");
+  loadStudentMemberships();
+}
+
+// =================================================
+// FEE PAYMENTS JS
+// =================================================
+
+async function loadPayments() {
+  const res = await fetch("/api/fee-payments");
+  allPayments = await res.json();
+  renderPaymentRows(allPayments);
+}
+
+function renderPaymentRows(payments) {
+  const tbody = document.getElementById("paymentTableBody");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+  if (!payments || payments.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-3">No payments found</td></tr>`;
+    return;
+  }
+  payments.forEach(p => {
+    const studentName = p.students ? `${p.students.first_name} ${p.students.last_name || ""}` : "N/A";
+    tbody.innerHTML += `
+      <tr>
+        <td><code>${p.receipt_number || "N/A"}</code></td>
+        <td>${studentName}</td>
+        <td>₹${p.amount}</td>
+        <td>${p.payment_date || ""}</td>
+        <td>${p.payment_mode || ""}</td>
+        <td><span class="badge ${p.status === 'completed' ? 'bg-success' : p.status === 'pending' ? 'bg-warning' : 'bg-danger'}">${p.status}</span></td>
+        <td>
+          <button class="btn btn-primary btn-sm me-1" onclick="editPayment(${p.id})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deletePayment(${p.id})">Delete</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function showPaymentForm() {
+  document.getElementById("payment-id").value = "";
+  document.getElementById("pay-amount").value = "";
+  document.getElementById("pay-date").value = new Date().toISOString().split('T')[0];
+  document.getElementById("pay-mode").value = "cash";
+  document.getElementById("pay-reference").value = "";
+  document.getElementById("pay-status").value = "completed";
+  document.getElementById("pay-remarks").value = "";
+  document.getElementById("payment-form").style.display = "block";
+  populatePaymentDropdowns();
+}
+
+function editPayment(id) {
+  const p = allPayments.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById("payment-id").value = p.id;
+  document.getElementById("pay-student").value = p.student_id || "";
+  document.getElementById("pay-membership").value = p.student_membership_id || "";
+  document.getElementById("pay-amount").value = p.amount || "";
+  document.getElementById("pay-date").value = p.payment_date || "";
+  document.getElementById("pay-mode").value = p.payment_mode || "cash";
+  document.getElementById("pay-reference").value = p.reference_number || "";
+  document.getElementById("pay-status").value = p.status || "completed";
+  document.getElementById("pay-remarks").value = p.remarks || "";
+  document.getElementById("payment-form").style.display = "block";
+  populatePaymentDropdowns();
+}
+
+async function savePayment() {
+  const id = document.getElementById("payment-id").value;
+  const studentId = document.getElementById("pay-student").value;
+  const amount = document.getElementById("pay-amount").value;
+
+  if (!studentId) { showToast("Please select a student", "warning"); return; }
+  if (!amount) { showToast("Amount is required", "warning"); return; }
+
+  const data = {
+    student_id: parseInt(studentId),
+    student_membership_id: document.getElementById("pay-membership").value || null,
+    amount: parseFloat(amount),
+    payment_date: document.getElementById("pay-date").value,
+    payment_mode: document.getElementById("pay-mode").value,
+    reference_number: document.getElementById("pay-reference").value.trim(),
+    status: document.getElementById("pay-status").value,
+    remarks: document.getElementById("pay-remarks").value.trim(),
+    received_by: "admin"
+  };
+
+  const isEdit = !!id;
+  const res = await fetch("/api/fee-payments", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(isEdit
+      ? { action: "update", id: Number(id), data }
+      : { action: "add", data })
+  });
+
+  if (!res.ok) { showToast("Save failed", "error"); return; }
+
+  showToast(isEdit ? "Payment updated ✅" : "Payment recorded ✅");
+  document.getElementById("payment-form").style.display = "none";
+  loadPayments();
+}
+
+async function deletePayment(id) {
+  if (!confirm("Delete this payment?")) return;
+  const res = await fetch("/api/fee-payments", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "delete", id })
+  });
+  if (!res.ok) { showToast("Delete failed", "error"); return; }
+  showToast("Payment deleted");
+  loadPayments();
+}
+
+// =================================================
+// DROPDOWN HELPERS
+// =================================================
+
+function populatePlanDropdowns() {
+  // For student membership form
+  const select = document.getElementById("sm-plan");
+  if (!select) return;
+  select.innerHTML = '<option value="">Select Plan *</option>';
+  if (allPlans) {
+    allPlans.filter(p => p.status === 'active').forEach(p => {
+      select.innerHTML += `<option value="${p.id}" data-amount="${p.amount}">${p.name} - ₹${p.amount} (${p.duration_days} days)</option>`;
+    });
+  }
+  
+  // Auto-calculate final amount when plan changes
+  document.getElementById("sm-plan")?.addEventListener('change', function() {
+    const amount = this.options[this.selectedIndex]?.dataset?.amount || 0;
+    const discount = parseFloat(document.getElementById("sm-discount").value) || 0;
+    document.getElementById("sm-final-amount").value = amount - discount;
+  });
+  
+  document.getElementById("sm-discount")?.addEventListener('input', function() {
+    const planSelect = document.getElementById("sm-plan");
+    const amount = parseFloat(planSelect.options[planSelect.selectedIndex]?.dataset?.amount) || 0;
+    const discount = parseFloat(this.value) || 0;
+    document.getElementById("sm-final-amount").value = amount - discount;
+  });
+}
+
+function populateStudentMembershipDropdowns() {
+  populateStudentList("sm-student");
+  populatePlanDropdowns();
+}
+
+function populatePaymentDropdowns() {
+  populateStudentList("pay-student");
+  // Populate memberships for selected student
+  document.getElementById("pay-student")?.addEventListener('change', function() {
+    const studentId = this.value;
+    const membershipSelect = document.getElementById("pay-membership");
+    if (!membershipSelect) return;
+    membershipSelect.innerHTML = '<option value="">Select Membership</option>';
+    if (studentId && allStudentMemberships) {
+      const memberships = allStudentMemberships.filter(m => m.student_id == studentId && m.status === 'active');
+      memberships.forEach(m => {
+        const plan = allPlans.find(p => p.id == m.plan_id);
+        membershipSelect.innerHTML += `<option value="${m.id}">${plan?.name || 'Plan'} - ₹${m.final_amount}</option>`;
+      });
+    }
+  });
+}
+
+function populateStudentList(selectId) {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+  select.innerHTML = '<option value="">Select Student *</option>';
+  if (window.allStudents) {
+    window.allStudents.forEach(s => {
+      select.innerHTML += `<option value="${s.id}">${s.first_name} ${s.last_name || ''} (${s.mobile || ''})</option>`;
+    });
+  }
 }
 
 // =================================================
