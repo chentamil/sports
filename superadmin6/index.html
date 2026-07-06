@@ -192,6 +192,82 @@
 
       </button>
     </div>
+    <!-- New ANALYTICS Starts here -->
+         <!-- FINANCIAL DASHBOARD -->
+    <div class="card p-3 mb-4 border-info">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">💰 Financial Dashboard</h4>
+        <div>
+          <select id="finance-period" class="form-select d-inline w-auto" onchange="loadFinancialDashboard()">
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month" selected>This Month</option>
+            <option value="year">This Year</option>
+          </select>
+          <button class="btn btn-outline-primary btn-sm ms-2" onclick="loadFinancialDashboard()">Refresh</button>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-6 col-md-3">
+          <div class="card p-3 text-center bg-success text-white">
+            <small>Revenue</small>
+            <h4 id="financeRevenue">₹0</h4>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card p-3 text-center bg-danger text-white">
+            <small>Expenses</small>
+            <h4 id="financeExpenses">₹0</h4>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card p-3 text-center bg-primary text-white">
+            <small>Profit</small>
+            <h4 id="financeProfit">₹0</h4>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card p-3 text-center bg-warning text-dark">
+            <small>Margin</small>
+            <h4 id="financeMargin">0%</h4>
+          </div>
+        </div>
+      </div>
+
+      <!-- Revenue Breakdown -->
+      <div class="row g-3 mb-3">
+        <div class="col-6">
+          <div class="card p-2 text-center">
+            <small class="text-muted">Bookings</small>
+            <strong id="financeBookings">₹0</strong>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="card p-2 text-center">
+            <small class="text-muted">Memberships</small>
+            <strong id="financeFees">₹0</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="row g-3">
+        <div class="col-md-7">
+          <div style="height:250px;">
+            <canvas id="financeChart"></canvas>
+          </div>
+        </div>
+        <div class="col-md-5">
+          <div style="height:250px;">
+            <canvas id="expenseCategoryChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- New ANALYTICS ends here -->
+
 
     <!-- ANALYTICS -->
     <div class="row my-4">
@@ -774,6 +850,104 @@
         </tr>
       </thead>
       <tbody id="paymentTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== -->
+<!-- EXPENSE MANAGEMENT -->
+<!-- ===================== -->
+<div class="card p-3 mb-4 border-warning">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">📊 Expense Management</h4>
+    <button class="btn btn-warning text-dark" onclick="showExpenseForm()">+ Add Expense</button>
+  </div>
+
+  <div id="expense-form" style="display:none;" class="border rounded p-3 mb-3">
+    <input type="hidden" id="expense-id">
+    <div class="row g-2">
+      <div class="col-md-2">
+        <input type="date" id="expense-date" class="form-control" placeholder="Date">
+      </div>
+      <div class="col-md-3">
+        <select id="expense-category" class="form-select">
+          <option value="">Select Category *</option>
+          <option value="Shuttle Purchase">🏸 Shuttle Purchase</option>
+          <option value="Court Maintenance">🔧 Court Maintenance</option>
+          <option value="Electricity">⚡ Electricity</option>
+          <option value="Water">💧 Water</option>
+          <option value="Staff Salary">👨‍🏫 Staff Salary</option>
+          <option value="Coach Salary">🧑‍🏫 Coach Salary</option>
+          <option value="Equipment">🎯 Equipment</option>
+          <option value="Cleaning">🧹 Cleaning</option>
+          <option value="Repairs">🔨 Repairs</option>
+          <option value="Marketing">📢 Marketing</option>
+          <option value="Other">📌 Other</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <input type="number" id="expense-amount" class="form-control" placeholder="Amount *">
+      </div>
+      <div class="col-md-2">
+        <input id="expense-paid-to" class="form-control" placeholder="Paid To">
+      </div>
+      <div class="col-md-2">
+        <select id="expense-payment-mode" class="form-select">
+          <option value="cash">Cash</option>
+          <option value="upi">UPI</option>
+          <option value="bank_transfer">Bank Transfer</option>
+          <option value="card">Card</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <input id="expense-reference" class="form-control" placeholder="Reference #">
+      </div>
+      <div class="col-md-4">
+        <input id="expense-remarks" class="form-control" placeholder="Remarks">
+      </div>
+    </div>
+    <button class="btn btn-warning text-dark mt-3" onclick="saveExpense()">Save Expense</button>
+    <button class="btn btn-secondary mt-3 ms-2" onclick="document.getElementById('expense-form').style.display='none'">Cancel</button>
+  </div>
+
+  <!-- Filter -->
+  <div class="row g-2 mb-3">
+    <div class="col-md-3">
+      <input type="date" id="expense-filter-start" class="form-control" placeholder="Start Date">
+    </div>
+    <div class="col-md-3">
+      <input type="date" id="expense-filter-end" class="form-control" placeholder="End Date">
+    </div>
+    <div class="col-md-3">
+      <select id="expense-filter-category" class="form-select">
+        <option value="">All Categories</option>
+        <option value="Shuttle Purchase">🏸 Shuttle Purchase</option>
+        <option value="Court Maintenance">🔧 Court Maintenance</option>
+        <option value="Electricity">⚡ Electricity</option>
+        <option value="Water">💧 Water</option>
+        <option value="Staff Salary">👨‍🏫 Staff Salary</option>
+        <option value="Coach Salary">🧑‍🏫 Coach Salary</option>
+        <option value="Equipment">🎯 Equipment</option>
+        <option value="Cleaning">🧹 Cleaning</option>
+        <option value="Repairs">🔨 Repairs</option>
+        <option value="Marketing">📢 Marketing</option>
+        <option value="Other">📌 Other</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <button class="btn btn-primary w-100" onclick="loadExpenses()">Apply Filter</button>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>ID</th><th>Date</th><th>Category</th>
+          <th>Amount (₹)</th><th>Paid To</th><th>Mode</th><th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="expenseTableBody"></tbody>
     </table>
   </div>
 </div>
@@ -2070,31 +2244,33 @@ function showToast(msg, type = "success") {
     location.reload();
   }
 
-  function showDashboard() {
+function showDashboard() {
 
-    document.getElementById("login-box").style.display="none";
+  document.getElementById("login-box").style.display="none";
 
-    document.getElementById("dashboard").style.display="block";
+  document.getElementById("dashboard").style.display="block";
 
-    loadSlots();
+  loadSlots();
 
-    loadAnnouncements();
+  loadAnnouncements();
 
-    loadBookings();
+  loadBookings();
 
-    loadStudents();
-    loadCoaches();
-    loadBatches();
-    loadPlans();
-    loadStudentMemberships();
-    loadPayments();
-    populateBatchDropdowns();
+  loadStudents();
+  loadCoaches();
+  loadBatches();
+  loadPlans();
+  loadStudentMemberships();
+  loadPayments();
+  loadExpenses();
+  loadFinancialDashboard();
+  populateBatchDropdowns();
 
-    // Set today's date for attendance
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('attendance-date').value = today;
-    loadAttendance();
-  }
+  // Set today's date for attendance
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('attendance-date').value = today;
+  loadAttendance();
+}
 
   async function checkUser() {
 
@@ -4373,6 +4549,277 @@ function populateStudentList(selectId) {
       select.innerHTML += `<option value="${s.id}">${s.first_name} ${s.last_name || ''} (${s.mobile || ''})</option>`;
     });
   }
+}
+
+// =================================================
+// EXPENSES JS
+// =================================================
+
+let allExpenses = [];
+let financeChart = null;
+let expenseCategoryChart = null;
+
+async function loadExpenses() {
+  const startDate = document.getElementById("expense-filter-start")?.value || '';
+  const endDate = document.getElementById("expense-filter-end")?.value || '';
+  const category = document.getElementById("expense-filter-category")?.value || '';
+
+  let url = '/api/expenses?';
+  if (startDate) url += `start_date=${startDate}&`;
+  if (endDate) url += `end_date=${endDate}&`;
+  if (category) url += `category=${category}&`;
+
+  const res = await fetch(url);
+  allExpenses = await res.json();
+  renderExpenseRows(allExpenses);
+}
+
+function renderExpenseRows(expenses) {
+  const tbody = document.getElementById("expenseTableBody");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+  if (!expenses || expenses.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-3">No expenses found</td></tr>`;
+    return;
+  }
+  
+  let total = 0;
+  expenses.forEach(e => {
+    total += e.amount;
+    const categoryEmojis = {
+      'Shuttle Purchase': '🏸',
+      'Court Maintenance': '🔧',
+      'Electricity': '⚡',
+      'Water': '💧',
+      'Staff Salary': '👨‍🏫',
+      'Coach Salary': '🧑‍🏫',
+      'Equipment': '🎯',
+      'Cleaning': '🧹',
+      'Repairs': '🔨',
+      'Marketing': '📢',
+      'Other': '📌'
+    };
+    const emoji = categoryEmojis[e.category] || '📌';
+    
+    tbody.innerHTML += `
+      <tr>
+        <td>${e.id}</td>
+        <td>${e.expense_date || ""}</td>
+        <td>${emoji} ${e.category}</td>
+        <td><strong>₹${e.amount}</strong></td>
+        <td>${e.paid_to || ""}</td>
+        <td>${e.payment_mode || ""}</td>
+        <td>
+          <button class="btn btn-primary btn-sm me-1" onclick="editExpense(${e.id})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteExpense(${e.id})">Delete</button>
+        </td>
+      </tr>
+    `;
+  });
+  
+  // Add total row
+  tbody.innerHTML += `
+    <tr class="table-warning">
+      <td colspan="3"><strong>TOTAL</strong></td>
+      <td><strong>₹${total}</strong></td>
+      <td colspan="3"></td>
+    </tr>
+  `;
+}
+
+function showExpenseForm() {
+  document.getElementById("expense-id").value = "";
+  document.getElementById("expense-date").value = new Date().toISOString().split('T')[0];
+  document.getElementById("expense-category").value = "";
+  document.getElementById("expense-amount").value = "";
+  document.getElementById("expense-paid-to").value = "";
+  document.getElementById("expense-payment-mode").value = "cash";
+  document.getElementById("expense-reference").value = "";
+  document.getElementById("expense-remarks").value = "";
+  document.getElementById("expense-form").style.display = "block";
+}
+
+function editExpense(id) {
+  const e = allExpenses.find(x => x.id === id);
+  if (!e) return;
+  document.getElementById("expense-id").value = e.id;
+  document.getElementById("expense-date").value = e.expense_date || "";
+  document.getElementById("expense-category").value = e.category || "";
+  document.getElementById("expense-amount").value = e.amount || "";
+  document.getElementById("expense-paid-to").value = e.paid_to || "";
+  document.getElementById("expense-payment-mode").value = e.payment_mode || "cash";
+  document.getElementById("expense-reference").value = e.reference_number || "";
+  document.getElementById("expense-remarks").value = e.remarks || "";
+  document.getElementById("expense-form").style.display = "block";
+  document.getElementById("expense-form").scrollIntoView({ behavior: "smooth" });
+}
+
+async function saveExpense() {
+  const id = document.getElementById("expense-id").value;
+  const category = document.getElementById("expense-category").value;
+  const amount = document.getElementById("expense-amount").value;
+
+  if (!category) { showToast("Please select a category", "warning"); return; }
+  if (!amount) { showToast("Amount is required", "warning"); return; }
+
+  const data = {
+    expense_date: document.getElementById("expense-date").value,
+    category: category,
+    amount: parseFloat(amount),
+    paid_to: document.getElementById("expense-paid-to").value.trim(),
+    payment_mode: document.getElementById("expense-payment-mode").value,
+    reference_number: document.getElementById("expense-reference").value.trim(),
+    remarks: document.getElementById("expense-remarks").value.trim()
+  };
+
+  const isEdit = !!id;
+  const res = await fetch("/api/expenses", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(isEdit
+      ? { action: "update", id: Number(id), data }
+      : { action: "add", data })
+  });
+
+  if (!res.ok) { showToast("Save failed", "error"); return; }
+
+  showToast(isEdit ? "Expense updated ✅" : "Expense added ✅");
+  document.getElementById("expense-form").style.display = "none";
+  loadExpenses();
+  loadFinancialDashboard();
+}
+
+async function deleteExpense(id) {
+  if (!confirm("Delete this expense?")) return;
+  const res = await fetch("/api/expenses", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "delete", id })
+  });
+  if (!res.ok) { showToast("Delete failed", "error"); return; }
+  showToast("Expense deleted");
+  loadExpenses();
+  loadFinancialDashboard();
+}
+
+// =================================================
+// FINANCIAL DASHBOARD JS
+// =================================================
+
+async function loadFinancialDashboard() {
+  const period = document.getElementById("finance-period").value;
+  
+  try {
+    const res = await fetch(`/api/financial-dashboard?period=${period}`);
+    const data = await res.json();
+    
+    // Update summary cards
+    document.getElementById("financeRevenue").textContent = `₹${data.summary.totalRevenue}`;
+    document.getElementById("financeExpenses").textContent = `₹${data.summary.totalExpenses}`;
+    document.getElementById("financeProfit").textContent = `₹${data.summary.profit}`;
+    document.getElementById("financeMargin").textContent = `${data.summary.profitMargin}%`;
+    
+    // Update breakdown
+    document.getElementById("financeBookings").textContent = `₹${data.summary.bookingRevenue}`;
+    document.getElementById("financeFees").textContent = `₹${data.summary.feeRevenue}`;
+    
+    // Render charts
+    renderFinanceCharts(data);
+    
+  } catch (err) {
+    console.error('Error loading financial dashboard:', err);
+    showToast("Failed to load financial data", "error");
+  }
+}
+
+function renderFinanceCharts(data) {
+  // Destroy old charts
+  if (financeChart) {
+    financeChart.destroy();
+    financeChart = null;
+  }
+  if (expenseCategoryChart) {
+    expenseCategoryChart.destroy();
+    expenseCategoryChart = null;
+  }
+
+  // Chart 1: Daily Revenue vs Expenses (Line Chart)
+  const ctx1 = document.getElementById("financeChart").getContext("2d");
+  const labels = data.dailyChartData.map(d => d.date);
+  const revenueData = data.dailyChartData.map(d => d.revenue);
+  const expenseData = data.dailyChartData.map(d => d.expenses);
+  
+  financeChart = new Chart(ctx1, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Revenue',
+          data: revenueData,
+          borderColor: '#22c55e',
+          backgroundColor: 'rgba(34, 197, 94, 0.1)',
+          fill: true,
+          tension: 0.4
+        },
+        {
+          label: 'Expenses',
+          data: expenseData,
+          borderColor: '#ef4444',
+          backgroundColor: 'rgba(239, 68, 68, 0.1)',
+          fill: true,
+          tension: 0.4
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: { boxWidth: 12, padding: 10 }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { callback: function(value) { return '₹' + value; } }
+        }
+      }
+    }
+  });
+
+  // Chart 2: Expenses by Category (Doughnut Chart)
+  const ctx2 = document.getElementById("expenseCategoryChart").getContext("2d");
+  const categoryLabels = Object.keys(data.expensesByCategory);
+  const categoryValues = Object.values(data.expensesByCategory);
+  
+  const colors = [
+    '#ef4444', '#f59e0b', '#22c55e', '#3b82f6', '#8b5cf6',
+    '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#06b6d4'
+  ];
+  
+  expenseCategoryChart = new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+      labels: categoryLabels.map(label => label + ` (₹${data.expensesByCategory[label]})`),
+      datasets: [{
+        data: categoryValues,
+        backgroundColor: colors.slice(0, categoryLabels.length)
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: { boxWidth: 12, padding: 8, font: { size: 10 } }
+        }
+      }
+    }
+  });
 }
 
 // =================================================
