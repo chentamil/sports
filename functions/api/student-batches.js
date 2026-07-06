@@ -16,12 +16,26 @@ export async function onRequest(context) {
 
   try {
 
-    // GET — list all student-batch links with student and batch details
+    // GET — list student-batch links with filters
     if (request.method === "GET") {
-      const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/student_batches?select=*,students(first_name,last_name,mobile),batches(batch_name,start_time,end_time,days_of_week)&order=id.desc`,
-        { headers: authHeaders }
-      );
+      const url = new URL(request.url);
+      const batchId = url.searchParams.get('batch_id');
+      const studentId = url.searchParams.get('student_id');
+      const status = url.searchParams.get('status');
+
+      let queryUrl = `${SUPABASE_URL}/rest/v1/student_batches?select=*,students(first_name,last_name,mobile,email),batches(batch_name,start_time,end_time,days_of_week)&order=id.desc`;
+
+      if (batchId) {
+        queryUrl += `&batch_id=eq.${batchId}`;
+      }
+      if (studentId) {
+        queryUrl += `&student_id=eq.${studentId}`;
+      }
+      if (status) {
+        queryUrl += `&status=eq.${status}`;
+      }
+
+      const res = await fetch(queryUrl, { headers: authHeaders });
       return Response.json(await res.json());
     }
 
@@ -30,7 +44,6 @@ export async function onRequest(context) {
 
       // ADD
       if (body.action === "add") {
-        // Data should include: { student_id, batch_id, start_date, end_date, status }
         const res = await fetch(`${SUPABASE_URL}/rest/v1/student_batches`, {
           method: "POST",
           headers: { ...authHeaders, "Content-Type": "application/json", Prefer: "return=minimal" },

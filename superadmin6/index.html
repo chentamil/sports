@@ -349,7 +349,7 @@
 <!--  -->
 
 <!-- ===================== -->
-<!-- STUDENT MANAGEMENT -->
+<!-- STUDENT MANAGEMENT (ENHANCED) -->
 <!-- ===================== -->
 <div class="card p-3 mb-4 border-info">
 
@@ -358,15 +358,24 @@
     <button class="btn btn-info text-white" onclick="showStudentForm()">+ Add Student</button>
   </div>
 
-  <!-- Add/Edit Form -->
+  <!-- Add/Edit Form (Enhanced) -->
   <div id="student-form" style="display:none;" class="border rounded p-3 mb-3">
     <input type="hidden" id="stu-id">
     <div class="row g-2">
+      <div class="col-md-3">
+        <input id="stu-code" class="form-control" placeholder="Student Code (e.g., SEBA-001)">
+      </div>
       <div class="col-md-3">
         <input id="stu-first" class="form-control" placeholder="First Name *">
       </div>
       <div class="col-md-3">
         <input id="stu-last" class="form-control" placeholder="Last Name">
+      </div>
+      <!-- Inside student-form, after address field -->
+      <div class="col-md-3">
+        <select id="stu-batch" class="form-select">
+          <option value="">Assign to Batch (Optional)</option>
+        </select>
       </div>
       <div class="col-md-2">
         <select id="stu-gender" class="form-select">
@@ -387,6 +396,14 @@
       <div class="col-md-3">
         <input id="stu-email" class="form-control" placeholder="Email">
       </div>
+      <div class="col-md-6">
+        <textarea id="stu-address" class="form-control" placeholder="Address" rows="2"></textarea>
+      </div>
+      <div class="col-md-3">
+        <select id="stu-batch" class="form-select">
+          <option value="">Assign to Batch (Optional)</option>
+        </select>
+      </div>
       <div class="col-md-2">
         <select id="stu-status" class="form-select">
           <option value="active">Active</option>
@@ -402,7 +419,7 @@
   </div>
 
   <!-- Search -->
-  <input id="stu-search" class="form-control mb-3" placeholder="🔍 Search by name or mobile..."
+  <input id="stu-search" class="form-control mb-3" placeholder="🔍 Search by name, code, or mobile..."
     oninput="filterStudents()">
 
   <!-- Table -->
@@ -410,7 +427,7 @@
     <table class="table table-bordered">
       <thead>
         <tr>
-          <th>ID</th><th>Name</th><th>Mobile</th>
+          <th>ID</th><th>Code</th><th>Name</th><th>Mobile</th>
           <th>Email</th><th>Joined</th><th>Status</th><th>Action</th>
         </tr>
       </thead>
@@ -3070,7 +3087,7 @@ function populateBatchDropdowns() {
   const select = document.getElementById("attendance-batch");
   select.innerHTML = `<option value="">All Batches</option>`;
   if (window.allBatches) {
-    window.allBatches.forEach(b => {
+    window.allBatches.filter(b => b.status === 'active').forEach(b => {
       select.innerHTML += `<option value="${b.id}">${b.batch_name}</option>`;
     });
   }
@@ -3167,7 +3184,7 @@ function editBatch(id) {
 }
 
 // =================================================
-// ATTENDANCE MANAGEMENT JS
+// ATTENDANCE MANAGEMENT JS (FIXED)
 // =================================================
 
 let attendanceData = [];
@@ -3182,36 +3199,50 @@ async function loadAttendance() {
     return;
   }
 
-  // Build query URL
-  let url = `/api/attendance?date=${date}`;
-  if (batchId) {
-    url += `&batch_id=${batchId}`;
-  }
-
   try {
-    const res = await fetch(url);
-    attendanceData = await res.json();
-
-    // Get students for this batch (or all students)
     let students = [];
+    let batchName = "N/A";
+
+    // If a specific batch is selected
     if (batchId) {
-      // Fetch students assigned to this batch
+      // Step 1: Get student-batch links for this batch
       const sbRes = await fetch(`/api/student-batches?batch_id=${batchId}&status=eq.active`);
       const sbData = await sbRes.json();
+      
+      // Step 2: Get student details for these IDs
       const studentIds = sbData.map(sb => sb.student_id);
-      // Get student details
-      const studentsRes = await fetch(`/api/students`);
-      const allStudents = await studentsRes.json();
-      students = allStudents.filter(s => studentIds.includes(s.id));
+      
+      if (studentIds.length > 0) {
+        const studentsRes = await fetch(`/api/students`);
+        const allStudents = await studentsRes.json();
+        students = allStudents.filter(s => studentIds.includes(s.id));
+      }
+      
+      // Get batch name
+      const batchRes = await fetch(`/api/batches`);
+      const allBatches = await batchRes.json();
+      const batch = allBatches.find(b => b.id == batchId);
+      batchName = batch ? batch.batch_name : "N/A";
+      
     } else {
-      // Fetch all active students
+      // "All Batches" - show all active students
       const studentsRes = await fetch(`/api/students`);
       const allStudents = await studentsRes.json();
       students = allStudents.filter(s => s.status === 'active');
     }
 
     attendanceStudents = students;
-    renderAttendanceTable(students, attendanceData);
+
+    // Fetch existing attendance for this date
+    let url = `/api/attendance?date=${date}`;
+    if (batchId) {
+      url += `&batch_id=${batchId}`;
+    }
+    const attRes = await fetch(url);
+    attendanceData = await attRes.json();
+
+    // Render the table with batch name
+    renderAttendanceTable(students, attendanceData, batchId, batchName);
 
   } catch (err) {
     showToast("Failed to load attendance", "error");
@@ -3219,29 +3250,32 @@ async function loadAttendance() {
   }
 }
 
-function renderAttendanceTable(students, attendanceRecords) {
+function renderAttendanceTable(students, attendanceRecords, batchId, batchName) {
   const tbody = document.getElementById("attendanceTableBody");
   if (!tbody) return;
 
   if (!students || students.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="3" class="text-center text-muted py-3">No students found for this batch.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="3" class="text-center text-muted py-3">
+      ${batchId ? 'No students assigned to this batch yet.' : 'No active students found.'}
+    </td></tr>`;
     return;
   }
 
   tbody.innerHTML = "";
   students.forEach(student => {
+    // Find if this student has attendance for today
     const record = attendanceRecords.find(a => a.student_id === student.id);
-    const status = record ? record.status : 'present'; // Default to present for new day
-
-    // Get batch name if available
-    const batchName = record?.batches?.batch_name || "N/A";
+    const status = record ? record.status : 'present'; // Default to present
 
     tbody.innerHTML += `
       <tr>
-        <td>${student.first_name} ${student.last_name || ""}</td>
+        <td><strong>${student.first_name} ${student.last_name || ""}</strong></td>
         <td>${batchName}</td>
         <td>
-          <select class="form-select attendance-status" data-student-id="${student.id}" data-record-id="${record?.id || ''}">
+          <select class="form-select attendance-status" 
+                  data-student-id="${student.id}" 
+                  data-record-id="${record?.id || ''}"
+                  data-batch-id="${batchId || ''}">
             <option value="present" ${status === 'present' ? 'selected' : ''}>✅ Present</option>
             <option value="absent" ${status === 'absent' ? 'selected' : ''}>❌ Absent</option>
             <option value="leave" ${status === 'leave' ? 'selected' : ''}>🏖️ Leave</option>
@@ -3263,7 +3297,7 @@ async function saveAttendance() {
   }
 
   if (!batchId) {
-    showToast("Please select a batch", "warning");
+    showToast("Please select a specific batch (not 'All Batches') to save", "warning");
     return;
   }
 
@@ -3273,8 +3307,7 @@ async function saveAttendance() {
   selects.forEach(select => {
     const studentId = parseInt(select.dataset.studentId);
     const status = select.value;
-    const recordId = select.dataset.recordId;
-
+    
     attendancePayload.push({
       student_id: studentId,
       batch_id: parseInt(batchId),
@@ -3301,7 +3334,8 @@ async function saveAttendance() {
     });
 
     if (!res.ok) {
-      showToast("Failed to save attendance", "error");
+      const error = await res.text();
+      showToast(`Failed to save attendance: ${error}`, "error");
       return;
     }
 
@@ -3338,18 +3372,19 @@ function renderStudentRows(students) {
   if (!tbody) return;
   tbody.innerHTML = "";
   if (students.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-3">No students found</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-3">No students found</td></tr>`;
     return;
   }
   students.forEach(s => {
     tbody.innerHTML += `
       <tr>
         <td>${s.id}</td>
-        <td>${s.first_name} ${s.last_name||""}</td>
-        <td><a href="tel:${s.mobile}">${s.mobile||""}</a></td>
-        <td><a href="mailto:${s.email}">${s.email||""}</a></td>
-        <td>${s.joining_date||""}</td>
-        <td><span class="badge ${s.status==='active'?'bg-success':'bg-secondary'}">${s.status}</span></td>
+        <td><code>${s.student_code || "-"}</code></td>
+        <td>${s.first_name} ${s.last_name || ""}</td>
+        <td><a href="tel:${s.mobile}">${s.mobile || ""}</a></td>
+        <td><a href="mailto:${s.email}">${s.email || ""}</a></td>
+        <td>${s.joining_date || ""}</td>
+        <td><span class="badge ${s.status === 'active' ? 'bg-success' : 'bg-secondary'}">${s.status}</span></td>
         <td>
           <button class="btn btn-primary btn-sm me-1" onclick="editStudent(${s.id})">Edit</button>
           <button class="btn btn-danger btn-sm" onclick="deleteStudent(${s.id})">Delete</button>
@@ -3359,35 +3394,53 @@ function renderStudentRows(students) {
   });
 }
 
+// Populate batch dropdown in student form
+async function populateBatchDropdown() {
+  const res = await fetch('/api/batches');
+  const batches = await res.json();
+  const select = document.getElementById('stu-batch');
+  select.innerHTML = '<option value="">Assign to Batch (Optional)</option>';
+  batches.filter(b => b.status === 'active').forEach(b => {
+    select.innerHTML += `<option value="${b.id}">${b.batch_name}</option>`;
+  });
+}
+
 function showStudentForm() {
   document.getElementById("stu-id").value = "";
+  document.getElementById("stu-code").value = "";
   document.getElementById("stu-first").value = "";
   document.getElementById("stu-last").value = "";
   document.getElementById("stu-gender").value = "";
   document.getElementById("stu-dob").value = "";
   document.getElementById("stu-mobile").value = "";
   document.getElementById("stu-email").value = "";
+  document.getElementById("stu-address").value = "";
   document.getElementById("stu-join").value = new Date().toLocaleDateString("sv-SE");
   document.getElementById("stu-status").value = "active";
   document.getElementById("stu-notes").value = "";
+  populateBatchDropdown(); // ← THIS IS THE NEW LINE
   document.getElementById("student-form").style.display = "block";
+  
 }
 
 function editStudent(id) {
   const s = window.allStudents?.find(x => x.id === id);
   if (!s) return;
   document.getElementById("stu-id").value = s.id;
-  document.getElementById("stu-first").value = s.first_name||"";
-  document.getElementById("stu-last").value = s.last_name||"";
-  document.getElementById("stu-gender").value = s.gender||"";
-  document.getElementById("stu-dob").value = s.date_of_birth||"";
-  document.getElementById("stu-mobile").value = s.mobile||"";
-  document.getElementById("stu-email").value = s.email||"";
-  document.getElementById("stu-join").value = s.joining_date||"";
-  document.getElementById("stu-status").value = s.status||"active";
-  document.getElementById("stu-notes").value = s.notes||"";
+  document.getElementById("stu-code").value = s.student_code || "";
+  document.getElementById("stu-first").value = s.first_name || "";
+  document.getElementById("stu-last").value = s.last_name || "";
+  document.getElementById("stu-gender").value = s.gender || "";
+  document.getElementById("stu-dob").value = s.date_of_birth || "";
+  document.getElementById("stu-mobile").value = s.mobile || "";
+  document.getElementById("stu-email").value = s.email || "";
+  document.getElementById("stu-address").value = s.address || "";
+  document.getElementById("stu-join").value = s.joining_date || "";
+  document.getElementById("stu-status").value = s.status || "active";
+  document.getElementById("stu-notes").value = s.notes || "";
   document.getElementById("student-form").style.display = "block";
-  document.getElementById("student-form").scrollIntoView({ behavior:"smooth" });
+  document.getElementById("student-form").scrollIntoView({ behavior: "smooth" });
+  populateBatchDropdown(); // ← ADD THIS LINE
 }
 
 async function saveStudent() {
@@ -3399,15 +3452,17 @@ async function saveStudent() {
   if (!mobile) { showToast("Mobile is required", "warning"); return; }
 
   const data = {
-    first_name:   firstName,
-    last_name:    document.getElementById("stu-last").value.trim(),
-    gender:       document.getElementById("stu-gender").value,
+    student_code: document.getElementById("stu-code").value.trim() || null,
+    first_name: firstName,
+    last_name: document.getElementById("stu-last").value.trim(),
+    gender: document.getElementById("stu-gender").value,
     date_of_birth: document.getElementById("stu-dob").value || null,
-    mobile:       mobile,
-    email:        document.getElementById("stu-email").value.trim(),
+    mobile: mobile,
+    email: document.getElementById("stu-email").value.trim(),
+    address: document.getElementById("stu-address").value.trim(),
     joining_date: document.getElementById("stu-join").value || null,
-    status:       document.getElementById("stu-status").value,
-    notes:        document.getElementById("stu-notes").value.trim()
+    status: document.getElementById("stu-status").value,
+    notes: document.getElementById("stu-notes").value.trim()
   };
 
   const isEdit = !!id;
@@ -3421,9 +3476,44 @@ async function saveStudent() {
 
   if (!res.ok) { showToast("Save failed", "error"); return; }
 
-  showToast(isEdit ? "Student updated ✅" : "Student added ✅");
+  // If adding a new student and batch is selected, assign them
+  if (!isEdit) {
+    const batchId = document.getElementById('stu-batch').value;
+    if (batchId) {
+      // Fetch the newly created student to get their ID
+      const studentsRes = await fetch("/api/students");
+      const allStudents = await studentsRes.json();
+      const newStudent = allStudents[0]; // Most recent student is first (ordered by id.desc)
+      
+      if (newStudent && newStudent.id) {
+        await fetch('/api/student-batches', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'add',
+            data: {
+              student_id: newStudent.id,
+              batch_id: parseInt(batchId),
+              start_date: new Date().toISOString().split('T')[0],
+              status: 'active'
+            }
+          })
+        });
+        showToast("Student added and assigned to batch ✅");
+      } else {
+        showToast("Student added ✅");
+      }
+    } else {
+      showToast("Student added ✅");
+    }
+  } else {
+    showToast("Student updated ✅");
+  }
+
   document.getElementById("student-form").style.display = "none";
   loadStudents();
+  populateBatchDropdowns(); // Refresh batch dropdowns
+  loadAttendance(); // Refresh attendance if open
 }
 
 async function deleteStudent(id) {
