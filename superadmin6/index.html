@@ -192,6 +192,37 @@
 
       </button>
     </div>
+
+    <!-- Navigation Tabs for Reports -->
+    <div class="mb-4">
+      <ul class="nav nav-tabs" id="reportTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboardContent" type="button" role="tab">
+            📊 Dashboard
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reportsContent" type="button" role="tab">
+            📈 Reports
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notificationsContent" type="button" role="tab">
+            🔔 Notifications <span id="notificationBadge" class="badge bg-danger ms-1 d-none">0</span>
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="audit-tab" data-bs-toggle="tab" data-bs-target="#auditContent" type="button" role="tab">
+            📜 Audit Logs
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+      <div class="tab-pane fade show active" id="dashboardContent" role="tabpanel">
+
     <!-- New ANALYTICS Starts here -->
          <!-- FINANCIAL DASHBOARD -->
     <div class="card p-3 mb-4 border-info">
@@ -1447,6 +1478,13 @@
     width: auto !important;
   }
 }
+
+  .notification-item {
+    transition: background 0.3s ease;
+  }
+  .notification-item:hover {
+    background: #f8f9fa !important;
+  }
 </style>
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
@@ -2141,6 +2179,179 @@ showToast(`Status updated to "${status}" for ${ids.length} slots`);
 </div>
     <!-- Booking Modal ends here -->
 
+        </div> <!-- End dashboardContent -->
+
+      <!-- ===================================================== -->
+      <!-- REPORTS TAB -->
+      <!-- ===================================================== -->
+      <div class="tab-pane fade" id="reportsContent" role="tabpanel">
+        
+        <!-- Student Report -->
+        <div class="card p-3 mb-4">
+          <h4 class="mb-3">📋 Student Report</h4>
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <select id="report-student" class="form-select">
+                <option value="">Select Student</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <input type="date" id="report-start" class="form-control" placeholder="Start Date">
+            </div>
+            <div class="col-md-3">
+              <input type="date" id="report-end" class="form-control" placeholder="End Date">
+            </div>
+            <div class="col-md-2">
+              <button class="btn btn-primary w-100" onclick="loadStudentReport()">Generate</button>
+            </div>
+          </div>
+          
+          <div id="studentReportResult" style="display:none;">
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <div class="card p-3 text-center">
+                  <h6>Student</h6>
+                  <h5 id="reportStudentName">-</h5>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card p-3 text-center">
+                  <h6>Attendance</h6>
+                  <h5 id="reportAttendance">-</h5>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card p-3 text-center">
+                  <h6>Total Paid</h6>
+                  <h5 id="reportTotalPaid">-</h5>
+                </div>
+              </div>
+            </div>
+            
+            <div class="table-responsive">
+              <table class="table table-bordered table-sm">
+                <thead>
+                  <tr>
+                    <th>Date</th><th>Type</th><th>Details</th><th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody id="reportDetailsBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Financial Summary Report -->
+        <div class="card p-3 mb-4">
+          <h4 class="mb-3">💰 Financial Summary</h4>
+          <div class="row g-3 mb-3">
+            <div class="col-md-3">
+              <input type="date" id="finance-report-start" class="form-control">
+            </div>
+            <div class="col-md-3">
+              <input type="date" id="finance-report-end" class="form-control">
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-primary" onclick="loadFinancialSummary()">Generate</button>
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-success" onclick="exportFinancialCSV()">⬇️ Export CSV</button>
+            </div>
+          </div>
+          <div id="financialSummaryResult">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <div class="card p-2 text-center bg-success text-white">
+                  <small>Revenue</small>
+                  <h5 id="fsRevenue">₹0</h5>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card p-2 text-center bg-danger text-white">
+                  <small>Expenses</small>
+                  <h5 id="fsExpenses">₹0</h5>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card p-2 text-center bg-primary text-white">
+                  <small>Profit</small>
+                  <h5 id="fsProfit">₹0</h5>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card p-2 text-center bg-warning text-dark">
+                  <small>Margin</small>
+                  <h5 id="fsMargin">0%</h5>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- NOTIFICATIONS TAB -->
+      <!-- ===================================================== -->
+      <div class="tab-pane fade" id="notificationsContent" role="tabpanel">
+        <div class="card p-3 mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0">🔔 Notifications</h4>
+            <div>
+              <button class="btn btn-outline-secondary btn-sm" onclick="markAllNotificationsRead()">Mark All Read</button>
+              <button class="btn btn-outline-primary btn-sm ms-2" onclick="loadNotifications()">Refresh</button>
+              <button class="btn btn-outline-danger btn-sm ms-2" onclick="checkExpiringMemberships()">Check Expiring</button>
+            </div>
+          </div>
+          <div id="notificationList">
+            <p class="text-muted text-center">Loading notifications...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- AUDIT LOGS TAB -->
+      <!-- ===================================================== -->
+      <div class="tab-pane fade" id="auditContent" role="tabpanel">
+        <div class="card p-3 mb-4">
+          <h4 class="mb-3">📜 Audit Logs</h4>
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <select id="audit-table-filter" class="form-select">
+                <option value="">All Tables</option>
+                <option value="students">Students</option>
+                <option value="bookings">Bookings</option>
+                <option value="fee_payments">Fee Payments</option>
+                <option value="attendance">Attendance</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <input type="date" id="audit-start" class="form-control">
+            </div>
+            <div class="col-md-3">
+              <input type="date" id="audit-end" class="form-control">
+            </div>
+            <div class="col-md-2">
+              <button class="btn btn-primary w-100" onclick="loadAuditLogs()">Load</button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-bordered table-sm">
+              <thead>
+                <tr>
+                  <th>Time</th><th>User</th><th>Action</th>
+                  <th>Table</th><th>Record ID</th>
+                </tr>
+              </thead>
+              <tbody id="auditTableBody">
+                <tr><td colspan="5" class="text-center text-muted">Select filters and click Load</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- End tab-content -->  
+
 
   </div>
 
@@ -2264,7 +2475,9 @@ function showDashboard() {
   loadPayments();
   loadExpenses();
   loadFinancialDashboard();
+  loadNotifications();
   populateBatchDropdowns();
+  populateReportStudentDropdown();
 
   // Set today's date for attendance
   const today = new Date().toISOString().split('T')[0];
@@ -4820,6 +5033,284 @@ function renderFinanceCharts(data) {
       }
     }
   });
+}
+
+// =================================================
+// REPORTS JS
+// =================================================
+
+function populateReportStudentDropdown() {
+  const select = document.getElementById("report-student");
+  if (!select) return;
+  select.innerHTML = '<option value="">Select Student</option>';
+  if (window.allStudents) {
+    window.allStudents.forEach(s => {
+      select.innerHTML += `<option value="${s.id}">${s.first_name} ${s.last_name || ''} - ${s.mobile || ''}</option>`;
+    });
+  }
+}
+
+async function loadStudentReport() {
+  const studentId = document.getElementById("report-student").value;
+  const startDate = document.getElementById("report-start").value;
+  const endDate = document.getElementById("report-end").value;
+
+  if (!studentId) {
+    showToast("Please select a student", "warning");
+    return;
+  }
+
+  try {
+    const url = `/api/student-reports?student_id=${studentId}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    document.getElementById("studentReportResult").style.display = "block";
+    
+    // Update summary cards
+    document.getElementById("reportStudentName").textContent = 
+      `${data.student?.first_name || ''} ${data.student?.last_name || ''}`;
+    document.getElementById("reportAttendance").textContent = 
+      `${data.attendance.summary.percentage}% (${data.attendance.summary.present}/${data.attendance.summary.total})`;
+    document.getElementById("reportTotalPaid").textContent = 
+      `₹${data.payments.summary.totalAmount}`;
+
+    // Build details table
+    const tbody = document.getElementById("reportDetailsBody");
+    tbody.innerHTML = "";
+    
+    // Add attendance records
+    data.attendance.records.forEach(a => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${a.attendance_date}</td>
+          <td><span class="badge ${a.status === 'present' ? 'bg-success' : a.status === 'absent' ? 'bg-danger' : 'bg-warning'}">${a.status}</span></td>
+          <td>Attendance - ${a.batches?.batch_name || 'N/A'}</td>
+          <td>-</td>
+        </tr>
+      `;
+    });
+
+    // Add payment records
+    data.payments.records.forEach(p => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${p.payment_date}</td>
+          <td><span class="badge bg-success">Payment</span></td>
+          <td>Receipt: ${p.receipt_number || 'N/A'}</td>
+          <td>₹${p.amount}</td>
+        </tr>
+      `;
+    });
+
+    showToast("Report generated successfully ✅");
+
+  } catch (err) {
+    showToast("Failed to load report", "error");
+    console.error(err);
+  }
+}
+
+async function loadFinancialSummary() {
+  const startDate = document.getElementById("finance-report-start").value;
+  const endDate = document.getElementById("finance-report-end").value;
+
+  try {
+    // Get revenue from fee payments
+    let paymentsUrl = '/api/fee-payments';
+    if (startDate) paymentsUrl += `?start_date=${startDate}`;
+    if (endDate) paymentsUrl += `?end_date=${endDate}`;
+    const paymentsRes = await fetch(paymentsUrl);
+    const payments = await paymentsRes.json();
+    const totalRevenue = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
+
+    // Get expenses
+    let expensesUrl = '/api/expenses';
+    if (startDate) expensesUrl += `?start_date=${startDate}`;
+    if (endDate) expensesUrl += `&end_date=${endDate}`;
+    const expensesRes = await fetch(expensesUrl);
+    const expenses = await expensesRes.json();
+    const totalExpenses = expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+
+    const profit = totalRevenue - totalExpenses;
+    const margin = totalRevenue > 0 ? Math.round((profit / totalRevenue) * 100) : 0;
+
+    document.getElementById("fsRevenue").textContent = `₹${totalRevenue}`;
+    document.getElementById("fsExpenses").textContent = `₹${totalExpenses}`;
+    document.getElementById("fsProfit").textContent = `₹${profit}`;
+    document.getElementById("fsMargin").textContent = `${margin}%`;
+
+    // Store for CSV export
+    window.financialReportData = { startDate, endDate, totalRevenue, totalExpenses, profit, margin, payments, expenses };
+
+  } catch (err) {
+    showToast("Failed to load financial summary", "error");
+    console.error(err);
+  }
+}
+
+function exportFinancialCSV() {
+  const data = window.financialReportData;
+  if (!data) {
+    showToast("Please generate report first", "warning");
+    return;
+  }
+
+  let csv = "Type,Date,Category,Amount\n";
+  
+  // Add payments
+  data.payments.forEach(p => {
+    csv += `Revenue,${p.payment_date},Payment - ${p.receipt_number || 'N/A'},${p.amount}\n`;
+  });
+  
+  // Add expenses
+  data.expenses.forEach(e => {
+    csv += `Expense,${e.expense_date},${e.category},${e.amount}\n`;
+  });
+
+  // Summary
+  csv += `\n\nSUMMARY,,,\n`;
+  csv += `Total Revenue,,,${data.totalRevenue}\n`;
+  csv += `Total Expenses,,,${data.totalExpenses}\n`;
+  csv += `Profit,,,${data.profit}\n`;
+  csv += `Margin (%),,,${data.margin}\n`;
+
+  // Trigger download
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `financial-report-${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  showToast("CSV exported successfully ✅");
+}
+
+// =================================================
+// NOTIFICATIONS JS
+// =================================================
+
+let allNotifications = [];
+
+async function loadNotifications() {
+  try {
+    const res = await fetch('/api/notifications');
+    allNotifications = await res.json();
+    renderNotifications(allNotifications);
+    updateNotificationBadge(allNotifications);
+  } catch (err) {
+    console.error('Error loading notifications:', err);
+  }
+}
+
+function renderNotifications(notifications) {
+  const container = document.getElementById("notificationList");
+  if (!container) return;
+
+  if (!notifications || notifications.length === 0) {
+    container.innerHTML = `<p class="text-muted text-center">No notifications found</p>`;
+    return;
+  }
+
+  container.innerHTML = notifications.map(n => `
+    <div class="notification-item ${n.is_read ? 'bg-light' : 'bg-white border-start border-4 border-primary'}" 
+         style="padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; border-left: 4px solid ${n.is_read ? '#dee2e6' : '#0d6efd'};">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <strong>${n.title}</strong>
+          <p class="mb-1">${n.message}</p>
+          <small class="text-muted">
+            ${n.students ? `${n.students.first_name} ${n.students.last_name || ''}` : 'General'} • 
+            ${new Date(n.created_at).toLocaleDateString()} ${new Date(n.created_at).toLocaleTimeString()}
+          </small>
+        </div>
+        <div>
+          ${!n.is_read ? `<button class="btn btn-sm btn-outline-primary" onclick="markNotificationRead(${n.id})">Mark Read</button>` : ''}
+          <button class="btn btn-sm btn-outline-danger ms-1" onclick="deleteNotification(${n.id})">×</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateNotificationBadge(notifications) {
+  const badge = document.getElementById("notificationBadge");
+  if (!badge) return;
+  const unread = notifications?.filter(n => !n.is_read).length || 0;
+  if (unread > 0) {
+    badge.textContent = unread;
+    badge.classList.remove('d-none');
+  } else {
+    badge.classList.add('d-none');
+  }
+}
+
+async function markNotificationRead(id) {
+  const res = await fetch('/api/notifications', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'markRead', id })
+  });
+  if (res.ok) {
+    loadNotifications();
+    showToast("Notification marked as read");
+  }
+}
+
+async function markAllNotificationsRead() {
+  const res = await fetch('/api/notifications', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'markAllRead' })
+  });
+  if (res.ok) {
+    loadNotifications();
+    showToast("All notifications marked as read");
+  }
+}
+
+async function deleteNotification(id) {
+  if (!confirm("Delete this notification?")) return;
+  const res = await fetch('/api/notifications', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'delete', id })
+  });
+  if (res.ok) {
+    loadNotifications();
+    showToast("Notification deleted");
+  }
+}
+
+async function checkExpiringMemberships() {
+  try {
+    // Call the database function
+    const res = await fetch('/api/notifications', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        action: 'add', 
+        data: { 
+          type: 'system', 
+          title: 'Membership Check', 
+          message: 'Checking expiring memberships...' 
+        } 
+      })
+    });
+    
+    // We'll also call the SQL function directly via Supabase
+    const response = await fetch('/api/expiring-check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    
+    showToast("Expiring memberships checked ✅");
+    loadNotifications();
+  } catch (err) {
+    showToast("Error checking memberships", "error");
+    console.error(err);
+  }
 }
 
 // =================================================
