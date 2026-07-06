@@ -4548,11 +4548,20 @@ async function saveStudentMembership() {
   const discount = parseFloat(document.getElementById("sm-discount").value) || 0;
   const plan = allPlans.find(p => p.id == planId);
   const finalAmount = plan ? plan.amount - discount : 0;
+  
+  // Calculate end date based on plan duration
+  let endDate = null;
+  if (plan && plan.duration_days) {
+    const start = new Date(startDate);
+    start.setDate(start.getDate() + plan.duration_days);
+    endDate = start.toISOString().split('T')[0];
+  }
 
   const data = {
     student_id: parseInt(studentId),
     plan_id: parseInt(planId),
     start_date: startDate,
+    end_date: endDate, // ← THIS IS THE NEW LINE
     discount: discount,
     final_amount: finalAmount,
     status: document.getElementById("sm-status").value,
@@ -5042,11 +5051,25 @@ function renderFinanceCharts(data) {
 function populateReportStudentDropdown() {
   const select = document.getElementById("report-student");
   if (!select) return;
-  select.innerHTML = '<option value="">Select Student</option>';
-  if (window.allStudents) {
+  
+  // If students are already loaded, use them
+  if (window.allStudents && window.allStudents.length > 0) {
+    select.innerHTML = '<option value="">Select Student</option>';
     window.allStudents.forEach(s => {
       select.innerHTML += `<option value="${s.id}">${s.first_name} ${s.last_name || ''} - ${s.mobile || ''}</option>`;
     });
+  } else {
+    // Fetch students directly
+    fetch('/api/students')
+      .then(res => res.json())
+      .then(students => {
+        window.allStudents = students;
+        select.innerHTML = '<option value="">Select Student</option>';
+        students.forEach(s => {
+          select.innerHTML += `<option value="${s.id}">${s.first_name} ${s.last_name || ''} - ${s.mobile || ''}</option>`;
+        });
+      })
+      .catch(err => console.error('Error loading students for report:', err));
   }
 }
 
@@ -5119,9 +5142,13 @@ async function loadFinancialSummary() {
     // Get revenue from fee payments
     let paymentsUrl = '/api/fee-payments';
     if (startDate) paymentsUrl += `?start_date=${startDate}`;
-    if (endDate) paymentsUrl += `?end_date=${endDate}`;
+    if (endDate) paymentsUrl += `&end_date=${endDate}`;
     const paymentsRes = await fetch(paymentsUrl);
-    const payments = await paymentsRes.json();
+    let payments = await paymentsRes.json();
+    // Ensure payments is an array
+    if (!Array.isArray(payments)) {
+      payments = [];
+    }
     const totalRevenue = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
 
     // Get expenses
@@ -5129,7 +5156,11 @@ async function loadFinancialSummary() {
     if (startDate) expensesUrl += `?start_date=${startDate}`;
     if (endDate) expensesUrl += `&end_date=${endDate}`;
     const expensesRes = await fetch(expensesUrl);
-    const expenses = await expensesRes.json();
+    let expenses = await expensesRes.json();
+    // Ensure expenses is an array
+    if (!Array.isArray(expenses)) {
+      expenses = [];
+    }
     const totalExpenses = expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
 
     const profit = totalRevenue - totalExpenses;
@@ -5285,32 +5316,66 @@ async function deleteNotification(id) {
 
 async function checkExpiringMemberships() {
   try {
-    // Call the database function
-    const res = await fetch('/api/notifications', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        action: 'add', 
-        data: { 
-          type: 'system', 
-          title: 'Membership Check', 
-          message: 'Checking expiring memberships...' 
-        } 
-      })
-    });
-    
-    // We'll also call the SQL function directly via Supabase
+    // Call the SQL function directly via Supabase
     const response = await fetch('/api/expiring-check', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' }
     });
     
+    if (!response.ok) {
+      throw new Error('Failed to check expiring memberships');
+    }
+    
     showToast("Expiring memberships checked ✅");
     loadNotifications();
   } catch (err) {
-    showToast("Error checking memberships", "error");
+    showToast("Error checking memberships: " + err.message, "error");
     console.error(err);
   }
+}
+
+// =================================================
+// AUDIT LOGS JS
+// =================================================
+
+async function loadAuditLogs() {
+  const table = document.getElementById("audit-table-filter").value;
+  const startDate = document.getElementById("audit-start").value;
+  const endDate = document.getElementById("audit-end").value;
+
+  let url = '/api/audit-logs?';
+  if (table) url += `table=${table}&`;
+  if (startDate) url += `start_date=${startDate}&`;
+  if (endDate) url += `end_date=${endDate}&`;
+
+  try {
+    const res = await fetch(url);
+    const logs = await res.json();
+    renderAuditLogs(logs);
+  } catch (err) {
+    showToast("Failed to load audit logs", "error");
+    console.error(err);
+  }
+}
+
+function renderAuditLogs(logs) {
+  const tbody = document.getElementById("auditTableBody");
+  if (!tbody) return;
+
+  if (!logs || logs.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">No audit logs found</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = logs.map(log => `
+    <tr>
+      <td>${new Date(log.created_at).toLocaleString()}</td>
+      <td>${log.user_email || log.user_id || 'System'}</td>
+      <td><span class="badge ${log.action === 'INSERT' ? 'bg-success' : log.action === 'UPDATE' ? 'bg-warning' : 'bg-danger'}">${log.action}</span></td>
+      <td>${log.table_name || '-'}</td>
+      <td>${log.record_id || '-'}</td>
+    </tr>
+  `).join('');
 }
 
 // =================================================
