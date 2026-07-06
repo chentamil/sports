@@ -399,11 +399,6 @@
       <div class="col-md-6">
         <textarea id="stu-address" class="form-control" placeholder="Address" rows="2"></textarea>
       </div>
-      <div class="col-md-3">
-        <select id="stu-batch" class="form-select">
-          <option value="">Assign to Batch (Optional)</option>
-        </select>
-      </div>
       <div class="col-md-2">
         <select id="stu-status" class="form-select">
           <option value="active">Active</option>
@@ -2962,6 +2957,8 @@ async function loadBatches() {
   const res = await fetch("/api/batches");
   window.allBatches = await res.json();
   renderBatchRows(window.allBatches);
+  populateBatchDropdowns(); // <-- Add this line
+  populateStudentDropdown(); // <-- Add this line for assignment dropdown
 }
 
 function renderBatchRows(batches) {
@@ -3022,6 +3019,10 @@ function editBatch(id) {
   document.getElementById("batch-form").style.display = "block";
   populateCoachDropdown();
   document.getElementById("batch-form").scrollIntoView({ behavior: "smooth" });
+  
+  // Load assignment dropdown and student list
+  populateStudentDropdown();
+  loadBatchStudents(id);
 }
 
 async function saveBatch() {
@@ -3107,13 +3108,19 @@ async function populateStudentDropdown() {
 // Assign student to batch
 async function assignStudentToBatch() {
     const studentId = document.getElementById('assign-student').value;
-    const batchId = document.getElementById('batch-id').value; // Hidden input
-    const startDate = document.getElementById('assign-start').value || new Date().toISOString().split('T')[0];
+    const batchId = document.getElementById('batch-id').value; // Hidden input in batch form
     
-    if (!studentId || !batchId) {
-        showToast('Please select student and batch', 'warning');
+    if (!studentId) {
+        showToast('Please select a student', 'warning');
         return;
     }
+    
+    if (!batchId) {
+        showToast('Please edit a batch first to assign students', 'warning');
+        return;
+    }
+    
+    const startDate = document.getElementById('assign-start').value || new Date().toISOString().split('T')[0];
     
     const res = await fetch('/api/student-batches', {
         method: 'POST',
@@ -3136,6 +3143,7 @@ async function assignStudentToBatch() {
     
     showToast('Student assigned to batch ✅');
     loadBatchStudents(batchId);
+    loadAttendance(); // Refresh attendance
 }
 
 // Load students in a batch
@@ -3175,13 +3183,6 @@ async function removeStudentFromBatch(id) {
     }
 }
 
-// Call this when editing a batch
-function editBatch(id) {
-    // ... existing code ...
-    document.getElementById('batch-id').value = id;
-    populateStudentDropdown();
-    loadBatchStudents(id);
-}
 
 // =================================================
 // ATTENDANCE MANAGEMENT JS (FIXED)
@@ -3218,11 +3219,11 @@ async function loadAttendance() {
         students = allStudents.filter(s => studentIds.includes(s.id));
       }
       
-      // Get batch name
-      const batchRes = await fetch(`/api/batches`);
-      const allBatches = await batchRes.json();
-      const batch = allBatches.find(b => b.id == batchId);
-      batchName = batch ? batch.batch_name : "N/A";
+      // Get batch name from window.allBatches
+      if (window.allBatches) {
+        const batch = window.allBatches.find(b => b.id == batchId);
+        batchName = batch ? batch.batch_name : "N/A";
+      }
       
     } else {
       // "All Batches" - show all active students

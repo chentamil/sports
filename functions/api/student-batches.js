@@ -32,11 +32,16 @@ export async function onRequest(context) {
         queryUrl += `&student_id=eq.${studentId}`;
       }
       if (status) {
-        queryUrl += `&status=eq.${status}`;
+        // Remove "eq." if it's already there
+        const cleanStatus = status.replace('eq.', '');
+        queryUrl += `&status=eq.${cleanStatus}`;
       }
 
+      console.log('Query URL:', queryUrl); // For debugging
+
       const res = await fetch(queryUrl, { headers: authHeaders });
-      return Response.json(await res.json());
+      const data = await res.json();
+      return Response.json(data);
     }
 
     if (request.method === "POST") {
@@ -75,6 +80,7 @@ export async function onRequest(context) {
     return new Response("Invalid Request", { status: 400 });
 
   } catch (err) {
+    console.error('Error in student-batches:', err);
     return new Response(JSON.stringify({ error: err.message }), { status: 500 });
   }
 }
