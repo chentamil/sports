@@ -172,31 +172,104 @@
   <!-- DASHBOARD -->
 
   <div id="dashboard" style="display:none;">
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center mb-3">
-      <!-- Left Button -->
-      <a href="/" target="_blank" rel="noopener noreferrer" class="btn btn-primary  px-4">
 
-        <i class="bi bi-eye me-2"></i>
-        Go to Customer View
+    <!-- ===================== -->
+    <!-- TOP NAVBAR (desktop menu) + OFFCANVAS (mobile menu) -->
+    <!-- ===================== -->
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark rounded-4 mb-3 px-3 sticky-top">
+      <div class="container-fluid px-0">
+        <span class="navbar-brand fw-bold mb-0">🏸 Shivani Elite</span>
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-label="Menu">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse d-none d-md-flex">
+          <ul class="navbar-nav ms-auto gap-2 flex-row flex-wrap">
+            <li class="nav-item"><button class="btn btn-sm btn-outline-light" onclick="scrollToSection('section-home')">🏠 Home</button></li>
+            <li class="nav-item"><button class="btn btn-sm btn-outline-light" onclick="scrollToSection('section-students')">🎓 Students</button></li>
+            <li class="nav-item"><button class="btn btn-sm btn-outline-light" onclick="scrollToSection('section-batches')">📚 Batches</button></li>
+            <li class="nav-item"><button class="btn btn-sm btn-outline-light" onclick="scrollToSection('section-fees')">💰 Fees</button></li>
+            <li class="nav-item"><button class="btn btn-sm btn-outline-light" onclick="scrollToSection('section-attendance')">✅ Attendance</button></li>
+            <li class="nav-item dropdown">
+              <button class="btn btn-sm btn-outline-light dropdown-toggle" data-bs-toggle="dropdown">⋯ More</button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><button class="dropdown-item" onclick="scrollToSection('section-finance')">📊 Financial Dashboard</button></li>
+                <li><button class="dropdown-item" onclick="scrollToSection('section-coaches')">🧑‍🏫 Coaches</button></li>
+                <li><button class="dropdown-item" onclick="scrollToSection('section-plans')">💳 Membership Plans</button></li>
+                <li><button class="dropdown-item" onclick="scrollToSection('section-memberships')">📋 Student Memberships</button></li>
+                <li><button class="dropdown-item" onclick="scrollToSection('section-expenses')">📊 Expenses</button></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><button class="dropdown-item" onclick="switchTopTab('notifications-tab')">🔔 Notifications</button></li>
+                <li><button class="dropdown-item" onclick="switchTopTab('reports-tab')">📈 Reports</button></li>
+                <li><button class="dropdown-item" onclick="switchTopTab('audit-tab')">📜 Audit Logs</button></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="/" target="_blank" rel="noopener noreferrer"><i class="bi bi-eye me-2"></i>Go to Customer View</a></li>
+                <li><button class="dropdown-item text-danger" onclick="logout()"><i class="bi bi-box-arrow-right me-2"></i>Logout</button></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
 
-      </a>
-
-      <!-- Right Button -->
-      <button class="btn text-white px-4" style="
-    background:
-    linear-gradient(135deg,#ef4444,#dc2626);
-  " onclick="logout()">
-
-        <i class="bi bi-box-arrow-right me-2"></i>
-        Logout
-
-      </button>
+    <!-- Offcanvas menu (mobile) -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title">Menu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+      </div>
+      <div class="offcanvas-body">
+        <div class="d-grid gap-2">
+          <button class="btn btn-outline-primary text-start" onclick="scrollToSection('section-home')">🏠 Home</button>
+          <button class="btn btn-outline-primary text-start" onclick="scrollToSection('section-students')">🎓 Students</button>
+          <button class="btn btn-outline-primary text-start" onclick="scrollToSection('section-batches')">📚 Batches</button>
+          <button class="btn btn-outline-primary text-start" onclick="scrollToSection('section-fees')">💰 Fees</button>
+          <button class="btn btn-outline-primary text-start" onclick="scrollToSection('section-attendance')">✅ Attendance</button>
+          <hr class="my-1">
+          <button class="btn btn-outline-secondary text-start" onclick="scrollToSection('section-finance')">📊 Financial Dashboard</button>
+          <button class="btn btn-outline-secondary text-start" onclick="scrollToSection('section-coaches')">🧑‍🏫 Coaches</button>
+          <button class="btn btn-outline-secondary text-start" onclick="scrollToSection('section-plans')">💳 Membership Plans</button>
+          <button class="btn btn-outline-secondary text-start" onclick="scrollToSection('section-memberships')">📋 Student Memberships</button>
+          <button class="btn btn-outline-secondary text-start" onclick="scrollToSection('section-expenses')">📊 Expenses</button>
+          <hr class="my-1">
+          <button class="btn btn-outline-dark text-start" onclick="switchTopTab('notifications-tab')">🔔 Notifications</button>
+          <button class="btn btn-outline-dark text-start" onclick="switchTopTab('reports-tab')">📈 Reports</button>
+          <button class="btn btn-outline-dark text-start" onclick="switchTopTab('audit-tab')">📜 Audit Logs</button>
+          <hr class="my-1">
+          <a href="/" target="_blank" rel="noopener noreferrer" class="btn btn-primary text-start"><i class="bi bi-eye me-2"></i>Go to Customer View</a>
+          <button class="btn text-white text-start" style="background:linear-gradient(135deg,#ef4444,#dc2626);" onclick="logout()"><i class="bi bi-box-arrow-right me-2"></i>Logout</button>
+        </div>
+      </div>
     </div>
+
+    <!-- Mobile bottom app-style footer nav -->
+    <nav class="navbar fixed-bottom bg-white border-top d-md-none py-1" style="box-shadow: 0 -2px 10px rgba(0,0,0,0.08); z-index: 1030;">
+      <div class="container-fluid px-1">
+        <div class="d-flex justify-content-around w-100">
+          <button class="btn btn-link text-decoration-none text-dark d-flex flex-column align-items-center p-1" onclick="scrollToSection('section-home')">
+            <i class="bi bi-house-door fs-5"></i><small>Home</small>
+          </button>
+          <button class="btn btn-link text-decoration-none text-dark d-flex flex-column align-items-center p-1" onclick="scrollToSection('section-students')">
+            <i class="bi bi-people fs-5"></i><small>Students</small>
+          </button>
+          <button class="btn btn-link text-decoration-none text-dark d-flex flex-column align-items-center p-1" onclick="scrollToSection('section-batches')">
+            <i class="bi bi-calendar3 fs-5"></i><small>Batches</small>
+          </button>
+          <button class="btn btn-link text-decoration-none text-dark d-flex flex-column align-items-center p-1" onclick="scrollToSection('section-fees')">
+            <i class="bi bi-cash-coin fs-5"></i><small>Fees</small>
+          </button>
+          <button class="btn btn-link text-decoration-none text-dark d-flex flex-column align-items-center p-1" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
+            <i class="bi bi-three-dots fs-5"></i><small>More</small>
+          </button>
+        </div>
+      </div>
+    </nav>
+    <div class="d-md-none" style="height:64px;"></div>
+    <!-- /mobile footer spacer -->
 
     <!-- ===================== -->
     <!-- HOME SUMMARY -->
     <!-- ===================== -->
-    <div class="card p-3 mb-4 border-primary">
+    <div class="card p-3 mb-4 border-primary" id="section-home">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0">🏠 Home</h4>
         <button class="btn btn-outline-primary btn-sm" onclick="loadHomeSummary()">Refresh</button>
@@ -259,7 +332,7 @@
 
     <!-- New ANALYTICS Starts here -->
          <!-- FINANCIAL DASHBOARD -->
-    <div class="card p-3 mb-4 border-info">
+    <div class="card p-3 mb-4 border-info" id="section-finance">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0">💰 Financial Dashboard</h4>
         <div>
@@ -492,7 +565,7 @@
 <!-- ===================== -->
 <!-- STUDENT MANAGEMENT (ENHANCED) -->
 <!-- ===================== -->
-<div class="card p-3 mb-4 border-info">
+<div class="card p-3 mb-4 border-info" id="section-students">
 
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="mb-0">🎓 Student Management</h4>
@@ -588,7 +661,7 @@
         <div class="text-center mb-3">
           <img id="sd-photo" src="" alt="Profile Photo" class="rounded-circle border"
                style="width:100px;height:100px;object-fit:cover;"
-               onerror="this.src='https://placehold.co/100x100/E5E7EB/6B7280?text=User+1'">
+               onerror="this.src='https://placehold.co/100x100/E5E7EB/6B7280?text=No+Photo'">
           <div class="mt-2">
             <button class="btn btn-sm btn-outline-secondary" onclick="toggleEditPhoto()">✏️ Edit Photo</button>
           </div>
@@ -659,7 +732,7 @@
 <!-- ===================== -->
 <!-- COACH MANAGEMENT -->
 <!-- ===================== -->
-<div class="card p-3 mb-4 border-warning">
+<div class="card p-3 mb-4 border-warning" id="section-coaches">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="mb-0">🧑‍🏫 Coach Management</h4>
     <button class="btn btn-warning text-white" onclick="showCoachForm()">+ Add Coach</button>
@@ -717,11 +790,25 @@
 <!-- ===================== -->
 <!-- BATCH MANAGEMENT -->
 <!-- ===================== -->
-<div class="card p-3 mb-4 border-success">
+<div class="card p-3 mb-4 border-success" id="section-batches">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="mb-0">📚 Batch Management</h4>
-    <button class="btn btn-success" onclick="showBatchForm()">+ Add Batch</button>
+    <h4 class="mb-0">📚 Batches</h4>
+    <button class="btn btn-success" onclick="showBatchForm()">+ Create Batch</button>
   </div>
+
+  <!-- Friendly card grid — main view for staff -->
+  <div class="row g-3 mb-3" id="batchCardGrid">
+    <div class="col-12 text-center text-muted py-3">Loading batches...</div>
+  </div>
+
+  <!-- Advanced full editor (table + form), collapsed by default -->
+  <div class="mb-2">
+    <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#batchAdvancedEditor">
+      ⚙️ Advanced Batch Editor
+    </button>
+  </div>
+
+  <div class="collapse" id="batchAdvancedEditor">
 
   <div id="batch-form" style="display:none;" class="border rounded p-3 mb-3">
     <input type="hidden" id="batch-id">
@@ -759,6 +846,9 @@
           <option value="inactive">Inactive</option>
         </select>
       </div>
+      <div class="col-md-6">
+        <input id="batch-description" class="form-control" placeholder="Short description (shown on batch card)">
+      </div>
     </div>
     <button class="btn btn-primary mt-3" onclick="saveBatch()">Save Batch</button>
     <button class="btn btn-secondary mt-3 ms-2" onclick="document.getElementById('batch-form').style.display='none'">Cancel</button>
@@ -794,13 +884,58 @@
       <tbody id="batchTableBody"></tbody>
     </table>
   </div>
+
+  </div>
+  <!-- /batchAdvancedEditor -->
+
 </div>
 <!-- BATCH MANAGEMENT ends -->
 
 <!-- ===================== -->
+<!-- ADD ENQUIRY MODAL -->
+<!-- ===================== -->
+<div class="modal fade" id="enquiryModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Enquiry</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="enq-batch-id">
+        <div class="mb-2">
+          <label class="form-label">Batch</label>
+          <input id="enq-batch-name" class="form-control" readonly>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Student Name *</label>
+          <input id="enq-student-name" class="form-control" placeholder="Student Name">
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Mobile</label>
+          <input id="enq-mobile" class="form-control" placeholder="Mobile Number">
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Date of Enquiry</label>
+          <input type="date" id="enq-date" class="form-control">
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Notes</label>
+          <textarea id="enq-notes" class="form-control" rows="2" placeholder="Notes"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" onclick="submitEnquiry()">Save Enquiry</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== -->
 <!-- ATTENDANCE MANAGEMENT -->
 <!-- ===================== -->
-<div class="card p-3 mb-4 border-danger">
+<div class="card p-3 mb-4 border-danger" id="section-attendance">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="mb-0">✅ Attendance</h4>
     <div>
@@ -831,7 +966,7 @@
 <!-- ===================== -->
 <!-- MEMBERSHIP PLANS -->
 <!-- ===================== -->
-<div class="card p-3 mb-4 border-purple" style="border-color: #8b5cf6;">
+<div class="card p-3 mb-4 border-purple" style="border-color: #8b5cf6;" id="section-plans">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="mb-0">💳 Membership Plans</h4>
     <button class="btn btn-primary" style="background:#8b5cf6;border-color:#8b5cf6;" onclick="showPlanForm()">+ Add Plan</button>
@@ -879,7 +1014,7 @@
 <!-- ===================== -->
 <!-- STUDENT MEMBERSHIPS -->
 <!-- ===================== -->
-<div class="card p-3 mb-4 border-purple" style="border-color: #a78bfa;">
+<div class="card p-3 mb-4 border-purple" style="border-color: #a78bfa;" id="section-memberships">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="mb-0">📋 Student Memberships</h4>
     <button class="btn btn-primary" style="background:#a78bfa;border-color:#a78bfa;" onclick="showStudentMembershipForm()">+ Assign Membership</button>
@@ -938,7 +1073,7 @@
 <!-- ===================== -->
 <!-- FEES REPORT -->
 <!-- ===================== -->
-<div class="card p-3 mb-4 border-success">
+<div class="card p-3 mb-4 border-success" id="section-fees">
   <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
     <h4 class="mb-0">📅 Fees Report</h4>
     <div class="d-flex gap-2 flex-wrap">
@@ -1097,7 +1232,7 @@
 <!-- ===================== -->
 <!-- EXPENSE MANAGEMENT -->
 <!-- ===================== -->
-<div class="card p-3 mb-4 border-warning">
+<div class="card p-3 mb-4 border-warning" id="section-expenses">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="mb-0">📊 Expense Management</h4>
     <button class="btn btn-warning text-dark" onclick="showExpenseForm()">+ Add Expense</button>
@@ -2664,6 +2799,32 @@ function showToast(msg, type = "success") {
     location.reload();
   }
 
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  const dashTabBtn = document.getElementById("dashboard-tab");
+  if (dashTabBtn && !dashTabBtn.classList.contains("active")) {
+    bootstrap.Tab.getOrCreateInstance(dashTabBtn).show();
+  }
+  const offcanvasEl = document.getElementById("mobileMenu");
+  const offcanvasInstance = offcanvasEl && bootstrap.Offcanvas.getInstance(offcanvasEl);
+  if (offcanvasInstance) offcanvasInstance.hide();
+  if (el) {
+    setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+  }
+}
+
+function switchTopTab(tabId) {
+  const btn = document.getElementById(tabId);
+  if (btn) bootstrap.Tab.getOrCreateInstance(btn).show();
+  const offcanvasEl = document.getElementById("mobileMenu");
+  const offcanvasInstance = offcanvasEl && bootstrap.Offcanvas.getInstance(offcanvasEl);
+  if (offcanvasInstance) offcanvasInstance.hide();
+  setTimeout(() => {
+    const el = document.getElementById(tabId);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 60);
+}
+
 function showDashboard() {
 
   document.getElementById("login-box").style.display="none";
@@ -3735,9 +3896,112 @@ async function loadBatches() {
   const res = await fetch("/api/batches");
   window.allBatches = await res.json();
   renderBatchRows(window.allBatches);
+  renderBatchCards(window.allBatches);
   populateBatchDropdowns(); // <-- Add this line
   populateStudentDropdown(); // <-- Add this line for assignment dropdown
   populateFeesReportBatchDropdown();
+}
+
+function renderBatchCards(batches) {
+  const grid = document.getElementById("batchCardGrid");
+  if (!grid) return;
+  grid.innerHTML = "";
+
+  if (!batches || batches.length === 0) {
+    grid.innerHTML = `<div class="col-12 text-center text-muted py-3">No batches yet. Click "+ Create Batch" to add one.</div>`;
+    return;
+  }
+
+  batches.forEach(b => {
+    const isActive = b.status === "active";
+    const timeText = (b.start_time || b.end_time)
+      ? `${b.start_time || "?"} - ${b.end_time || "?"}`
+      : "Time not set";
+
+    grid.innerHTML += `
+      <div class="col-12 col-sm-6 col-lg-4">
+        <div class="card p-3 h-100 shadow-sm">
+          <div class="d-flex justify-content-between align-items-start mb-1">
+            <h5 class="mb-0">${b.batch_name}</h5>
+            <span class="badge ${isActive ? 'bg-success' : 'bg-secondary'}">${b.status}</span>
+          </div>
+          <div class="text-muted small mb-1"><i class="bi bi-clock"></i> ${timeText}</div>
+          <div class="text-muted small mb-3">${b.description || "No description added"}</div>
+          <div class="d-grid gap-2">
+            <button class="btn btn-outline-danger btn-sm" onclick="goTakeAttendance(${b.id})">
+              <i class="bi bi-check2-square"></i> Take Attendance
+            </button>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-primary btn-sm flex-fill" onclick="openAddEnquiry(${b.id}, '${(b.batch_name || "").replace(/'/g, "")}')">
+                <i class="bi bi-person-plus"></i> Add Enquiry
+              </button>
+              <button class="btn btn-outline-success btn-sm flex-fill" onclick="openBatchStudentEditor(${b.id})">
+                <i class="bi bi-people"></i> Add Student
+              </button>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-secondary btn-sm flex-fill" onclick="openBatchStudentEditor(${b.id})">
+                <i class="bi bi-pencil"></i> Edit
+              </button>
+              <button class="btn btn-outline-danger btn-sm flex-fill" onclick="deleteBatch(${b.id})">
+                <i class="bi bi-trash"></i> Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+function goTakeAttendance(batchId) {
+  const sel = document.getElementById("attendance-batch");
+  if (sel) sel.value = batchId;
+  loadAttendance();
+  scrollToSection("section-attendance");
+}
+
+function openBatchStudentEditor(batchId) {
+  const collapseEl = document.getElementById("batchAdvancedEditor");
+  const collapse = bootstrap.Collapse.getOrCreateInstance(collapseEl);
+  collapse.show();
+  editBatch(batchId);
+}
+
+function openAddEnquiry(batchId, batchName) {
+  document.getElementById("enq-batch-id").value = batchId || "";
+  document.getElementById("enq-batch-name").value = batchName || "";
+  document.getElementById("enq-student-name").value = "";
+  document.getElementById("enq-mobile").value = "";
+  document.getElementById("enq-date").value = new Date().toISOString().split("T")[0];
+  document.getElementById("enq-notes").value = "";
+  new bootstrap.Modal(document.getElementById("enquiryModal")).show();
+}
+
+async function submitEnquiry() {
+  const studentName = document.getElementById("enq-student-name").value.trim();
+  if (!studentName) { showToast("Student name is required", "warning"); return; }
+
+  const data = {
+    batch_id: document.getElementById("enq-batch-id").value || null,
+    batch_name: document.getElementById("enq-batch-name").value || null,
+    student_name: studentName,
+    mobile: document.getElementById("enq-mobile").value.trim(),
+    enquiry_date: document.getElementById("enq-date").value || new Date().toISOString().split("T")[0],
+    notes: document.getElementById("enq-notes").value.trim(),
+    status: "open"
+  };
+
+  const res = await fetch("/api/enquiries", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "add", data })
+  });
+
+  if (!res.ok) { showToast("Save failed", "error"); return; }
+
+  showToast("Enquiry saved ✅");
+  bootstrap.Modal.getInstance(document.getElementById("enquiryModal")).hide();
 }
 
 function populateFeesReportBatchDropdown() {
@@ -3790,6 +4054,7 @@ function showBatchForm() {
   document.getElementById("batch-days").value = "";
   document.getElementById("batch-capacity").value = "20";
   document.getElementById("batch-status").value = "active";
+  document.getElementById("batch-description").value = "";
   document.getElementById("batch-form").style.display = "block";
   populateCoachDropdown();
 }
@@ -3806,6 +4071,7 @@ function editBatch(id) {
   document.getElementById("batch-days").value = b.days_of_week ? b.days_of_week.join(",") : "";
   document.getElementById("batch-capacity").value = b.capacity || "20";
   document.getElementById("batch-status").value = b.status || "active";
+  document.getElementById("batch-description").value = b.description || "";
   document.getElementById("batch-form").style.display = "block";
   populateCoachDropdown();
   document.getElementById("batch-form").scrollIntoView({ behavior: "smooth" });
@@ -3831,7 +4097,8 @@ async function saveBatch() {
     end_time: document.getElementById("batch-end").value || null,
     days_of_week: daysArray,
     capacity: parseInt(document.getElementById("batch-capacity").value) || 20,
-    status: document.getElementById("batch-status").value
+    status: document.getElementById("batch-status").value,
+    description: document.getElementById("batch-description").value.trim() || null
   };
 
   const isEdit = !!id;
@@ -4222,7 +4489,7 @@ async function openStudentDetail(id) {
   const s = (window.allStudents || []).find(x => x.id === id);
   if (!s) return;
 
-  document.getElementById("sd-photo").src = s.photo_url || "https://via.placeholder.com/100x100.png?text=No+Photo";
+  document.getElementById("sd-photo").src = s.photo_url || "https://placehold.co/100x100/E5E7EB/6B7280?text=No+Photo";
   document.getElementById("sd-photo-url").value = s.photo_url || "";
   document.getElementById("sd-photo-edit").style.display = "none";
 
@@ -4333,7 +4600,7 @@ async function savePhotoUrl() {
   });
   if (!res.ok) { showToast("Photo update failed", "error"); return; }
   showToast("Photo updated ✅");
-  document.getElementById("sd-photo").src = url || "https://via.placeholder.com/100x100.png?text=No+Photo";
+  document.getElementById("sd-photo").src = url || "https://placehold.co/100x100/E5E7EB/6B7280?text=No+Photo";
   document.getElementById("sd-photo-edit").style.display = "none";
   loadStudents();
 }
