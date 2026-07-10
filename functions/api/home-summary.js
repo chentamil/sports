@@ -52,18 +52,24 @@ export async function onRequest(context) {
       (activeBatchesRes.headers.get("content-range") || "0/0").split("/")[1] || 0
     );
 
-    // Latest activity: recent joins + recent completed payments
+    // Latest activity: recent joins + recent completed payments + recent court bookings (status=booked)
     const recentStudentsRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/students?select=id,first_name,last_name,created_at&order=created_at.desc&limit=5`,
+      `${SUPABASE_URL}/rest/v1/students?select=id,first_name,last_name,created_at&order=created_at.desc&limit=10`,
       { headers: authHeaders }
     );
     const recentStudents = await recentStudentsRes.json();
 
     const recentPaymentsRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/fee_payments?select=id,amount,created_at,students(first_name,last_name)&status=eq.completed&order=created_at.desc&limit=5`,
+      `${SUPABASE_URL}/rest/v1/fee_payments?select=id,amount,created_at,students(first_name,last_name)&status=eq.completed&order=created_at.desc&limit=10`,
       { headers: authHeaders }
     );
     const recentPayments = await recentPaymentsRes.json();
+
+    const recentBookingsRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/bookings?select=id,customer_name,created_at,students(first_name,last_name),slots(status,date,start_time,end_time,price)&order=created_at.desc&limit=10`,
+      { headers: authHeaders }
+    );
+    const recentBookings = await recentBookingsRes.json();
 
     const activity = [];
 
@@ -84,13 +90,24 @@ export async function onRequest(context) {
       });
     });
 
+    (recentBookings || []).forEach(b => {
+      if (!b.slots || b.slots.status !== "booked") return; // only confirmed court bookings
+      const name = b.students ? `${b.students.first_name} ${b.students.last_name || ""}`.trim() : (b.customer_name || "Guest");
+      const when = b.slots.date ? `${b.slots.date} ${b.slots.start_time || ""}-${b.slots.end_time || ""}`.trim() : "";
+      activity.push({
+        type: "booking",
+        text: `${name} booked a court${when ? " for " + when : ""}${b.slots.price ? " (₹" + b.slots.price + ")" : ""}`,
+        time: b.created_at
+      });
+    });
+
     activity.sort((a, b) => new Date(b.time) - new Date(a.time));
 
     return Response.json({
       activeStudents,
       newStudents30,
       activeBatches,
-      activity: activity.slice(0, 8)
+      activity: activity.slice(0, 5)
     });
 
   } catch (err) {

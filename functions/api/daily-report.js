@@ -48,6 +48,15 @@ export async function onRequest(context) {
     const membershipsToday = await membershipsRes.json();
     const membershipBookingToday = (membershipsToday || []).reduce((sum, m) => sum + Number(m.final_amount || 0), 0);
 
+    // 3b. Court bookings today (status = booked)
+    const courtBookingsRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/bookings?select=id,slots(status,date,price)&created_at=gte.${todayStart}&created_at=lt.${todayEnd}`,
+      { headers: authHeaders }
+    );
+    const courtBookingsRaw = await courtBookingsRes.json();
+    const courtBookingsToday = (courtBookingsRaw || []).filter(b => b.slots && b.slots.status === "booked");
+    const courtBookingRevenueToday = courtBookingsToday.reduce((sum, b) => sum + Number((b.slots && b.slots.price) || 0), 0);
+
     // 4. Attendance % today across all batches
     const attRes = await fetch(
       `${SUPABASE_URL}/rest/v1/attendance?select=status&attendance_date=eq.${today}`,
@@ -72,6 +81,8 @@ export async function onRequest(context) {
       feesPaidToday,
       feesPaidTodayCount: (feesToday || []).length,
       membershipBookingToday,
+      courtBookingsTodayCount: courtBookingsToday.length,
+      courtBookingRevenueToday,
       attendancePercentToday,
       attendanceMarkedToday: totalMarked,
       enquiriesToday,

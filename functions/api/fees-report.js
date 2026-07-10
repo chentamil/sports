@@ -103,6 +103,7 @@ export async function onRequest(context) {
     });
 
     const transactions = payments.map(p => ({
+      id: p.id,
       date: p.payment_date,
       name: p.students ? `${p.students.first_name} ${p.students.last_name || ""}`.trim() : "N/A",
       amount: p.amount,

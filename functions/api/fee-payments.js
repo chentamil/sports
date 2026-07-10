@@ -23,7 +23,7 @@ export async function onRequest(context) {
       const startDate = url.searchParams.get('start_date');
       const endDate = url.searchParams.get('end_date');
 
-      let queryUrl = `${SUPABASE_URL}/rest/v1/fee_payments?select=*,students(first_name,last_name,mobile,email),student_memberships(plan_id,start_date,end_date)&order=id.desc`;
+      let queryUrl = `${SUPABASE_URL}/rest/v1/fee_payments?select=*,students(first_name,last_name,mobile,email),student_memberships(plan_id,start_date,end_date,membership_plans(name))&order=id.desc`;
 
       if (studentId) {
         queryUrl += `&student_id=eq.${studentId}`;
