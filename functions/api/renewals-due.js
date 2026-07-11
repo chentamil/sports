@@ -26,7 +26,7 @@ export async function onRequest(context) {
     const windowEnd = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]; // next 7 days
 
     const membershipsRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/student_memberships?select=id,student_id,end_date,students(first_name,last_name,mobile,status),membership_plans(name)&end_date=gte.${windowStart}&end_date=lte.${windowEnd}&order=end_date.asc`,
+      `${SUPABASE_URL}/rest/v1/student_memberships?select=id,student_id,end_date,final_amount,students(first_name,last_name,mobile,status),membership_plans(name,amount)&end_date=gte.${windowStart}&end_date=lte.${windowEnd}&order=end_date.asc`,
       { headers: authHeaders }
     );
     const memberships = await membershipsRes.json();
@@ -42,6 +42,7 @@ export async function onRequest(context) {
           name,
           mobile: m.students.mobile || "",
           planName: (m.membership_plans && m.membership_plans.name) || "Membership",
+          amount: m.final_amount || (m.membership_plans && m.membership_plans.amount) || 0,
           endDate: m.end_date,
           daysLeft: diffDays
         };

@@ -28,76 +28,106 @@ export async function onRequest(context) {
     const startDate = `${month}-01`;
     const endDate = new Date(year, mon, 0).toISOString().split("T")[0]; // last day of month
 
-    // 1. Target student ids, filtered by batch if given
-    let studentIds = null;
-    if (batchId && batchId !== "all") {
-      const sbRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/student_batches?select=student_id&batch_id=eq.${batchId}&status=eq.active`,
-        { headers: authHeaders }
-      );
-      const sb = await sbRes.json();
-      studentIds = [...new Set((sb || []).map(r => r.student_id))];
+    // 1. Target ENROLLMENTS (student + batch pairs), not just students.
+    // A student in 2 batches gets 2 separate rows here — that's the whole point of this fix.
+    let enrollmentsUrl = `${SUPABASE_URL}/rest/v1/student_batches?select=student_id,batch_id,students(id,first_name,last_name,mobile,status),batches(batch_name,status)&status=eq.active`;
+    if (batchId && batchId !== "all") enrollmentsUrl += `&batch_id=eq.${batchId}`;
+    const enrollmentsRes = await fetch(enrollmentsUrl, { headers: authHeaders });
+    const enrollmentsRaw = await enrollmentsRes.json();
 
-      if (studentIds.length === 0) {
-        return Response.json({
-          month, batchId: batchId || "all",
-          paidCount: 0, pendingCount: 0,
-          paidStudents: [], pendingStudents: [], transactions: []
-        });
-      }
+    // Only active students in active batches
+    const enrollments = (enrollmentsRaw || []).filter(e =>
+      e.students && e.students.status === "active" && e.batches
+    );
+
+    if (enrollments.length === 0) {
+      return Response.json({
+        month, batchId: batchId || "all",
+        paidCount: 0, pendingCount: 0,
+        paidStudents: [], pendingStudents: [], transactions: []
+      });
     }
 
-    // 2. Active students in scope
-    let studentsUrl = `${SUPABASE_URL}/rest/v1/students?select=id,first_name,last_name,mobile,status&status=eq.active`;
-    if (studentIds) studentsUrl += `&id=in.(${studentIds.join(",")})`;
-    const studentsRes = await fetch(studentsUrl, { headers: authHeaders });
-    const students = await studentsRes.json();
-    const idsForQuery = students.map(s => s.id);
+    const idsForQuery = [...new Set(enrollments.map(e => e.student_id))];
 
-    // 3. Completed payments in the selected month, for these students
-    let payments = [];
-    if (idsForQuery.length) {
-      const paymentsUrl = `${SUPABASE_URL}/rest/v1/fee_payments?select=*,students(first_name,last_name)&status=eq.completed&payment_date=gte.${startDate}&payment_date=lte.${endDate}&student_id=in.(${idsForQuery.join(",")})&order=payment_date.desc`;
-      const paymentsRes = await fetch(paymentsUrl, { headers: authHeaders });
-      payments = await paymentsRes.json();
-    }
+    // 2. All active memberships for these students (batch-specific + legacy/general ones with no batch set)
+    const membershipsUrl = `${SUPABASE_URL}/rest/v1/student_memberships?select=*,membership_plans(name,amount)&student_id=in.(${idsForQuery.join(",")})&order=start_date.desc`;
+    const membershipsRes = await fetch(membershipsUrl, { headers: authHeaders });
+    const memberships = await membershipsRes.json();
 
-    const paidStudentIds = new Set(payments.map(p => p.student_id));
+    // Latest membership per (student, batch) — exact match
+    const membershipByStudentBatch = {};
+    // Latest membership per student with NO batch set — fallback for data created before this feature existed
+    const membershipGeneralByStudent = {};
 
-    // 4. Latest membership per student (for "valid till" + due amount on pending list)
-    let memberships = [];
-    if (idsForQuery.length) {
-      const membershipsUrl = `${SUPABASE_URL}/rest/v1/student_memberships?select=*,membership_plans(amount)&student_id=in.(${idsForQuery.join(",")})&order=start_date.desc`;
-      const membershipsRes = await fetch(membershipsUrl, { headers: authHeaders });
-      memberships = await membershipsRes.json();
-    }
-    const latestMembershipByStudent = {};
     (memberships || []).forEach(m => {
-      if (!latestMembershipByStudent[m.student_id]) latestMembershipByStudent[m.student_id] = m;
+      if (m.batch_id) {
+        const key = `${m.student_id}_${m.batch_id}`;
+        if (!membershipByStudentBatch[key]) membershipByStudentBatch[key] = m;
+      } else {
+        if (!membershipGeneralByStudent[m.student_id]) membershipGeneralByStudent[m.student_id] = m;
+      }
     });
+
+    // 3. Completed payments this month for these students
+    const paymentsUrl = `${SUPABASE_URL}/rest/v1/fee_payments?select=*,students(first_name,last_name)&status=eq.completed&payment_date=gte.${startDate}&payment_date=lte.${endDate}&student_id=in.(${idsForQuery.join(",")})&order=payment_date.desc`;
+    const paymentsRes = await fetch(paymentsUrl, { headers: authHeaders });
+    const payments = await paymentsRes.json();
+
+    // A membership is "paid this month" if any completed payment this month points at it
+    const paidMembershipIds = new Set(
+      payments.filter(p => p.student_membership_id).map(p => p.student_membership_id)
+    );
+    // Payments with NO membership link at all (old data / quick payments) — still count per student,
+    // applied to at most one of that student's enrollments so we don't double-count.
+    const unlinkedPaidStudentIds = new Set(
+      payments.filter(p => !p.student_membership_id).map(p => p.student_id)
+    );
+    const unlinkedPaidStudentIdsUsed = new Set();
 
     const paidStudents = [];
     const pendingStudents = [];
 
-    students.forEach(s => {
+    enrollments.forEach(e => {
+      const s = e.students;
+      const batchName = e.batches.batch_name;
       const name = `${s.first_name} ${s.last_name || ""}`.trim();
-      if (paidStudentIds.has(s.id)) {
-        const pay = payments.find(p => p.student_id === s.id);
+
+      const exactKey = `${e.student_id}_${e.batch_id}`;
+      const membership = membershipByStudentBatch[exactKey] || membershipGeneralByStudent[e.student_id] || null;
+
+      let isPaid = false;
+      let paidVia = null;
+
+      if (membership && paidMembershipIds.has(membership.id)) {
+        isPaid = true;
+        paidVia = payments.find(p => p.student_membership_id === membership.id);
+      } else if (unlinkedPaidStudentIds.has(e.student_id) && !unlinkedPaidStudentIdsUsed.has(e.student_id)) {
+        // Fallback for payments recorded with no membership link — best-effort, applied once
+        isPaid = true;
+        unlinkedPaidStudentIdsUsed.add(e.student_id);
+        paidVia = payments.find(p => p.student_id === e.student_id && !p.student_membership_id);
+      }
+
+      if (isPaid) {
         paidStudents.push({
           id: s.id,
           name,
+          batch: batchName,
           mobile: s.mobile || "",
-          amount: pay ? pay.amount : 0,
-          payment_date: pay ? pay.payment_date : ""
+          amount: paidVia ? paidVia.amount : (membership ? membership.final_amount : 0),
+          payment_date: paidVia ? paidVia.payment_date : ""
         });
       } else {
-        const mem = latestMembershipByStudent[s.id];
         pendingStudents.push({
           id: s.id,
           name,
+          batch: batchName,
+          batchId: e.batch_id,
+          membershipId: membership ? membership.id : null,
           mobile: s.mobile || "",
-          amount: mem ? (mem.final_amount || (mem.membership_plans && mem.membership_plans.amount) || 0) : 0,
-          valid_till: mem ? mem.end_date : null
+          amount: membership ? (membership.final_amount || (membership.membership_plans && membership.membership_plans.amount) || 0) : 0,
+          valid_till: membership ? membership.end_date : null
         });
       }
     });
