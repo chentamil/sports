@@ -139,131 +139,105 @@
 <div class="container py-5">
 
 <!-- CONTACT -->
-<section id="contact-mail" class="py-5 bg-light">
-  <div class="container">
-    <div class="text-center mb-5">
-      <h2 class="fw-bold">Get Started Today</h2>
-      <p class="text-secondary">Have a project? Let's talk about it.</p>
-    </div>
-    <div class="row justify-content-center">
-      <div class="col-lg-8">
-        <div class="card shadow-lg">
-          <div class="card-body p-4">
-            <!-- Header -->
-            <div class="d-flex align-items-center mb-4">
-              <div class="header-icon me-3">
-                <i class="bi bi-send-fill fs-3 p-3 rounded-2" style="background: color-mix(in srgb, #0ea5e9 12%, transparent); color: #0ea5e9;"></i>
-              </div>
-              <div class="header-text">
-                <h4 class="mb-1">Send Us a Message</h4>
-                <p class="mb-0 text-muted">Fill out the form and our team will respond within 24 hours.</p>
+ <!-- Form Center -->
+    <hr class="m-0">
+    <section class="py-5 bg-light">
+      <div class="container">
+        <div class="text-center">
+          <h2 class="mb-2">Contact Us</h2>
+          <p class="text-muted text-center mb-4">we will respond soon</p>
+        </div>  
+
+        <div class="row justify-content-center">
+          <div class="col-12 col-md-10 col-lg-8">
+
+            <div class="card border-0 shadow-sm">
+              <div class="card-body p-4">
+
+                <h5 class="text-center mb-4">Send Enquiry</h5>
+
+                <div id="formAlert2" class="alert d-none"></div>
+
+                <form id="jewelForm">
+
+                  <input type="hidden" name="site" value="www.jothiheartandskin.info">
+
+                  <!-- Honeypot -->
+                  <input type="text" name="website" class="d-none" autocomplete="off">
+
+                  <div class="row g-3">
+
+                    <!-- Name -->
+                    <div class="col-md-6">
+                      <label class="form-label">Your Name</label>
+                      <input type="text" name="name" class="form-control" placeholder="Enter your name" required>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="col-md-6">
+                      <label class="form-label">Your Email</label>
+                      <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
+                    </div>
+
+                    <div class="col-md-6">
+                       <label class="form-label">Mobile Number</label>
+                      <input type="tel" name="mobile" class="form-control" placeholder="Mobile">
+                    </div>
+
+                    <!-- Message -->
+                    <div class="col-12">
+                      <label class="form-label">Message</label>
+                      <textarea name="message" class="form-control" rows="4" placeholder="Write your message here"></textarea>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="col-12 text-center mt-2">
+                      <button class="btn btn-primary px-5">
+                        Send
+                      </button>
+                    </div>
+
+                    <!-- Security Note -->
+                    <div class="secure-note text-center small text-secondary text-opacity-50 mt-2">
+                      <i class="bi bi-lock-fill"></i>
+                      <span>Your data is protected by reCAPTCHA <a class="small" href="https://policies.google.com/privacy" target="_blank">Privacy</a> ·
+                        <a class="small" href="https://policies.google.com/terms" target="_blank">Terms</a></span>
+                    </div>
+
+                  </div>
+                </form>
+
               </div>
             </div>
 
-            <!-- Alert -->
-            <div id="leadFormAlert" class="alert d-none" role="alert"></div>
-
-            <!-- Form -->
-            <form id="leadForm">
-              <input type="hidden" name="site" value="www.achabazar.com">
-
-              <!-- Honeypot -->
-              <input type="text" name="website" class="d-none" autocomplete="off">
-
-              <div class="row g-3">
-
-                <!-- Name -->
-                <div class="col-md-6">
-                  <div class="input-group-custom">
-                    <label>Your Name</label>
-                    <div class="input-wrapper d-flex align-items-center border rounded p-2">
-                      <i class="bi bi-person me-2"></i>
-                      <input type="text" name="name" class="form-control border-0" placeholder="John Doe" required>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Email -->
-                <div class="col-md-6">
-                  <div class="input-group-custom">
-                    <label>Email Address</label>
-                    <div class="input-wrapper d-flex align-items-center border rounded p-2">
-                      <i class="bi bi-envelope me-2"></i>
-                      <input type="email" name="email" class="form-control border-0" placeholder="john@example.com" required>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Mobile -->
-                <div class="col-12">
-                  <div class="input-group-custom">
-                    <label>Mobile</label>
-                    <div class="input-wrapper d-flex align-items-center border rounded p-2">
-                      <i class="bi bi-chat-square-text me-2"></i>
-                      <input type="tel" name="mobile" class="form-control border-0" placeholder="Your Mobile No. 9443456789" required>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Message -->
-                <div class="col-12">
-                  <div class="input-group-custom">
-                    <label>Your Message</label>
-                    <div class="input-wrapper textarea-wrapper d-flex align-items-start border rounded p-2">
-                      <i class="bi bi-pencil-square mt-1 me-2"></i>
-                      <textarea name="message" rows="5" class="form-control border-0" placeholder="How can we help you? , Tell us about your project..." required></textarea>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Submit Button -->
-                <div class="col-12 text-center mt-3">
-                  <button type="submit" class="btn btn-primary-custom px-4" style="box-shadow: none !important;">Send Message <i class="bi bi-arrow-right-circle-fill"></i></button>
-                </div>
-
-                <!-- google-recaptcha -->
-                <div class="col-12 text-center mt-2 recaptcha-inline small text-muted">
-                  <img class="img-fluid rounded-2" src="https://www.achabazar.com/images/google-recaptcha.webp" alt="google-recaptcha">
-                </div>
-
-                <!-- Security Note -->
-                <div class="secure-note text-center small text-secondary text-opacity-50 mt-2">
-                  <i class="bi bi-lock-fill"></i>
-                  <span>Your data is protected by reCAPTCHA <a class="small" href="https://policies.google.com/privacy" target="_blank">Privacy</a> ·
-                    <a class="small" href="https://policies.google.com/terms" target="_blank">Terms</a></span>
-                </div>
-
-              </div>
-            </form>
-            <!-- End of form -->
           </div>
         </div>
+
       </div>
-    </div>
-  </div>
-</section>
+    </section>    
 
 <script src="https://www.google.com/recaptcha/api.js?render=6Led3dQsAAAAAJ3gbHohRpri-isc6Y8LcG1RwI4H"></script>
 <script>
-const leadForm = document.getElementById("leadForm");
-const leadFormAlert = document.getElementById("leadFormAlert");
+  const form2 = document.getElementById("jewelForm");
+  const alertBox2 = document.getElementById("formAlert2");
 
-// Set minimum date if needed, similar to your first code, if you have date fields
+  form2.addEventListener("submit", async (e) => {
+      e.preventDefault();
+       //const data = Object.fromEntries(new FormData(form2));
 
-leadForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+       //<-- ADD THIS (closes grecaptcha.ready)
+      grecaptcha.ready(async function () {
+        const token = await grecaptcha.execute("6Led3dQsAAAAAJ3gbHohRpri-isc6Y8LcG1RwI4H", { action: "submit" });
 
-  grecaptcha.ready(async function () {
-    const token = await grecaptcha.execute("6Led3dQsAAAAAJ3gbHohRpri-isc6Y8LcG1RwI4H", { action: "submit" });
-
-    const data = {
-      ...Object.fromEntries(new FormData(leadForm)),
-      token: token,
-      site: window.location.hostname
-    };
+        const data = {
+          ...Object.fromEntries(new FormData(form2)),
+          token: token,
+          site: window.location.hostname
+        };
+      //  
 
     try {
-      const res = await fetch("https://send.achabazar.com", {
+      const res = await fetch("https://silent-hall-cc73.chentamil1988.workers.dev", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -277,22 +251,31 @@ leadForm.addEventListener("submit", async (e) => {
         throw new Error(result.error || "Failed");
       }
 
-      leadFormAlert.className = "alert alert-success";
-      leadFormAlert.innerHTML = "✅ Message sent successfully!";
-      leadFormAlert.classList.remove("d-none");
+      alertBox2.className = "alert alert-success";
+      alertBox2.innerHTML = "✅ Message sent successfully!";
+      alertBox2.classList.remove("d-none");
+
       alert("✅ Message sent success!");
-      leadForm.reset();
+      form2.reset();
 
     } catch (err) {
-      leadFormAlert.className = "alert alert-danger";
-      leadFormAlert.innerHTML = "❌ Error sending message";
-      leadFormAlert.classList.remove("d-none");
+
+      alertBox2.className = "alert alert-danger";
+      alertBox2.innerHTML = "❌ Error sending message";
+      alertBox2.classList.remove("d-none");
+
       alert("❌ Error sending message");
       console.error(err);
     }
   });
-});
+  }); // <-- ADD THIS (closes grecaptcha.ready)
 </script>
+
+<style>
+.grecaptcha-badge {
+  visibility: hidden !important;
+}
+</style>
 
   </main>
 
