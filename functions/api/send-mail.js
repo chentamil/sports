@@ -6,7 +6,7 @@
 // SETUP REQUIRED (one-time):
 // 1. Cloudflare Pages dashboard → your project → Settings → Environment variables
 // 2. Add RESEND_API_KEY as an "Encrypted" variable (your existing Resend key)
-// 3. Add RESEND_FROM as a plain variable, e.g. "Shivani Elite Academy <noreply@yourdomain.com>"
+// 3. Add RESEND_FROM as a plain variable, e.g. Shivani Elite Academy <noreply@yourdomain.com> without ""
 //    (must be a domain you've verified in Resend — Resend will reject unverified senders)
 
 export async function onRequest(context) {
