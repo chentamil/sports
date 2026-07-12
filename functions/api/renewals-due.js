@@ -20,13 +20,17 @@ export async function onRequest(context) {
       return new Response("Invalid Request", { status: 400 });
     }
 
+    const url = new URL(request.url);
+    const aheadDays = Math.max(1, Math.min(parseInt(url.searchParams.get("days") || "7", 10), 90));
+    const overdueDays = Math.max(0, Math.min(parseInt(url.searchParams.get("overdue_days") || "3", 10), 90));
+
     const today = new Date();
     const todayStr = today.toISOString().split("T")[0];
-    const windowStart = new Date(today.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]; // 3 days overdue
-    const windowEnd = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]; // next 7 days
+    const windowStart = new Date(today.getTime() - overdueDays * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+    const windowEnd = new Date(today.getTime() + aheadDays * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
 
     const membershipsRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/student_memberships?select=id,student_id,end_date,final_amount,students(first_name,last_name,mobile,status),membership_plans(name,amount)&end_date=gte.${windowStart}&end_date=lte.${windowEnd}&order=end_date.asc`,
+      `${SUPABASE_URL}/rest/v1/student_memberships?select=id,student_id,end_date,final_amount,students(first_name,last_name,mobile,email,status),membership_plans(name,amount)&end_date=gte.${windowStart}&end_date=lte.${windowEnd}&order=end_date.asc`,
       { headers: authHeaders }
     );
     const memberships = await membershipsRes.json();
@@ -41,6 +45,7 @@ export async function onRequest(context) {
           studentId: m.student_id,
           name,
           mobile: m.students.mobile || "",
+          email: m.students.email || "",
           planName: (m.membership_plans && m.membership_plans.name) || "Membership",
           amount: m.final_amount || (m.membership_plans && m.membership_plans.amount) || 0,
           endDate: m.end_date,
