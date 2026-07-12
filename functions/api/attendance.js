@@ -44,17 +44,22 @@ export async function onRequest(context) {
       // body.data should be an array of objects: 
       // [ { student_id, batch_id, attendance_date, status, remarks, marked_by }, ... ]
       if (body.action === "bulkUpsert") {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/attendance`, {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/attendance?on_conflict=student_id,batch_id,attendance_date`, {
           method: "POST",
           headers: {
             ...authHeaders,
             "Content-Type": "application/json",
-            // This is the magic! It tells Supabase to update on conflict.
+            // This is the magic! It tells Supabase to update on conflict,
+            // matched against the unique constraint on (student_id, batch_id, attendance_date).
             Prefer: "resolution=merge-duplicates"
           },
           body: JSON.stringify(body.data)
         });
-        return new Response(res.ok ? "ok" : "failed", { status: res.ok ? 200 : 500 });
+        if (!res.ok) {
+          const errText = await res.text();
+          return new Response(errText, { status: 500 });
+        }
+        return new Response("ok", { status: 200 });
       }
 
       // ADD single (if needed, but bulk is better)
