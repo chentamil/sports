@@ -22,6 +22,20 @@ export async function onRequest(context) {
       const studentId = url.searchParams.get('student_id');
       const status = url.searchParams.get('status');
 
+      // Self-healing auto-expiry: no cron jobs available on Pages Functions, so instead
+      // we correct any stale "active" memberships whose end_date has passed every time
+      // this list loads. Cheap (single bulk PATCH) and keeps status accurate without
+      // needing a scheduled job.
+      const todayStr = new Date().toISOString().split("T")[0];
+      await fetch(
+        `${SUPABASE_URL}/rest/v1/student_memberships?status=eq.active&end_date=lt.${todayStr}`,
+        {
+          method: "PATCH",
+          headers: { ...authHeaders, "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "expired" })
+        }
+      );
+
       let queryUrl = `${SUPABASE_URL}/rest/v1/student_memberships?select=*,students(first_name,last_name,mobile,email),membership_plans(name,duration_days,amount)&order=id.desc`;
 
       if (studentId) {

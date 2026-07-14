@@ -1,3 +1,31 @@
+async function applyMembershipRenewal(membershipId, SUPABASE_URL, authHeaders) {
+  try {
+    const memRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/student_memberships?id=eq.${membershipId}&select=id,end_date,plan_id,membership_plans(duration_days)`,
+      { headers: authHeaders }
+    );
+    const memArr = await memRes.json();
+    const membership = memArr && memArr[0];
+
+    if (membership && membership.membership_plans && membership.membership_plans.duration_days) {
+      const durationDays = membership.membership_plans.duration_days;
+      const today = new Date();
+      const currentEnd = membership.end_date ? new Date(membership.end_date + "T00:00:00") : today;
+      const base = currentEnd > today ? currentEnd : today;
+      const newEnd = new Date(base.getTime() + durationDays * 24 * 60 * 60 * 1000);
+      const newEndStr = newEnd.toISOString().split("T")[0];
+
+      await fetch(`${SUPABASE_URL}/rest/v1/student_memberships?id=eq.${membership.id}`, {
+        method: "PATCH",
+        headers: { ...authHeaders, "Content-Type": "application/json" },
+        body: JSON.stringify({ end_date: newEndStr, status: "active" })
+      });
+    }
+  } catch (e) {
+    // Renewal extension failing shouldn't fail the payment itself.
+  }
+}
+
 export async function onRequest(context) {
 
   const SUPABASE_URL = context.env.SUPABASE_URL;
@@ -56,45 +84,40 @@ export async function onRequest(context) {
         // membership's end_date by the plan's duration, instead of requiring a
         // manual new membership row every cycle.
         if (body.data.status === "completed" && body.data.student_membership_id) {
-          try {
-            const memRes = await fetch(
-              `${SUPABASE_URL}/rest/v1/student_memberships?id=eq.${body.data.student_membership_id}&select=id,end_date,plan_id,membership_plans(duration_days)`,
-              { headers: authHeaders }
-            );
-            const memArr = await memRes.json();
-            const membership = memArr && memArr[0];
-
-            if (membership && membership.membership_plans && membership.membership_plans.duration_days) {
-              const durationDays = membership.membership_plans.duration_days;
-              // Renew from whichever is later: current end_date or today — so a very
-              // overdue renewal doesn't get backdated, but an on-time renewal extends cleanly.
-              const today = new Date();
-              const currentEnd = membership.end_date ? new Date(membership.end_date + "T00:00:00") : today;
-              const base = currentEnd > today ? currentEnd : today;
-              const newEnd = new Date(base.getTime() + durationDays * 24 * 60 * 60 * 1000);
-              const newEndStr = newEnd.toISOString().split("T")[0];
-
-              await fetch(`${SUPABASE_URL}/rest/v1/student_memberships?id=eq.${membership.id}`, {
-                method: "PATCH",
-                headers: { ...authHeaders, "Content-Type": "application/json" },
-                body: JSON.stringify({ end_date: newEndStr, status: "active" })
-              });
-            }
-          } catch (e) {
-            // Renewal extension failing shouldn't fail the payment itself — the payment is already saved.
-          }
+          await applyMembershipRenewal(body.data.student_membership_id, SUPABASE_URL, authHeaders);
         }
 
         return new Response("ok", { status: 200 });
       }
 
       if (body.action === "update") {
+        // Fetch the payment's CURRENT status before changing it, so we can tell whether
+        // this edit is genuinely "payment just cleared" (pending → completed) vs just a
+        // typo fix on an already-completed payment. Only the former should extend the
+        // membership — otherwise editing the same completed receipt twice would double-extend it.
+        const beforeRes = await fetch(
+          `${SUPABASE_URL}/rest/v1/fee_payments?id=eq.${body.id}&select=status,student_membership_id`,
+          { headers: authHeaders }
+        );
+        const beforeArr = await beforeRes.json();
+        const before = beforeArr && beforeArr[0];
+
         const res = await fetch(`${SUPABASE_URL}/rest/v1/fee_payments?id=eq.${body.id}`, {
           method: "PATCH",
           headers: { ...authHeaders, "Content-Type": "application/json" },
           body: JSON.stringify(body.data)
         });
-        return new Response(res.ok ? "ok" : "failed", { status: res.ok ? 200 : 500 });
+        if (!res.ok) {
+          return new Response("failed", { status: 500 });
+        }
+
+        const newlyCompleted = before && before.status !== "completed" && body.data.status === "completed";
+        const membershipId = body.data.student_membership_id || (before && before.student_membership_id);
+        if (newlyCompleted && membershipId) {
+          await applyMembershipRenewal(membershipId, SUPABASE_URL, authHeaders);
+        }
+
+        return new Response("ok", { status: 200 });
       }
 
       if (body.action === "delete") {
