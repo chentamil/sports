@@ -1,0 +1,4775 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Visit Kanchipuram - Demo Platform</title>
+
+    <!-- Bootstrap 5.2.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Custom CSS (Part 3) -->
+    <style>
+
+    </style>
+
+</head>
+
+<body>
+
+<!-- ===========================
+Navbar
+=========================== -->
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
+    <div class="container">
+
+        <a class="navbar-brand fw-bold" href="#">
+            <i class="bi bi-building"></i>
+            Visit Kanchipuram
+        </a>
+
+        <button class="navbar-toggler"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav">
+
+            <span class="navbar-toggler-icon"></span>
+
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+
+            <ul class="navbar-nav ms-auto">
+
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Home</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Temples</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Plan Trip</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Shopping</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Wedding</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Business</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Contact</a>
+                </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+</nav>
+
+<!-- ===========================
+Hero
+=========================== -->
+
+<section class="py-5 bg-light">
+
+<div class="container">
+
+<div class="row align-items-center">
+
+<div class="col-lg-6">
+
+<span class="badge bg-warning text-dark mb-3">
+
+Temple Tourism • Shopping • Pilgrimage
+
+</span>
+
+<h1 class="display-4 fw-bold">
+
+Discover Kanchipuram
+
+</h1>
+
+<p class="lead">
+
+Plan your complete spiritual journey with temples,
+shopping, hotels, restaurants, guides and local experiences.
+
+</p>
+
+<div class="mt-4">
+
+<a href="#" class="btn btn-primary btn-lg me-2">
+
+Explore Temples
+
+</a>
+
+<a href="#" class="btn btn-outline-dark btn-lg">
+
+Plan My Trip
+
+</a>
+
+</div>
+
+</div>
+
+<div class="col-lg-6 text-center">
+
+<img src="https://placehold.co/700x450?text=Hero+Banner"
+class="img-fluid rounded shadow">
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===========================
+Trip Planner
+=========================== -->
+
+<section class="py-5">
+
+<div class="container">
+
+<div class="text-center mb-5">
+
+<h2>
+
+Plan Your Visit
+
+</h2>
+
+<p>
+
+Generate your own itinerary in seconds.
+
+</p>
+
+</div>
+
+<div class="card shadow border-0">
+
+<div class="card-body">
+
+<div class="row g-3">
+
+<div class="col-md-3">
+
+<label class="form-label">
+
+Arrival Date
+
+</label>
+
+<input type="date" class="form-control">
+
+</div>
+
+<div class="col-md-2">
+
+<label class="form-label">
+
+People
+
+</label>
+
+<select class="form-select">
+
+<option>1</option>
+<option>2</option>
+<option>4</option>
+<option>6+</option>
+
+</select>
+
+</div>
+
+<div class="col-md-2">
+
+<label class="form-label">
+
+Duration
+
+</label>
+
+<select class="form-select">
+
+<option>1 Day</option>
+<option>2 Days</option>
+<option>3 Days</option>
+
+</select>
+
+</div>
+
+<div class="col-md-2">
+
+<label class="form-label">
+
+Budget
+
+</label>
+
+<select class="form-select">
+
+<option>Budget</option>
+<option>Standard</option>
+<option>Luxury</option>
+
+</select>
+
+</div>
+
+<div class="col-md-3 d-grid">
+
+<label class="form-label">
+
+&nbsp;
+
+</label>
+
+<button class="btn btn-primary">
+
+Generate Demo Plan
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===========================
+Quick Features
+=========================== -->
+
+<section class="py-5 bg-light">
+
+<div class="container">
+
+<div class="row g-4">
+
+<div class="col-md-3">
+
+<div class="card h-100 text-center shadow-sm">
+
+<div class="card-body">
+
+<i class="bi bi-bank fs-1 text-primary"></i>
+
+<h5 class="mt-3">
+
+Temple Guide
+
+</h5>
+
+<p>
+
+Complete temple information.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card h-100 text-center shadow-sm">
+
+<div class="card-body">
+
+<i class="bi bi-headphones fs-1 text-success"></i>
+
+<h5 class="mt-3">
+
+Audio Guide
+
+</h5>
+
+<p>
+
+Listen while exploring.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card h-100 text-center shadow-sm">
+
+<div class="card-body">
+
+<i class="bi bi-shop fs-1 text-danger"></i>
+
+<h5 class="mt-3">
+
+Shopping
+
+</h5>
+
+<p>
+
+Silk & Handloom Stores.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card h-100 text-center shadow-sm">
+
+<div class="card-body">
+
+<i class="bi bi-taxi-front fs-1 text-warning"></i>
+
+<h5 class="mt-3">
+
+Cab Booking
+
+</h5>
+
+<p>
+
+Local travel assistance.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===========================
+Temple Explorer
+=========================== -->
+
+<section class="py-5">
+
+<div class="container">
+
+<div class="d-flex justify-content-between mb-4">
+
+<h2>
+
+Popular Temples
+
+</h2>
+
+<button class="btn btn-outline-primary">
+
+View All
+
+</button>
+
+</div>
+
+<div class="row g-4">
+
+<!-- Temple -->
+
+<div class="col-lg-4">
+
+<div class="card shadow h-100">
+
+<img src="https://placehold.co/600x400?text=Temple+1"
+class="card-img-top">
+
+<div class="card-body">
+
+<h5>
+
+Demo Temple 1
+
+</h5>
+
+<p>
+
+Historic temple with beautiful architecture.
+
+</p>
+
+<div class="mb-3">
+
+<span class="badge bg-success">
+
+Open Today
+
+</span>
+
+<span class="badge bg-warning text-dark">
+
+Parking
+
+</span>
+
+</div>
+
+<button
+class="btn btn-primary w-100">
+
+View Details
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-lg-4">
+
+<div class="card shadow h-100">
+
+<img src="https://placehold.co/600x400?text=Temple+2"
+class="card-img-top">
+
+<div class="card-body">
+
+<h5>
+
+Demo Temple 2
+
+</h5>
+
+<p>
+
+Famous spiritual destination.
+
+</p>
+
+<div class="mb-3">
+
+<span class="badge bg-success">
+
+Audio Guide
+
+</span>
+
+<span class="badge bg-info">
+
+Festival
+
+</span>
+
+</div>
+
+<button class="btn btn-primary w-100">
+
+View Details
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-lg-4">
+
+<div class="card shadow h-100">
+
+<img src="https://placehold.co/600x400?text=Temple+3"
+class="card-img-top">
+
+<div class="card-body">
+
+<h5>
+
+Demo Temple 3
+
+</h5>
+
+<p>
+
+Traditional pilgrimage location.
+
+</p>
+
+<div class="mb-3">
+
+<span class="badge bg-secondary">
+
+History
+
+</span>
+
+<span class="badge bg-danger">
+
+Popular
+
+</span>
+
+</div>
+
+<button class="btn btn-primary w-100">
+
+View Details
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===========================
+One Day Itinerary
+=========================== -->
+
+<section class="py-5 bg-light">
+
+<div class="container">
+
+<h2 class="text-center mb-5">
+
+One Day Itinerary
+
+</h2>
+
+<div class="row">
+
+<div class="col-lg-8 mx-auto">
+
+<ul class="list-group shadow">
+
+<li class="list-group-item">
+
+🕘 09:00 AM - Demo Temple 1
+
+</li>
+
+<li class="list-group-item">
+
+🍽 Breakfast
+
+</li>
+
+<li class="list-group-item">
+
+🕙 10:30 AM - Demo Temple 2
+
+</li>
+
+<li class="list-group-item">
+
+🍛 Lunch
+
+</li>
+
+<li class="list-group-item">
+
+🛍 Silk Shopping
+
+</li>
+
+<li class="list-group-item">
+
+🕔 Evening Temple Visit
+
+</li>
+
+<li class="list-group-item">
+
+🏨 Hotel Check-in
+
+</li>
+
+</ul>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===========================
+Festival Calendar
+=========================== -->
+
+<section class="py-5">
+
+<div class="container">
+
+<div class="text-center mb-5">
+
+<h2>
+
+Upcoming Festivals
+
+</h2>
+
+</div>
+
+<div class="row g-4">
+
+<div class="col-md-4">
+
+<div class="card shadow-sm">
+
+<div class="card-body">
+
+<h5>
+
+Demo Festival 1
+
+</h5>
+
+<p>
+
+January 15
+
+</p>
+
+<span class="badge bg-primary">
+
+Major Festival
+
+</span>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="card shadow-sm">
+
+<div class="card-body">
+
+<h5>
+
+Demo Festival 2
+
+</h5>
+
+<p>
+
+March 21
+
+</p>
+
+<span class="badge bg-success">
+
+Temple Event
+
+</span>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-4">
+
+<div class="card shadow-sm">
+
+<div class="card-body">
+
+<h5>
+
+Demo Festival 3
+
+</h5>
+
+<p>
+
+August 08
+
+</p>
+
+<span class="badge bg-danger">
+
+Crowded
+
+</span>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===========================
+Nearby Services
+=========================== -->
+
+<section class="py-5 bg-light">
+
+<div class="container">
+
+<div class="text-center mb-5">
+
+<h2>
+
+Nearby Services
+
+</h2>
+
+</div>
+
+<div class="row g-4">
+
+<div class="col-md-3">
+
+<div class="card text-center h-100 shadow-sm">
+
+<div class="card-body">
+
+<i class="bi bi-building fs-1 text-primary"></i>
+
+<h5 class="mt-3">
+
+Hotels
+
+</h5>
+
+<p>
+
+50+ Hotels
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card text-center h-100 shadow-sm">
+
+<div class="card-body">
+
+<i class="bi bi-cup-hot fs-1 text-success"></i>
+
+<h5>
+
+Restaurants
+
+</h5>
+
+<p>
+
+Veg & Family
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card text-center h-100 shadow-sm">
+
+<div class="card-body">
+
+<i class="bi bi-p-circle fs-1 text-warning"></i>
+
+<h5>
+
+Parking
+
+</h5>
+
+<p>
+
+Safe Parking
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-3">
+
+<div class="card text-center h-100 shadow-sm">
+
+<div class="card-body">
+
+<i class="bi bi-person-badge fs-1 text-danger"></i>
+
+<h5>
+
+Local Guides
+
+</h5>
+
+<p>
+
+Verified Experts
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===========================
+END OF PART 1
+Part 2 Starts with Shopping Section
+=========================== -->
+
+
+<!-- =======================================================
+SHOPPING ZONE
+======================================================= -->
+
+<section class="py-5">
+
+    <div class="container">
+
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">
+                Shopping Zone
+            </h2>
+
+            <p class="text-muted">
+                Discover authentic silk sarees, jewellery and traditional shopping destinations.
+            </p>
+        </div>
+
+        <div class="row g-4">
+
+            <!-- Card -->
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="card h-100 shadow-sm">
+
+                    <img src="https://placehold.co/600x400?text=Silk+Sarees"
+                        class="card-img-top">
+
+                    <div class="card-body">
+
+                        <h5>Silk Sarees</h5>
+
+                        <p class="text-muted">
+
+                            Premium bridal and traditional silk collections.
+
+                        </p>
+
+                        <div class="d-flex justify-content-between">
+
+                            <span class="badge bg-success">
+                                120+ Shops
+                            </span>
+
+                            <button class="btn btn-sm btn-primary">
+                                Explore
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="card h-100 shadow-sm">
+
+                    <img src="https://placehold.co/600x400?text=Jewellery"
+                        class="card-img-top">
+
+                    <div class="card-body">
+
+                        <h5>Jewellery</h5>
+
+                        <p class="text-muted">
+
+                            Gold, Silver & Temple Jewellery.
+
+                        </p>
+
+                        <div class="d-flex justify-content-between">
+
+                            <span class="badge bg-warning text-dark">
+
+                                Verified
+
+                            </span>
+
+                            <button class="btn btn-sm btn-primary">
+
+                                Explore
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="card h-100 shadow-sm">
+
+                    <img src="https://placehold.co/600x400?text=Pooja+Items"
+                        class="card-img-top">
+
+                    <div class="card-body">
+
+                        <h5>Pooja Items</h5>
+
+                        <p class="text-muted">
+
+                            Brass lamps, idols & pooja essentials.
+
+                        </p>
+
+                        <button class="btn btn-primary w-100">
+
+                            View Stores
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="card h-100 shadow-sm">
+
+                    <img src="https://placehold.co/600x400?text=Handloom"
+                        class="card-img-top">
+
+                    <div class="card-body">
+
+                        <h5>Handloom</h5>
+
+                        <p class="text-muted">
+
+                            Traditional weaving & authentic handloom.
+
+                        </p>
+
+                        <button class="btn btn-primary w-100">
+
+                            Explore
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =======================================================
+WEDDING SHOPPING PLANNER
+======================================================= -->
+
+<section class="py-5 bg-light">
+
+    <div class="container">
+
+        <div class="row align-items-center">
+
+            <div class="col-lg-6">
+
+                <span class="badge bg-danger mb-3">
+
+                    Wedding Assistant
+
+                </span>
+
+                <h2 class="fw-bold">
+
+                    Wedding Shopping Planner
+
+                </h2>
+
+                <p class="lead">
+
+                    Plan your complete wedding shopping in Kanchipuram.
+
+                </p>
+
+                <ul class="list-group mb-4">
+
+                    <li class="list-group-item">
+
+                        ✔ Bridal Sarees
+
+                    </li>
+
+                    <li class="list-group-item">
+
+                        ✔ Jewellery Suggestions
+
+                    </li>
+
+                    <li class="list-group-item">
+
+                        ✔ Hotel Booking
+
+                    </li>
+
+                    <li class="list-group-item">
+
+                        ✔ Tailoring
+
+                    </li>
+
+                    <li class="list-group-item">
+
+                        ✔ Appointment Booking
+
+                    </li>
+
+                </ul>
+
+            </div>
+
+            <div class="col-lg-6">
+
+                <div class="card shadow border-0">
+
+                    <div class="card-body">
+
+                        <h4 class="mb-4">
+
+                            Generate Wedding Plan
+
+                        </h4>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Wedding Date
+
+                            </label>
+
+                            <input type="date"
+                                class="form-control">
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Budget
+
+                            </label>
+
+                            <select class="form-select">
+
+                                <option>₹50,000</option>
+                                <option>₹1,00,000</option>
+                                <option>₹2,00,000</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Shopping Days
+
+                            </label>
+
+                            <select class="form-select">
+
+                                <option>1 Day</option>
+                                <option>2 Days</option>
+                                <option>3 Days</option>
+
+                            </select>
+
+                        </div>
+
+                        <button class="btn btn-danger w-100">
+
+                            Generate Demo Plan
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =======================================================
+MOBILE APP FEATURES
+======================================================= -->
+
+<section class="py-5">
+
+    <div class="container">
+
+        <div class="text-center mb-5">
+
+            <h2>
+
+                Temple Mobile App
+
+            </h2>
+
+            <p class="text-muted">
+
+                Everything you need during your pilgrimage.
+
+            </p>
+
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-md-3">
+
+                <div class="card text-center h-100 shadow-sm">
+
+                    <div class="card-body">
+
+                        <i class="bi bi-phone fs-1 text-primary"></i>
+
+                        <h5 class="mt-3">
+
+                            Darshan Timings
+
+                        </h5>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <div class="card text-center h-100 shadow-sm">
+
+                    <div class="card-body">
+
+                        <i class="bi bi-map fs-1 text-success"></i>
+
+                        <h5 class="mt-3">
+
+                            Offline Maps
+
+                        </h5>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <div class="card text-center h-100 shadow-sm">
+
+                    <div class="card-body">
+
+                        <i class="bi bi-bell fs-1 text-warning"></i>
+
+                        <h5 class="mt-3">
+
+                            Festival Alerts
+
+                        </h5>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <div class="card text-center h-100 shadow-sm">
+
+                    <div class="card-body">
+
+                        <i class="bi bi-heart fs-1 text-danger"></i>
+
+                        <h5 class="mt-3">
+
+                            Donations
+
+                        </h5>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =======================================================
+AUDIO GUIDE
+======================================================= -->
+
+<section class="py-5 bg-light">
+
+    <div class="container">
+
+        <div class="text-center mb-5">
+
+            <h2>
+
+                Temple Audio Guide
+
+            </h2>
+
+        </div>
+
+        <div class="row justify-content-center">
+
+            <div class="col-lg-8">
+
+                <div class="card shadow">
+
+                    <div class="card-body">
+
+                        <div class="row align-items-center">
+
+                            <div class="col-md-4">
+
+                                <img src="https://placehold.co/500x300?text=Temple"
+                                    class="img-fluid rounded">
+
+                            </div>
+
+                            <div class="col-md-8">
+
+                                <h4>
+
+                                    Demo Temple Audio
+
+                                </h4>
+
+                                <p>
+
+                                    Listen to temple history in multiple languages.
+
+                                </p>
+
+                                <div class="mb-3">
+
+                                    <button class="btn btn-success">
+
+                                        <i class="bi bi-play-fill"></i>
+
+                                        Play Audio
+
+                                    </button>
+
+                                    <button class="btn btn-outline-primary">
+
+                                        English
+
+                                    </button>
+
+                                    <button class="btn btn-outline-primary">
+
+                                        Tamil
+
+                                    </button>
+
+                                    <button class="btn btn-outline-primary">
+
+                                        Hindi
+
+                                    </button>
+
+                                </div>
+
+                                <div class="progress">
+
+                                    <div class="progress-bar"
+                                        style="width:35%">
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =======================================================
+BUSINESS DASHBOARD
+======================================================= -->
+
+<section class="py-5">
+
+    <div class="container">
+
+        <div class="text-center mb-5">
+
+            <h2>
+
+                Business Portal
+
+            </h2>
+
+            <p class="text-muted">
+
+                Hotels, Restaurants, Shops & Guides can manage everything from one dashboard.
+
+            </p>
+
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="card h-100 shadow-sm">
+
+                    <div class="card-body text-center">
+
+                        <i class="bi bi-building fs-1 text-primary"></i>
+
+                        <h5 class="mt-3">
+
+                            Hotel Dashboard
+
+                        </h5>
+
+                        <ul class="list-group list-group-flush mt-3">
+
+                            <li class="list-group-item">
+
+                                Room Availability
+
+                            </li>
+
+                            <li class="list-group-item">
+
+                                Online Booking
+
+                            </li>
+
+                            <li class="list-group-item">
+
+                                Promotions
+
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="card h-100 shadow-sm">
+
+                    <div class="card-body text-center">
+
+                        <i class="bi bi-shop fs-1 text-success"></i>
+
+                        <h5 class="mt-3">
+
+                            Shop Dashboard
+
+                        </h5>
+
+                        <ul class="list-group list-group-flush mt-3">
+
+                            <li class="list-group-item">
+
+                                Upload Products
+
+                            </li>
+
+                            <li class="list-group-item">
+
+                                Catalog
+
+                            </li>
+
+                            <li class="list-group-item">
+
+                                Appointments
+
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="card h-100 shadow-sm">
+
+                    <div class="card-body text-center">
+
+                        <i class="bi bi-cup-hot fs-1 text-danger"></i>
+
+                        <h5 class="mt-3">
+
+                            Restaurant
+
+                        </h5>
+
+                        <ul class="list-group list-group-flush mt-3">
+
+                            <li class="list-group-item">
+
+                                Offers
+
+                            </li>
+
+                            <li class="list-group-item">
+
+                                Menu
+
+                            </li>
+
+                            <li class="list-group-item">
+
+                                Reservations
+
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="card h-100 shadow-sm">
+
+                    <div class="card-body text-center">
+
+                        <i class="bi bi-person-badge fs-1 text-warning"></i>
+
+                        <h5 class="mt-3">
+
+                            Local Guides
+
+                        </h5>
+
+                        <ul class="list-group list-group-flush mt-3">
+
+                            <li class="list-group-item">
+
+                                Schedule
+
+                            </li>
+
+                            <li class="list-group-item">
+
+                                Bookings
+
+                            </li>
+
+                            <li class="list-group-item">
+
+                                Ratings
+
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ===========================
+END OF PART 2A
+NEXT:
+Revenue
+Testimonials
+FAQ
+Contact
+Footer
+Bootstrap JS
+Script
+Closing Tags
+=========================== -->
+
+<!-- =======================================================
+REVENUE OPPORTUNITIES
+======================================================= -->
+
+<section class="py-5 bg-light">
+
+    <div class="container">
+
+        <div class="text-center mb-5">
+
+            <h2 class="fw-bold">
+
+                Revenue Opportunities
+
+            </h2>
+
+            <p class="text-muted">
+
+                Multiple income streams for a sustainable tourism platform.
+
+            </p>
+
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="card text-center shadow-sm h-100">
+
+                    <div class="card-body">
+
+                        <i class="bi bi-star-fill fs-1 text-warning"></i>
+
+                        <h5 class="mt-3">
+
+                            Premium Listings
+
+                        </h5>
+
+                        <p>
+
+                            Hotels, shops & restaurants subscribe for better visibility.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="card text-center shadow-sm h-100">
+
+                    <div class="card-body">
+
+                        <i class="bi bi-cash-stack fs-1 text-success"></i>
+
+                        <h5 class="mt-3">
+
+                            Booking Commission
+
+                        </h5>
+
+                        <p>
+
+                            Earn from hotel, guide, cab and package bookings.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="card text-center shadow-sm h-100">
+
+                    <div class="card-body">
+
+                        <i class="bi bi-megaphone fs-1 text-primary"></i>
+
+                        <h5 class="mt-3">
+
+                            Sponsored Ads
+
+                        </h5>
+
+                        <p>
+
+                            Promote local businesses and seasonal campaigns.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="card text-center shadow-sm h-100">
+
+                    <div class="card-body">
+
+                        <i class="bi bi-briefcase-fill fs-1 text-danger"></i>
+
+                        <h5 class="mt-3">
+
+                            Tour Packages
+
+                        </h5>
+
+                        <p>
+
+                            Curated temple tours and wedding shopping plans.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =======================================================
+TESTIMONIALS
+======================================================= -->
+
+<section class="py-5">
+
+<div class="container">
+
+<div class="text-center mb-5">
+
+<h2>
+
+What Visitors Say
+
+</h2>
+
+</div>
+
+<div id="testimonialCarousel"
+class="carousel slide"
+data-bs-ride="carousel">
+
+<div class="carousel-inner">
+
+<div class="carousel-item active">
+
+<div class="card shadow border-0">
+
+<div class="card-body text-center p-5">
+
+<h3 class="text-warning">
+
+★★★★★
+
+</h3>
+
+<p class="lead">
+
+"Everything we needed for our Kanchipuram trip
+was available in one place."
+
+</p>
+
+<h5>
+
+Demo User 1
+
+</h5>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="carousel-item">
+
+<div class="card shadow border-0">
+
+<div class="card-body text-center p-5">
+
+<h3 class="text-warning">
+
+★★★★★
+
+</h3>
+
+<p class="lead">
+
+"The itinerary planner saved us so much time."
+
+</p>
+
+<h5>
+
+Demo User 2
+
+</h5>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="carousel-item">
+
+<div class="card shadow border-0">
+
+<div class="card-body text-center p-5">
+
+<h3 class="text-warning">
+
+★★★★★
+
+</h3>
+
+<p class="lead">
+
+"Great shopping recommendations and hotel booking."
+
+</p>
+
+<h5>
+
+Demo User 3
+
+</h5>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<button class="carousel-control-prev"
+type="button"
+data-bs-target="#testimonialCarousel"
+data-bs-slide="prev">
+
+<span class="carousel-control-prev-icon bg-dark rounded-circle"></span>
+
+</button>
+
+<button class="carousel-control-next"
+type="button"
+data-bs-target="#testimonialCarousel"
+data-bs-slide="next">
+
+<span class="carousel-control-next-icon bg-dark rounded-circle"></span>
+
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- =======================================================
+FAQ
+======================================================= -->
+
+<section class="py-5 bg-light">
+
+<div class="container">
+
+<div class="text-center mb-5">
+
+<h2>
+
+Frequently Asked Questions
+
+</h2>
+
+</div>
+
+<div class="accordion"
+id="faqAccordion">
+
+<div class="accordion-item">
+
+<h2 class="accordion-header">
+
+<button class="accordion-button"
+
+data-bs-toggle="collapse"
+
+data-bs-target="#faq1">
+
+How do I plan a one-day temple visit?
+
+</button>
+
+</h2>
+
+<div id="faq1"
+
+class="accordion-collapse collapse show"
+
+data-bs-parent="#faqAccordion">
+
+<div class="accordion-body">
+
+Use our itinerary planner to generate the best route.
+
+</div>
+
+</div>
+
+</div>
+
+<div class="accordion-item">
+
+<h2 class="accordion-header">
+
+<button class="accordion-button collapsed"
+
+data-bs-toggle="collapse"
+
+data-bs-target="#faq2">
+
+Can I book hotels?
+
+</button>
+
+</h2>
+
+<div id="faq2"
+
+class="accordion-collapse collapse"
+
+data-bs-parent="#faqAccordion">
+
+<div class="accordion-body">
+
+Yes. Compare hotels and book directly.
+
+</div>
+
+</div>
+
+</div>
+
+<div class="accordion-item">
+
+<h2 class="accordion-header">
+
+<button class="accordion-button collapsed"
+
+data-bs-toggle="collapse"
+
+data-bs-target="#faq3">
+
+Can I hire a local guide?
+
+</button>
+
+</h2>
+
+<div id="faq3"
+
+class="accordion-collapse collapse"
+
+data-bs-parent="#faqAccordion">
+
+<div class="accordion-body">
+
+Verified local guides are available for booking.
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- =======================================================
+CONTACT
+======================================================= -->
+
+<section class="py-5">
+
+<div class="container">
+
+<div class="row">
+
+<div class="col-lg-6">
+
+<h2>
+
+Contact Us
+
+</h2>
+
+<p>
+
+Planning a trip?
+
+Need shopping assistance?
+
+Looking for partnership opportunities?
+
+Let's connect.
+
+</p>
+
+<ul class="list-group">
+
+<li class="list-group-item">
+
+📍 Demo Address, Kanchipuram
+
+</li>
+
+<li class="list-group-item">
+
+📞 +91 9876543210
+
+</li>
+
+<li class="list-group-item">
+
+✉ info@visitkanchipuram.demo
+
+</li>
+
+</ul>
+
+</div>
+
+<div class="col-lg-6">
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<form>
+
+<div class="mb-3">
+
+<label class="form-label">
+
+Name
+
+</label>
+
+<input type="text"
+
+class="form-control">
+
+</div>
+
+<div class="mb-3">
+
+<label class="form-label">
+
+Email
+
+</label>
+
+<input type="email"
+
+class="form-control">
+
+</div>
+
+<div class="mb-3">
+
+<label class="form-label">
+
+Message
+
+</label>
+
+<textarea rows="5"
+
+class="form-control"></textarea>
+
+</div>
+
+<button class="btn btn-primary w-100">
+
+Send Message
+
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- =======================================================
+FOOTER
+======================================================= -->
+
+<footer class="bg-dark text-white py-5">
+
+<div class="container">
+
+<div class="row">
+
+<div class="col-lg-4">
+
+<h4>
+
+Visit Kanchipuram
+
+</h4>
+
+<p>
+
+Temple Tourism
+
+Shopping
+
+Pilgrimage
+
+Business Portal
+
+</p>
+
+</div>
+
+<div class="col-lg-4">
+
+<h5>
+
+Quick Links
+
+</h5>
+
+<ul class="list-unstyled">
+
+<li><a href="#" class="text-white text-decoration-none">Temples</a></li>
+
+<li><a href="#" class="text-white text-decoration-none">Hotels</a></li>
+
+<li><a href="#" class="text-white text-decoration-none">Shopping</a></li>
+
+<li><a href="#" class="text-white text-decoration-none">Wedding Planner</a></li>
+
+</ul>
+
+</div>
+
+<div class="col-lg-4">
+
+<h5>
+
+Follow Us
+
+</h5>
+
+<p>
+
+<i class="bi bi-facebook fs-4 me-3"></i>
+
+<i class="bi bi-instagram fs-4 me-3"></i>
+
+<i class="bi bi-youtube fs-4 me-3"></i>
+
+<i class="bi bi-twitter-x fs-4"></i>
+
+</p>
+
+</div>
+
+</div>
+
+<hr>
+
+<div class="text-center">
+
+© 2026 Visit Kanchipuram Demo Platform
+
+</div>
+
+</div>
+
+</footer>
+
+<!-- =======================================================
+BOOTSTRAP
+======================================================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- =======================================================
+CUSTOM JAVASCRIPT
+(Part 4)
+======================================================= -->
+
+<script>
+
+
+
+</script>
+
+</body>
+
+</html>
+
+<style>
+
+/* ======================================================
+GLOBAL STYLES
+====================================================== */
+
+:root {
+
+    --primary-color:#8B0000;
+    --secondary-color:#C89B3C;
+    --accent-color:#0d6efd;
+    --light-bg:#fff8f0;
+    --dark-bg:#212529;
+    --text-color:#333;
+
+}
+
+
+* {
+
+    scroll-behavior:smooth;
+
+}
+
+
+body {
+
+    font-family:
+    "Segoe UI",
+    Arial,
+    sans-serif;
+
+    color:var(--text-color);
+
+    background:#ffffff;
+
+}
+
+
+section {
+
+    overflow:hidden;
+
+}
+
+
+h1,h2,h3,h4,h5 {
+
+    font-weight:700;
+
+}
+
+
+/* ======================================================
+NAVBAR
+====================================================== */
+
+
+.navbar {
+
+    background:
+    linear-gradient(
+        90deg,
+        #4b0000,
+        #8B0000
+    ) !important;
+
+}
+
+
+.navbar-brand {
+
+    font-size:1.4rem;
+
+    letter-spacing:.5px;
+
+}
+
+
+.nav-link {
+
+    transition:.3s;
+
+}
+
+
+.nav-link:hover {
+
+    color:#ffd700 !important;
+
+}
+
+
+/* ======================================================
+BUTTONS
+====================================================== */
+
+
+.btn-primary {
+
+
+    background:
+
+    linear-gradient(
+        45deg,
+        #8B0000,
+        #c0392b
+    );
+
+    border:none;
+
+}
+
+
+.btn-primary:hover {
+
+
+    transform:translateY(-2px);
+
+    box-shadow:
+    0 8px 20px
+    rgba(139,0,0,.3);
+
+}
+
+
+.btn {
+
+
+    transition:.3s;
+
+}
+
+
+/* ======================================================
+HERO SECTION
+====================================================== */
+
+
+section:first-of-type {
+
+
+    background:
+
+    linear-gradient(
+        135deg,
+        #fff8f0,
+        #ffffff
+    );
+
+
+}
+
+
+.hero-image {
+
+
+    border-radius:25px;
+
+    box-shadow:
+
+    0 20px 40px
+    rgba(0,0,0,.15);
+
+}
+
+
+/* ======================================================
+BADGES
+====================================================== */
+
+
+.badge {
+
+
+    padding:8px 12px;
+
+    border-radius:20px;
+
+}
+
+
+
+/* ======================================================
+CARDS COMMON
+====================================================== */
+
+
+.card {
+
+
+    border:none;
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    transition:.35s;
+
+}
+
+
+.card:hover {
+
+
+    transform:
+    translateY(-8px);
+
+
+    box-shadow:
+
+    0 15px 35px
+    rgba(0,0,0,.15)!important;
+
+
+}
+
+
+
+.card img {
+
+
+    transition:.5s;
+
+}
+
+
+
+.card:hover img {
+
+
+    transform:scale(1.05);
+
+
+}
+
+
+
+/* ======================================================
+FEATURE ICONS
+====================================================== */
+
+
+.bi {
+
+
+    transition:.3s;
+
+}
+
+
+
+.card:hover .bi {
+
+
+    transform:
+
+    rotateY(360deg);
+
+
+}
+
+
+
+/* ======================================================
+TRIP PLANNER
+====================================================== */
+
+
+.form-control,
+.form-select {
+
+
+    border-radius:12px;
+
+    padding:12px;
+
+    border:1px solid #ddd;
+
+
+}
+
+
+.form-control:focus,
+.form-select:focus {
+
+
+    border-color:
+    var(--secondary-color);
+
+
+    box-shadow:
+
+    0 0 0 .25rem
+    rgba(200,155,60,.25);
+
+
+}
+
+
+
+/* ======================================================
+TEMPLE SECTION
+====================================================== */
+
+
+.card-img-top {
+
+
+    height:240px;
+
+    object-fit:cover;
+
+}
+
+
+
+.list-group-item {
+
+
+    padding:15px;
+
+}
+
+
+/* ======================================================
+ITINERARY
+====================================================== */
+
+
+.list-group-item {
+
+
+    border-left:
+
+    5px solid
+    var(--secondary-color);
+
+    margin-bottom:8px;
+
+    border-radius:8px !important;
+
+}
+
+
+
+/* ======================================================
+SHOPPING SECTION
+====================================================== */
+
+
+.shopping-card {
+
+
+    position:relative;
+
+}
+
+
+
+.shopping-card img {
+
+
+    height:220px;
+
+    object-fit:cover;
+
+
+}
+
+
+
+.shopping-card .badge {
+
+
+    background:
+    var(--primary-color);
+
+}
+
+
+
+/* ======================================================
+WEDDING PLANNER
+====================================================== */
+
+
+.wedding-box {
+
+
+    background:
+
+    linear-gradient(
+        135deg,
+        #fff5f5,
+        #ffffff
+    );
+
+
+    border-radius:25px;
+
+}
+
+
+
+.wedding-box h2 {
+
+
+    color:
+
+    var(--primary-color);
+
+}
+
+
+
+/* ======================================================
+MOBILE APP SECTION
+====================================================== */
+
+
+.phone-frame {
+
+
+    border:
+
+    10px solid #111;
+
+    border-radius:40px;
+
+    padding:20px;
+
+    background:#fff;
+
+}
+
+
+
+.app-feature {
+
+
+    cursor:pointer;
+
+}
+
+
+
+.app-feature:hover {
+
+
+    background:#fff8f0;
+
+}
+
+
+
+/* ======================================================
+AUDIO GUIDE
+====================================================== */
+
+
+.progress {
+
+
+    height:10px;
+
+    border-radius:20px;
+
+}
+
+
+
+.progress-bar {
+
+
+    background:
+
+    linear-gradient(
+        90deg,
+        #8B0000,
+        #C89B3C
+    );
+
+
+}
+
+
+
+/* ======================================================
+BUSINESS DASHBOARD
+====================================================== */
+
+
+.dashboard-card {
+
+
+    border-top:
+
+    5px solid
+    var(--secondary-color);
+
+
+}
+
+
+
+.dashboard-card ul li {
+
+
+    font-size:.95rem;
+
+}
+
+
+
+/* ======================================================
+REVENUE SECTION
+====================================================== */
+
+
+.revenue-card {
+
+
+    background:white;
+
+    border-radius:20px;
+
+}
+
+
+.revenue-card i {
+
+
+    font-size:45px;
+
+
+}
+
+
+/* ======================================================
+TESTIMONIAL
+====================================================== */
+
+
+.carousel-item {
+
+
+    padding:30px;
+
+}
+
+
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+
+
+    padding:20px;
+
+}
+
+
+
+/* ======================================================
+FAQ
+====================================================== */
+
+
+.accordion-button {
+
+
+    font-weight:600;
+
+
+}
+
+
+
+.accordion-button:not(.collapsed) {
+
+
+    background:
+
+    #fff0d5;
+
+
+    color:
+
+    #8B0000;
+
+
+}
+
+
+
+/* ======================================================
+CONTACT FORM
+====================================================== */
+
+
+textarea {
+
+
+    resize:none;
+
+}
+
+
+/* ======================================================
+FOOTER
+====================================================== */
+
+
+footer {
+
+
+    background:
+
+    linear-gradient(
+        90deg,
+        #111,
+        #333
+    );
+
+
+}
+
+
+
+footer i {
+
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+
+
+footer i:hover {
+
+
+    color:#ffd700;
+
+    transform:
+    translateY(-5px);
+
+
+}
+
+
+/* ======================================================
+CUSTOM UTILITIES
+====================================================== */
+
+
+.shadow-soft {
+
+
+    box-shadow:
+
+    0 10px 30px
+    rgba(0,0,0,.12);
+
+
+}
+
+
+.rounded-xl {
+
+
+    border-radius:25px;
+
+}
+
+
+.text-gold {
+
+
+    color:
+
+    #C89B3C;
+
+}
+
+
+/* ======================================================
+END PART 3A
+PART 3B CONTINUES...
+====================================================== */
+
+/* ======================================================
+PART 3B
+ADVANCED UI STYLES
+====================================================== */
+
+
+/* ======================================================
+CUSTOM TIMELINE
+====================================================== */
+
+
+.timeline {
+
+    position:relative;
+
+    padding-left:40px;
+
+}
+
+
+.timeline::before {
+
+
+    content:"";
+
+    position:absolute;
+
+    left:15px;
+
+    top:0;
+
+    bottom:0;
+
+    width:4px;
+
+    background:
+
+    linear-gradient(
+
+        #8B0000,
+
+        #C89B3C
+
+    );
+
+
+}
+
+
+
+.timeline-item {
+
+
+    position:relative;
+
+    margin-bottom:35px;
+
+
+}
+
+
+
+.timeline-item::before {
+
+
+    content:"";
+
+    position:absolute;
+
+    left:-34px;
+
+    top:5px;
+
+    width:18px;
+
+    height:18px;
+
+    border-radius:50%;
+
+
+    background:
+
+    #C89B3C;
+
+
+    border:
+
+    4px solid white;
+
+
+    box-shadow:
+
+    0 0 0 3px #8B0000;
+
+
+}
+
+
+.timeline-item h5 {
+
+
+    color:#8B0000;
+
+}
+
+
+/* ======================================================
+IMAGE OVERLAY CARDS
+====================================================== */
+
+
+.image-card {
+
+
+    position:relative;
+
+    overflow:hidden;
+
+    border-radius:20px;
+
+
+}
+
+
+
+.image-card img {
+
+
+    width:100%;
+
+    transition:.5s;
+
+
+}
+
+
+
+.image-card:hover img {
+
+
+    transform:scale(1.1);
+
+
+}
+
+
+
+.image-overlay {
+
+
+    position:absolute;
+
+    bottom:0;
+
+    left:0;
+
+    right:0;
+
+
+    padding:25px;
+
+
+    color:white;
+
+
+    background:
+
+    linear-gradient(
+
+        transparent,
+
+        rgba(0,0,0,.8)
+
+    );
+
+
+}
+
+
+/* ======================================================
+SEARCH BOX
+====================================================== */
+
+
+.search-box {
+
+
+    background:white;
+
+    padding:20px;
+
+    border-radius:20px;
+
+
+    box-shadow:
+
+    0 10px 30px
+
+    rgba(0,0,0,.12);
+
+
+}
+
+
+
+.search-box input {
+
+
+    border-radius:50px;
+
+
+}
+
+
+/* ======================================================
+CATEGORY PILLS
+====================================================== */
+
+
+.category-pill {
+
+
+    display:inline-block;
+
+    padding:10px 18px;
+
+    margin:5px;
+
+
+    border-radius:50px;
+
+
+    background:
+
+    #fff3cd;
+
+
+    color:
+
+    #8B0000;
+
+
+    cursor:pointer;
+
+
+    transition:.3s;
+
+
+}
+
+
+.category-pill:hover {
+
+
+    background:#8B0000;
+
+    color:white;
+
+
+}
+
+
+/* ======================================================
+PRICE BOXES
+====================================================== */
+
+
+.price-box {
+
+
+    border-radius:20px;
+
+    padding:30px;
+
+    text-align:center;
+
+
+    background:white;
+
+
+    box-shadow:
+
+    0 10px 30px
+
+    rgba(0,0,0,.1);
+
+
+}
+
+
+
+.price-box h3 {
+
+
+    color:#8B0000;
+
+
+}
+
+
+
+/* ======================================================
+MOBILE APP PHONE MOCKUP
+====================================================== */
+
+
+.mobile-screen {
+
+
+    width:280px;
+
+    height:560px;
+
+
+    border-radius:35px;
+
+
+    background:white;
+
+
+    border:
+
+    8px solid #222;
+
+
+    margin:auto;
+
+
+    overflow:hidden;
+
+
+    box-shadow:
+
+    0 20px 50px
+
+    rgba(0,0,0,.25);
+
+
+}
+
+
+.mobile-header {
+
+
+    background:#8B0000;
+
+    color:white;
+
+    padding:20px;
+
+
+}
+
+
+
+.mobile-item {
+
+
+    padding:15px;
+
+    border-bottom:
+
+    1px solid #eee;
+
+
+}
+
+
+/* ======================================================
+MAP PLACEHOLDER
+====================================================== */
+
+
+.map-box {
+
+
+    height:300px;
+
+
+    background:
+
+
+    linear-gradient(
+
+        135deg,
+
+        #dff3ff,
+
+        #ffffff
+
+    );
+
+
+    border-radius:20px;
+
+
+    display:flex;
+
+
+    align-items:center;
+
+    justify-content:center;
+
+
+    font-size:30px;
+
+
+    color:#0d6efd;
+
+
+}
+
+
+
+/* ======================================================
+BOOKING BUTTONS
+====================================================== */
+
+
+.booking-btn {
+
+
+    border-radius:50px;
+
+
+    padding:
+
+    12px 30px;
+
+
+}
+
+
+
+/* ======================================================
+STATISTICS SECTION
+====================================================== */
+
+
+.stats-box {
+
+
+    text-align:center;
+
+    padding:30px;
+
+
+}
+
+
+
+.stats-number {
+
+
+    font-size:40px;
+
+    font-weight:800;
+
+    color:#8B0000;
+
+
+}
+
+
+
+/* ======================================================
+FLOATING BUTTON
+====================================================== */
+
+
+.back-top {
+
+
+    position:fixed;
+
+
+    bottom:25px;
+
+    right:25px;
+
+
+    width:45px;
+
+    height:45px;
+
+
+    border-radius:50%;
+
+
+    background:#8B0000;
+
+
+    color:white;
+
+
+    display:flex;
+
+
+    align-items:center;
+
+
+    justify-content:center;
+
+
+    cursor:pointer;
+
+
+    opacity:0;
+
+
+    visibility:hidden;
+
+
+    transition:.3s;
+
+
+    z-index:999;
+
+
+}
+
+
+
+.back-top.show {
+
+
+    opacity:1;
+
+    visibility:visible;
+
+
+}
+
+
+
+/* ======================================================
+LOADING ANIMATION
+====================================================== */
+
+
+.loading {
+
+
+    animation:
+
+    pulse 1.5s infinite;
+
+
+}
+
+
+
+@keyframes pulse {
+
+
+    0% {
+
+
+        opacity:.5;
+
+    }
+
+
+    50% {
+
+
+        opacity:1;
+
+    }
+
+
+    100% {
+
+
+        opacity:.5;
+
+    }
+
+
+}
+
+
+
+/* ======================================================
+FADE ANIMATION
+====================================================== */
+
+
+.fade-up {
+
+
+    animation:
+
+    fadeUp .8s ease;
+
+
+}
+
+
+
+@keyframes fadeUp {
+
+
+    from {
+
+
+        opacity:0;
+
+        transform:
+
+        translateY(40px);
+
+
+    }
+
+
+    to {
+
+
+        opacity:1;
+
+        transform:
+
+        translateY(0);
+
+
+    }
+
+
+}
+
+
+
+/* ======================================================
+GRADIENT HERO TEXT
+====================================================== */
+
+
+.gradient-text {
+
+
+    background:
+
+    linear-gradient(
+
+        90deg,
+
+        #8B0000,
+
+        #C89B3C
+
+    );
+
+
+    -webkit-background-clip:text;
+
+    color:transparent;
+
+
+}
+
+
+
+/* ======================================================
+DARK MODE SUPPORT
+====================================================== */
+
+
+.dark-mode {
+
+
+    background:#121212;
+
+    color:white;
+
+
+}
+
+
+
+.dark-mode .card {
+
+
+    background:#1f1f1f;
+
+    color:white;
+
+
+}
+
+
+
+.dark-mode .bg-light {
+
+
+    background:#1a1a1a!important;
+
+
+}
+
+
+
+.dark-mode footer {
+
+
+    background:black!important;
+
+
+}
+
+
+
+/* ======================================================
+RESPONSIVE DESIGN
+====================================================== */
+
+
+@media(max-width:992px){
+
+
+    .display-4 {
+
+
+        font-size:2.5rem;
+
+
+    }
+
+
+
+    .timeline {
+
+
+        padding-left:30px;
+
+
+    }
+
+
+
+}
+
+
+
+@media(max-width:768px){
+
+
+    h1 {
+
+
+        font-size:2rem;
+
+
+    }
+
+
+
+    h2 {
+
+
+        font-size:1.7rem;
+
+
+    }
+
+
+
+    .card-img-top {
+
+
+        height:200px;
+
+
+    }
+
+
+
+    .mobile-screen {
+
+
+        width:240px;
+
+        height:480px;
+
+
+    }
+
+
+
+}
+
+
+
+@media(max-width:576px){
+
+
+    .btn-lg {
+
+
+        width:100%;
+
+        margin-bottom:10px;
+
+
+    }
+
+
+
+    .navbar-brand {
+
+
+        font-size:1.1rem;
+
+
+    }
+
+
+
+    .stats-number {
+
+
+        font-size:30px;
+
+
+    }
+
+
+}
+
+
+
+/* ======================================================
+END OF COMPLETE CSS
+====================================================== */
+
+
+</style>
+<script>
+    // ======================================================
+// PART 4A
+// VISIT KANCHIPURAM DEMO JAVASCRIPT
+// ======================================================
+
+
+
+// ======================================================
+// CREATE BACK TO TOP BUTTON
+// ======================================================
+
+
+const backTop = document.createElement("div");
+
+backTop.className = "back-top";
+
+backTop.innerHTML = `
+<i class="bi bi-arrow-up"></i>
+`;
+
+document.body.appendChild(backTop);
+
+
+
+window.addEventListener("scroll",()=>{
+
+
+    if(window.scrollY > 400){
+
+        backTop.classList.add("show");
+
+    }
+
+    else{
+
+        backTop.classList.remove("show");
+
+    }
+
+
+});
+
+
+
+backTop.addEventListener("click",()=>{
+
+
+    window.scrollTo({
+
+        top:0,
+
+        behavior:"smooth"
+
+    });
+
+
+});
+
+
+
+
+// ======================================================
+// DEMO ITINERARY GENERATOR
+// ======================================================
+
+
+const planButtons = document.querySelectorAll(
+"button"
+);
+
+
+
+planButtons.forEach(button=>{
+
+
+    if(button.innerText.includes("Generate")){
+
+
+        button.addEventListener("click",()=>{
+
+
+            showToast(
+
+            `
+            <strong>Demo Trip Plan Generated</strong>
+            <br>
+            09:00 AM - Demo Temple 1
+            <br>
+            11:00 AM - Demo Temple 2
+            <br>
+            01:00 PM - Traditional Lunch
+            <br>
+            03:00 PM - Silk Shopping
+            <br>
+            05:30 PM - Evening Temple Visit
+            `
+
+            );
+
+
+        });
+
+
+    }
+
+
+});
+
+
+
+
+// ======================================================
+// TOAST MESSAGE SYSTEM
+// ======================================================
+
+
+function showToast(message){
+
+
+
+    const toast=document.createElement("div");
+
+
+    toast.className=
+    "position-fixed bottom-0 end-0 m-4 p-3 bg-dark text-white rounded shadow";
+
+
+    toast.style.zIndex="9999";
+
+
+    toast.innerHTML=message;
+
+
+    document.body.appendChild(toast);
+
+
+
+    setTimeout(()=>{
+
+
+        toast.remove();
+
+
+    },5000);
+
+
+
+}
+
+
+
+
+// ======================================================
+// AUDIO GUIDE DEMO
+// ======================================================
+
+
+
+const audioButtons=document.querySelectorAll(
+"button"
+);
+
+
+
+audioButtons.forEach(btn=>{
+
+
+    if(btn.innerText.includes("Play Audio")){
+
+
+        btn.addEventListener(
+        "click",
+        ()=>{
+
+
+            showToast(
+
+            `
+            🎧 Playing Demo Temple History Audio
+            <br>
+            Language: English
+            `
+
+            );
+
+
+        });
+
+
+    }
+
+
+});
+
+
+
+
+// ======================================================
+// WISHLIST SYSTEM
+// ======================================================
+
+
+
+document.querySelectorAll(".card .btn")
+.forEach(btn=>{
+
+
+    if(
+    btn.innerText.includes("Explore") ||
+    btn.innerText.includes("View")
+    ){
+
+
+        btn.addEventListener(
+        "click",
+        ()=>{
+
+
+            btn.classList.toggle(
+            "btn-success"
+            );
+
+
+            btn.innerHTML =
+            btn.classList.contains("btn-success")
+            ?
+
+            "✓ Saved"
+
+            :
+
+            btn.innerText;
+
+
+
+            showToast(
+            "Added to your travel wishlist"
+            );
+
+
+        });
+
+
+    }
+
+
+});
+
+
+
+
+// ======================================================
+// SCROLL FADE EFFECT
+// ======================================================
+
+
+
+const observer = new IntersectionObserver(
+(entries)=>{
+
+
+entries.forEach(entry=>{
+
+
+    if(entry.isIntersecting){
+
+
+        entry.target.classList.add(
+        "fade-up"
+        );
+
+
+    }
+
+
+});
+
+
+},
+{
+
+threshold:.15
+
+});
+
+
+
+document.querySelectorAll(
+".card,section h2"
+)
+.forEach(element=>{
+
+
+    observer.observe(element);
+
+
+});
+
+
+
+
+// ======================================================
+// COUNTER ANIMATION
+// ======================================================
+
+
+function animateCounter(element){
+
+
+let target =
+parseInt(element.dataset.value);
+
+
+
+let count=0;
+
+
+let interval =
+setInterval(()=>{
+
+
+count += Math.ceil(target/100);
+
+
+
+if(count>=target){
+
+
+count=target;
+
+clearInterval(interval);
+
+
+}
+
+
+
+element.innerHTML=count+"+";
+
+
+
+},20);
+
+
+
+}
+
+
+
+document.querySelectorAll(
+"[data-value]"
+)
+.forEach(counter=>{
+
+
+animateCounter(counter);
+
+
+});
+
+
+
+// ======================================================
+// END PART 4A
+// PART 4B CONTINUES
+// ======================================================
+
+// ======================================================
+// PART 4B
+// ADVANCED DEMO FUNCTIONS
+// ======================================================
+
+
+
+// ======================================================
+// DARK MODE TOGGLE
+// ======================================================
+
+
+const darkButton=document.createElement("button");
+
+
+darkButton.innerHTML="🌙";
+
+
+darkButton.className=
+"btn btn-warning position-fixed";
+
+
+darkButton.style.right="25px";
+
+darkButton.style.bottom="85px";
+
+darkButton.style.zIndex="9999";
+
+darkButton.style.borderRadius="50%";
+
+darkButton.style.width="45px";
+
+darkButton.style.height="45px";
+
+
+document.body.appendChild(darkButton);
+
+
+
+darkButton.addEventListener(
+"click",
+()=>{
+
+
+document.body.classList.toggle(
+"dark-mode"
+);
+
+
+
+if(document.body.classList.contains("dark-mode")){
+
+
+darkButton.innerHTML="☀️";
+
+
+localStorage.setItem(
+"theme",
+"dark"
+);
+
+
+}
+
+else{
+
+
+darkButton.innerHTML="🌙";
+
+
+localStorage.setItem(
+"theme",
+"light"
+);
+
+
+}
+
+
+});
+
+
+
+
+// Load saved theme
+
+
+if(
+localStorage.getItem("theme")
+==="dark"
+){
+
+
+document.body.classList.add(
+"dark-mode"
+);
+
+
+darkButton.innerHTML="☀️";
+
+
+}
+
+
+
+
+
+// ======================================================
+// TEMPLE SEARCH DEMO
+// ======================================================
+
+
+
+const searchInput=document.createElement(
+"input"
+);
+
+
+searchInput.placeholder=
+"Search temples...";
+
+
+searchInput.className=
+"form-control my-4";
+
+
+const templeSection=
+document.querySelector(
+"section:nth-of-type(5)"
+);
+
+
+
+if(templeSection){
+
+
+templeSection
+.querySelector(".container")
+.prepend(searchInput);
+
+
+
+searchInput.addEventListener(
+"keyup",
+()=>{
+
+
+let value=
+searchInput.value.toLowerCase();
+
+
+
+let cards=
+templeSection.querySelectorAll(
+".card"
+);
+
+
+
+cards.forEach(card=>{
+
+
+let text=
+card.innerText.toLowerCase();
+
+
+
+if(text.includes(value)){
+
+
+card.parentElement.style.display="block";
+
+
+}
+
+else{
+
+
+card.parentElement.style.display="none";
+
+
+}
+
+
+
+});
+
+
+});
+
+
+}
+
+
+
+
+
+// ======================================================
+// BOOKING DEMO MODAL
+// ======================================================
+
+
+
+function openBooking(title){
+
+
+const modal=document.createElement(
+"div"
+);
+
+
+
+modal.innerHTML=`
+
+<div class="modal fade show"
+style="display:block;background:rgba(0,0,0,.6)">
+
+<div class="modal-dialog">
+
+<div class="modal-content">
+
+<div class="modal-header">
+
+<h5>
+${title}
+</h5>
+
+<button class="btn-close closeModal">
+
+</button>
+
+</div>
+
+
+<div class="modal-body">
+
+
+<label class="form-label">
+Name
+</label>
+
+<input class="form-control mb-3">
+
+
+<label class="form-label">
+Phone
+</label>
+
+<input class="form-control mb-3">
+
+
+<button class="btn btn-primary w-100">
+
+Confirm Demo Booking
+
+</button>
+
+
+</div>
+
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+
+
+document.body.appendChild(modal);
+
+
+
+modal.querySelector(
+".closeModal"
+)
+.onclick=()=>{
+
+
+modal.remove();
+
+
+};
+
+
+
+}
+
+
+
+
+
+document.querySelectorAll(
+".btn"
+)
+.forEach(btn=>{
+
+
+if(
+btn.innerText.includes("Book")
+||
+btn.innerText.includes("Appointment")
+){
+
+
+btn.addEventListener(
+"click",
+()=>{
+
+
+openBooking(
+"Demo Booking"
+);
+
+
+});
+
+
+}
+
+
+
+});
+
+
+
+
+// ======================================================
+// CONTACT FORM DEMO
+// ======================================================
+
+
+
+document.querySelectorAll(
+"form"
+)
+.forEach(form=>{
+
+
+form.addEventListener(
+"submit",
+(e)=>{
+
+
+e.preventDefault();
+
+
+
+showToast(
+
+`
+✅ Thank you!
+<br>
+Your enquiry has been submitted.
+`
+
+);
+
+
+
+form.reset();
+
+
+});
+
+
+});
+
+
+
+
+// ======================================================
+// LANGUAGE SELECTOR DEMO
+// ======================================================
+
+
+
+const languages=[
+
+"English",
+
+"Tamil",
+
+"Hindi",
+
+"Telugu",
+
+"Kannada",
+
+"French"
+
+];
+
+
+
+const languageBox=
+document.createElement("select");
+
+
+languageBox.className=
+"form-select position-fixed";
+
+
+languageBox.style.top="80px";
+
+languageBox.style.right="20px";
+
+languageBox.style.width="130px";
+
+languageBox.style.zIndex="999";
+
+
+languages.forEach(lang=>{
+
+
+let option=
+document.createElement("option");
+
+
+option.textContent=lang;
+
+
+languageBox.appendChild(option);
+
+
+
+});
+
+
+
+document.body.appendChild(
+languageBox
+);
+
+
+
+languageBox.addEventListener(
+"change",
+()=>{
+
+
+showToast(
+
+"Language changed to "
++
+languageBox.value
+
+);
+
+
+});
+
+
+
+
+
+// ======================================================
+// BUSINESS DEMO CARDS
+// ======================================================
+
+
+
+document.querySelectorAll(
+".card"
+)
+.forEach(card=>{
+
+
+card.addEventListener(
+"dblclick",
+()=>{
+
+
+showToast(
+
+`
+Business Demo:
+<br>
+Premium listing enquiry created.
+
+`
+
+);
+
+
+});
+
+
+});
+
+
+
+
+
+// ======================================================
+// LOCAL WISHLIST STORAGE
+// ======================================================
+
+
+
+let wishlist=
+JSON.parse(
+localStorage.getItem(
+"wishlist"
+)
+)
+||
+[];
+
+
+
+function saveWishlist(item){
+
+
+wishlist.push(item);
+
+
+localStorage.setItem(
+
+"wishlist",
+
+JSON.stringify(wishlist)
+
+);
+
+
+}
+
+
+
+
+// ======================================================
+// PAGE READY MESSAGE
+// ======================================================
+
+
+
+window.addEventListener(
+"load",
+()=>{
+
+
+setTimeout(()=>{
+
+
+showToast(
+
+`
+🙏 Welcome to Visit Kanchipuram Demo Platform
+`
+
+);
+
+
+},1000);
+
+
+});
+
+
+
+// ======================================================
+// PROJECT COMPLETE
+// ======================================================
+
+</script>
+
+<!-- 
+✅ Full Demo Completed
+
+You now have:
+
+HTML
+
+✔ Tourism landing page
+✔ Temple explorer
+✔ Trip planner
+✔ Festivals
+✔ Hotels
+✔ Restaurants
+✔ Shopping
+✔ Wedding planner
+✔ Mobile app showcase
+✔ Audio guide
+✔ Business portal
+✔ Revenue model
+✔ Testimonials
+✔ FAQ
+✔ Contact
+✔ Footer
+
+CSS
+
+✔ Modern startup UI
+✔ Responsive design
+✔ Animations
+✔ Cards
+✔ Timeline
+✔ Dark mode support
+✔ Mobile optimization
+
+JavaScript
+
+✔ Trip generator
+✔ Search
+✔ Wishlist
+✔ Audio demo
+✔ Booking popup
+✔ Contact handling
+✔ Dark mode
+✔ Language selector
+✔ Toast alerts -->
