@@ -22,10 +22,11 @@ export async function onRequest(context) {
       const studentId = url.searchParams.get('student_id');
       const status = url.searchParams.get('status');
 
-      // Self-healing auto-expiry: no cron jobs available on Pages Functions, so instead
-      // we correct any stale "active" memberships whose end_date has passed every time
-      // this list loads. Cheap (single bulk PATCH) and keeps status accurate without
-      // needing a scheduled job.
+      // Self-healing status correction: no cron jobs available on Pages Functions, so instead
+      // we correct status based purely on end_date every time this list loads. Covers both
+      // directions - past-due memberships flip to "expired", and ones manually edited back
+      // into the future (or renewed) flip back to "active". "cancelled" is left alone since
+      // that's a manual decision, not date-driven.
       const todayStr = new Date().toISOString().split("T")[0];
       await fetch(
         `${SUPABASE_URL}/rest/v1/student_memberships?status=eq.active&end_date=lt.${todayStr}`,
@@ -33,6 +34,14 @@ export async function onRequest(context) {
           method: "PATCH",
           headers: { ...authHeaders, "Content-Type": "application/json" },
           body: JSON.stringify({ status: "expired" })
+        }
+      );
+      await fetch(
+        `${SUPABASE_URL}/rest/v1/student_memberships?status=eq.expired&end_date=gte.${todayStr}`,
+        {
+          method: "PATCH",
+          headers: { ...authHeaders, "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "active" })
         }
       );
 

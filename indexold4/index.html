@@ -329,9 +329,6 @@
     <!-- Messages from admin,dismissable alerts -->
     <div id="announcementContainer"></div>
 
-    <!-- Booking slots UI - can be hidden by admin via the public-settings toggle -->
-    <div id="bookingSlotsWrapper">
-
     <div class="mb-3 text-center d-flex justify-content-center align-items-center gap-3">
 
         <button id="prev-day" class="btn btn-outline-primary">
@@ -386,9 +383,6 @@
     <h5 id="selected-date-label" class="text-center fw-bold text-primary mb-4"></h5>
 
     <div id="slots-container" class="row g-4"></div>
-
-    </div>
-    <!-- bookingSlotsWrapper ends here -->
 
 
     <!-- Amenities Section -->
@@ -830,20 +824,6 @@ function renderAlerts(data) {
   }
   loadAnnouncements();
   loadSlots();
-  applyPublicSlotsSetting();
-
-  async function applyPublicSlotsSetting() {
-    try {
-      const res = await fetch("/api/public-settings");
-      const settings = await res.json();
-      const wrapper = document.getElementById("bookingSlotsWrapper");
-      if (wrapper && settings.show_booking_slots === "false") {
-        wrapper.style.display = "none";
-      }
-    } catch (e) {
-      // If the settings check fails for any reason, fail open (show slots as normal)
-    }
-  }
 
   const dateInput = document.getElementById("selected-date");
 
