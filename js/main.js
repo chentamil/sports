@@ -19,3 +19,10 @@
 
 clearModalArtifacts();
 checkUser();
+
+// PWA: register service worker (enables "Install App" prompt in Chrome)
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js").catch(() => {
+    // Registration failing shouldn't break the app - it's a progressive enhancement
+  });
+}

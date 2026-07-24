@@ -27,8 +27,6 @@
     <noscript><link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"></noscript>
     <!-- Custom CSS -->
     <link href="https://www.jothiheartandskin.info/css/style.css" rel="stylesheet">
-    <!-- Design system - overrides Bootstrap's default look, keeps its mechanics -->
-    <link href="/theme.css" rel="stylesheet">
     <!-- Favicon -->
     <!-- <link rel="icon" href="https://www.jothiheartandskin.info/images/sdj-logo.jpg" type="image/jpeg"> -->
      <link rel="icon" href="https://www.jothiheartandskin.info/images/shivani_logo.webp" type="image/jpeg">
@@ -75,7 +73,7 @@
     </style>
 </head>
 
-<body>
+
 
    <nav class="navbar navbar-expand-lg navbar-dark fixed-top p-0">
         <div class="container">
@@ -162,7 +160,7 @@
 
 </style>
 
-  <main style="margin-top: 50px;">
+
 
 
 <section class="hero-banner p-0">
@@ -333,6 +331,7 @@
           <div class="position-relative" style="cursor:pointer;" onclick="document.getElementById('selected-date').showPicker()">
 
               <!-- <input type="date" id="selected-date" class="form-control w-auto pe-5" min="2026-06-02"> -->
+              <label for="selected-date" class="visually-hidden">Select booking date</label>
               <input type="date" id="selected-date" class="form-control w-auto pe-5">
 
               <i class="bi bi-calendar3 position-absolute top-50 end-0 translate-middle-y me-3 text-primary"></i>
@@ -525,7 +524,8 @@
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3890.3577689115814!2d79.69019589999999!3d12.8201424!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a52c31bbe89c4cd%3A0x349e559ae45e732e!2sShivani%20Elite%20Badminton%20Academy!5e0!3m2!1sen!2sin!4v1780286999995!5m2!1sen!2sin"
             class="w-100 flex-grow-1 border-0 rounded-3"
             loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade">
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Map showing Shivani Elite Badminton Academy location">
           </iframe>
         </div>
       </div>
@@ -1059,7 +1059,7 @@ function renderAlerts(data) {
 </script>
 
 
-  </main>
+
 
    <!-- FOOTER -->
 <footer class="pt-5 pb-3 text-white fw-light">
@@ -1167,6 +1167,6 @@ function renderAlerts(data) {
 
 
 
-</body>
+
 
 </html>

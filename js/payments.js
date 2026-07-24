@@ -64,6 +64,33 @@ function openReceiptModal(paymentId) {
   new bootstrap.Modal(document.getElementById("receiptModal")).show();
 }
 
+function shareReceiptWhatsApp() {
+  const p = window._currentReceiptPayment;
+  if (!p) { showToast("Open a receipt first", "warning"); return; }
+
+  const mobile = (p.students && p.students.mobile) || "";
+  if (!mobile) { showToast("This student has no mobile number on file", "warning"); return; }
+
+  let phone = mobile.replace(/\D/g, "");
+  if (phone.length === 10) phone = "91" + phone;
+
+  const studentName = p.students ? `${p.students.first_name} ${p.students.last_name || ""}`.trim() : "";
+  const planName = (p.student_memberships && p.student_memberships.membership_plans && p.student_memberships.membership_plans.name) || "General Fee";
+
+  const text = `Hi ${studentName}, here is your payment receipt from Shivani Elite Badminton Academy:
+
+Receipt Number: ${p.receipt_number || "N/A"}
+Fee Category: ${planName}
+Payment Date: ${p.payment_date || ""}
+Payment Method: ${p.payment_mode || ""}
+Amount: Rs.${p.amount}
+
+Thank you for being with us!`;
+
+  const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+  window.open(url, "_blank");
+}
+
 function sendReceiptEmail() {
   const p = window._currentReceiptPayment;
   if (!p) { showToast("Open a receipt first", "warning"); return; }
