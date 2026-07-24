@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0F6B5C">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Home · SMSM Store</title>
+  <title>Track Order · SMSM Store</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,42 +30,60 @@
 
   <main class="app-main">
     <div class="container-app">
-      <section class="section text-center" style="padding-top: var(--space-5);">
-  <h1 style="font-size: 30px;">Fresh picks,<br>delivered to your door.</h1>
-  <p style="max-width: 320px; margin-inline: auto;">
-    Browse today's catalog and place your order in under a minute — pay when it arrives.
-  </p>
-  <a href="/catalog/" class="btn btn-primary" style="padding: 14px 32px; font-size: 15px;">
-    Start Shopping
-  </a>
-</section>
+      <h1>Track Your Order</h1>
 
-<div class="row g-3" style="margin-top: var(--space-4);">
-  <div class="col-4">
-    <div class="surface-card text-center" style="padding: var(--space-3);">
-      <div style="font-size: 22px;">🚚</div>
-      <p style="font-size: 12px; margin: var(--space-1) 0 0;">Cash on delivery</p>
-    </div>
-  </div>
-  <div class="col-4">
-    <div class="surface-card text-center" style="padding: var(--space-3);">
-      <div style="font-size: 22px;">📦</div>
-      <p style="font-size: 12px; margin: var(--space-1) 0 0;">Live order tracking</p>
-    </div>
-  </div>
-  <div class="col-4">
-    <div class="surface-card text-center" style="padding: var(--space-3);">
-      <div style="font-size: 22px;">✅</div>
-      <p style="font-size: 12px; margin: var(--space-1) 0 0;">Quality checked</p>
-    </div>
-  </div>
-</div>
+<form id="track-form" class="surface-card" style="display:flex; gap: var(--space-2);">
+  <input type="text" class="form-control" id="order-id-input" placeholder="Enter Order ID" required>
+  <button type="submit" class="btn btn-primary" style="white-space:nowrap;">Track</button>
+</form>
+
+<div id="track-result" style="margin-top: var(--space-4);"></div>
+
+<script>
+  document.getElementById("track-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const orderId = document.getElementById("order-id-input").value.trim();
+    const resultEl = document.getElementById("track-result");
+    resultEl.innerHTML = `<div class="alert alert-info">Looking up order...</div>`;
+
+    try {
+      const res = await fetch("/api/track?order_id=" + encodeURIComponent(orderId));
+      const order = await res.json();
+
+      if (!order) {
+        resultEl.innerHTML = `<div class="alert alert-warning">No order found with that ID.</div>`;
+        return;
+      }
+
+      resultEl.innerHTML = `
+        <div class="surface-card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0;">Order #${order.order_id}</h3>
+            <span class="badge" data-status="${order.status}">${order.status}</span>
+          </div>
+          <p style="margin: var(--space-2) 0 0;">Amount: <strong>₹${order.amount}</strong></p>
+          <p style="margin:0;">Placed: ${new Date(order.date).toLocaleString()}</p>
+          <div class="stack-sm" style="margin-top: var(--space-3);">
+            ${order.items.map(i => `
+              <div style="display:flex; justify-content:space-between; font-size:14px;">
+                <span>${i.name} (${i.size}) x ${i.qty}</span>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    } catch (err) {
+      resultEl.innerHTML = `<div class="alert alert-danger">Error looking up order.</div>`;
+      console.error(err);
+    }
+  });
+</script>
 
     </div>
   </main>
 
   <nav class="app-bottomnav">
-    <a href="/" class="nav-item active">
+    <a href="/" class="nav-item ">
       <span class="nav-icon">🏠</span> Home
     </a>
     <a href="/catalog/" class="nav-item ">
@@ -74,7 +92,7 @@
     <a href="/cart/" class="nav-item ">
       <span class="nav-icon">🛒</span> Cart
     </a>
-    <a href="/track/" class="nav-item ">
+    <a href="/track/" class="nav-item active">
       <span class="nav-icon">📦</span> Track
     </a>
   </nav>
