@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Victory Pickle Booking</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+
+
+  <style>
+    body {
+      background: #f4f6f9;
+    }
+
+    .slot-row {
+      transition: all 0.3s ease;
+      cursor: pointer;
+      padding: 0.75rem 1rem;
+    }
+    .slot-row:hover {
+      background-color: #e9ecef;
+      transform: translateX(2px);
+    }
+    .card-header {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .badge-status {
+      padding: 0.4em 0.6em;
+      font-size: 0.8rem;
+    }
+    .text-success-small { color: #28a745 !important; font-weight: 600;}
+    .text-danger-small { color: #dc3545 !important; }
+    .sub-header {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-top: 0.75rem;
+      margin-bottom: 0.5rem;
+      margin-left: 0.5rem;
+    }
+    .acha-bg{
+      background: linear-gradient(90deg, #1d2a4d, #3b4a7b);
+    }
+  </style>
+</head>
+
+<body>
+<div class="container py-4">
+  <h2 class="mb-4 text-center">🏓 Victory Pickle Court Booking</h2>
+
+<div class="mb-3 text-center d-flex justify-content-center align-items-center gap-3">
+  
+  <button id="prev-day" class="btn btn-outline-primary">
+    <i class="bi bi-chevron-left"></i>
+  </button>
+
+  <input type="date" id="selected-date" class="form-control w-auto">
+
+  <button id="next-day" class="btn btn-outline-primary">
+    <i class="bi bi-chevron-right"></i>
+  </button>
+
+</div>
+
+  <p class="text-center text-muted">
+    📍 Kanchipuram | Live slot availability below
+  </p>
+
+  <div id="slots-container" class="row g-4"></div>
+</div>
+
+<footer class="pt-5 pb-3 text-white fw-light" style="background:#111;">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 col-md-4 mb-3">
+        <h5 class="text-warning">🏓 Victory Pickle Court</h5>
+        <p class="text-secondary">
+          Premium pickleball experience in Kanchipuram.  
+          Book your slots easily and play hassle-free.
+        </p>
+      </div>
+      <div class="col-12 col-md-4 mb-3">
+        <h5 class="text-warning">Location</h5>
+        <a href="https://www.google.com/maps/place/Victory+Pickle+ball+court/@12.8658768,79.6910657,17z" target="_blank" class="text-white text-decoration-none">
+          <p class="mb-0">
+            Swami Gardens, 39<br>
+            Near Karungate Crossing<br>
+            Jina Kanchi Nagar<br>
+            Kanchipuram, Tamil Nadu 631502
+            <i class="bi bi-box-arrow-up-right ms-1"></i>
+          </p>
+        </a>
+      </div>
+      <div class="col-12 col-md-4 mb-3">
+        <h5 class="text-warning">Connect</h5>
+        <p class="mb-1">Victory Sports</p>
+        <a href="https://www.instagram.com/victorysports_kpm/" target="_blank" class="text-decoration-none text-light">
+          <i class="bi bi-instagram fs-4 me-2" style="color:#E1306C;"></i>
+          victorysports_kpm
+        </a>
+        <p class="text-secondary mt-2 mb-0">
+          9 posts • 66 followers • 4 following
+        </p>
+      </div>
+    </div>
+    <hr style="border-color: rgba(255,255,255,0.2);">
+
+    <div class="text-center mb-3 social-icons">
+            <i class="bi bi-facebook fs-3 me-3" style="color:#1877F2; cursor:pointer;" onclick="window.open('https://www.facebook.com/victorysports_kpm','_blank')"></i>
+
+            <i class="bi bi-instagram fs-3 me-3" style="color:#E1306C; cursor:pointer;" onclick="window.open('https://www.instagram.com/victorysports_kpm/','_blank')"></i>
+
+            <i class="bi bi-youtube fs-3" style="color:#FF0000; cursor:pointer;" onclick="window.open('https://www.youtube.com/@victorysports_kpm','_blank')"></i>
+
+            <!-- <i class="bi bi-twitter fs-3 me-3" style="color:#1DA1F2; cursor:pointer;"
+                onclick="window.open('https://www.twitter.com/victorysports_kpm','_blank')"></i>     -->
+    </div>
+
+    <hr style="border-color: rgba(255,255,255,0.2);">
+
+    <div class="text-center">
+      <p class="mb-0">© 2026 Victory Pickle Court • All rights reserved</p>
+    </div>
+  </div>
+
+  <!-- Floating WhatsApp -->
+  <a href="https://wa.me/919597547118?text=Hi%2C+I+am+interested+to+play+on+your+Court" target="_blank" class="btn btn-success btn-lg shadow" style="position:fixed;bottom:20px;right:20px;border-radius:50px;">
+    <i class="bi bi-whatsapp"></i>
+  </a>
+</footer>
+
+<script>
+
+  const PHONE = "919597547118";
+  let allData = [];
+
+  async function loadSlots() {
+
+    const res = await fetch('/api/public-slots');
+
+    const data = await res.json();
+
+    allData = data || [];
+
+    setToday();
+  }
+  
+  loadSlots();
+
+  const dateInput = document.getElementById("selected-date");
+
+document.getElementById('prev-day').addEventListener('click', () => {
+
+  const currentDate = new Date(dateInput.value);
+
+  currentDate.setDate(currentDate.getDate() - 1);
+
+  dateInput.value = currentDate.toISOString().split('T')[0];
+
+  renderSlots(dateInput.value);
+
+});
+
+document.getElementById('next-day').addEventListener('click', () => {
+
+  const currentDate = new Date(dateInput.value);
+
+  currentDate.setDate(currentDate.getDate() + 1);
+
+  dateInput.value = currentDate.toISOString().split('T')[0];
+
+  renderSlots(dateInput.value);
+
+});
+  const today = new Date().toISOString().split("T")[0];
+  dateInput.setAttribute("min", today);
+
+  function setToday() {
+    const todayStr = new Date().toLocaleDateString("en-CA");
+    dateInput.value = todayStr;
+    renderSlots(todayStr);
+  }
+
+  dateInput.addEventListener("change", function() {
+    renderSlots(this.value);
+  });
+
+  function getSlotHour(slot) {
+    const raw = slot.start_time || slot.time || "";
+    const startTime = raw.split("-")[0].trim();
+    let hour = parseInt(startTime);
+    if (isNaN(hour)) return 0;
+    if (startTime.toLowerCase().includes("pm") && hour !== 12) hour += 12;
+    if (startTime.toLowerCase().includes("am") && hour === 12) hour = 0;
+    return hour;
+  }
+
+  function renderSlots(date) {
+    const container = document.getElementById("slots-container");
+    container.innerHTML = "";
+
+    const now = new Date();
+    const currentHour = now.getHours();
+    const todayStr = now.toISOString().split("T")[0];
+
+    if (date < todayStr) {
+      container.innerHTML = `<p class="text-center">No slots available for past dates</p>`;
+      return;
+    }
+
+    const filtered = allData.filter(r => r.date === date);
+    if (!filtered.length) {
+      container.innerHTML = `<p class="text-center">No slots found</p>`;
+      return;
+    }
+
+    // Group slots by court
+    const groupedCourts = {};
+    filtered.forEach(slot => {
+      const courtName = slot.courts?.name || `Court No ${slot.court_id}`;
+      if (!groupedCourts[courtName]) groupedCourts[courtName] = [];
+      groupedCourts[courtName].push(slot);
+    });
+
+    // Render courts in ascending order
+    Object.keys(groupedCourts).sort().forEach(courtName => {
+      const courtSlots = groupedCourts[courtName];
+
+    // Count only available & future slots
+    const availableCount = courtSlots.filter(s => {
+        const status = (s.status || "").toLowerCase();
+        const hour = getSlotHour(s);
+        const isPast = (date === todayStr && hour < currentHour);
+        return status === "available" && !isPast;
+      }).length;
+      const badgeClass = availableCount === 0 ? "bg-danger" : "bg-warning text-dark";
+
+      // Separate morning/evening slots
+      const morningSlots = courtSlots.filter(s => getSlotHour(s) < 12).sort((a,b)=>getSlotHour(a)-getSlotHour(b));
+      const eveningSlots = courtSlots.filter(s => getSlotHour(s) >= 12).sort((a,b)=>getSlotHour(a)-getSlotHour(b));
+
+      function renderSlotGroup(slots, groupTitle) {
+        const futureSlots = slots.filter(s => {
+          const hour = getSlotHour(s);
+          return !(date===todayStr && hour<currentHour);
+        });
+        if (!futureSlots.length) return "";
+        return `<div class="sub-header">${groupTitle}</div>` + futureSlots.map(slot=>{
+          const status = (slot.status||"").toLowerCase();
+          const displayTime = `${slot.start_time || slot.time} - ${slot.end_time || ""}`;
+          let badgeText="", badgeClass="", btnHTML="";
+          if (status==="available") {
+            badgeText="Available"; badgeClass="text-success-small";
+            const msg = encodeURIComponent(`Hi, I want to book ${displayTime} at ${courtName} for ₹${slot.price}`);
+            btnHTML=`<a href="https://wa.me/${PHONE}?text=${msg}" target="_blank" class="btn btn-sm btn-primary">Book</a>`;
+          } else if (status==="booked") {
+            badgeText="Booked"; badgeClass="text-danger-small";
+            btnHTML=`<button class="btn btn-sm btn-danger" disabled>Booked</button>`;
+          } else {
+            badgeText="Unavailable"; badgeClass="text-dark";
+            btnHTML=`<button class="btn btn-sm btn-dark" disabled>Unavailable</button>`;
+          }
+          return `
+            <li class="list-group-item d-flex justify-content-between align-items-center slot-row">
+              <div>
+                <strong>${displayTime}</strong><br>
+                <small class="${badgeClass}">${badgeText}</small>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="fw-bold">₹${slot.price||0}</span>
+                ${btnHTML}
+              </div>
+            </li>
+          `;
+        }).join("");
+      }
+
+      // Render court card
+      const courtHTML = `
+      <div class="col-md-6 col-lg-4">
+        <div class="card shadow mb-4 rounded-4 border-0">
+          <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center acha-bg">
+            <h5 class="mb-0">🏟 ${courtName}</h5>
+            <span class="badge ${badgeClass}">Available Slots: ${availableCount}</span>
+          </div>
+          <div class="card-body p-0">
+            <ul class="list-group list-group-flush">
+              ${renderSlotGroup(morningSlots," 🌅 Morning Slots")}
+              ${renderSlotGroup(eveningSlots," 🌙 Evening Slots")}
+            </ul>
+          </div>
+        </div>
+      </div>
+      `;
+      container.innerHTML += courtHTML;
+    });
+  }
+</script>
+
+<!-- Toast Container -->
+<div id="toast" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+<script>
+  function showToast(message) {
+    const toast = document.getElementById("toast");
+    const el = document.createElement("div");
+    el.className = "alert alert-success shadow";
+    el.style.marginBottom = "10px";
+    el.innerText = message;
+    toast.appendChild(el);
+    setTimeout(() => el.remove(), 5000);
+  }
+</script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

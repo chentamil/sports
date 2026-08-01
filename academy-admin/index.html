@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Academy Admin - Shivani Elite</title>
+<meta content="Best Badminton Academy in Kanchipuram.Tamilnadu" name="description"/>
+<meta content="Best Shivani Elite Badminton Academy in Kanchipuram" property="og:title"/>
+<meta content="Shivani Elite Badminton Academy ." property="og:description"/>
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&amp;display=swap" rel="stylesheet"/>
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet"/>
+<!-- Design system - overrides Bootstrap's default look, keeps its mechanics -->
+<link href="/theme.css" rel="stylesheet"/>
+<link href="https://www.jothiheartandskin.info/images/shivani_logo.webp" rel="icon" type="image/jpeg"/>
+<link href="https://www.jothiheartandskin.info/favicon.ico" rel="icon" type="image/x-icon"/>
+<link href="/favicon.svg" rel="icon" type="https://www.jothiheartandskin.info/image/svg+xml"/>
+<!-- PWA -->
+<link href="/manifest.json" rel="manifest"/>
+<meta content="#198754" name="theme-color"/>
+<link href="/icons/icon-192.png" rel="apple-touch-icon"/>
+<!-- Google tag (gtag.js) -->
+</head>
+<body>
+<main>
+
+<style>
+  @media (max-width: 767.98px) {
+
+    .card {
+      border-radius: 18px;
+      border: none;
+    }
+
+    .table {
+      /* border-radius: 16px; */
+      /* overflow: hidden; */
+    }
+
+    .form-control,
+    .form-select {
+      border-radius: 12px;
+      min-height: 44px;
+    }
+
+    .btn {
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .modal-content {
+      border-radius: 24px;
+      border: none;
+    }
+
+    .modal-header {
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .modal-footer {
+      border-top: 1px solid #f1f5f9;
+    }
+
+    #dashboard h4 {
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .card h4 {
+      font-weight: 700;
+    }
+
+    body {
+      background: #f1f5f9;
+    }
+
+    input.form-control,
+    select.form-select {
+      min-width: 5rem;
+      /* or 10vw, see below */
+      margin-bottom: 0.5rem;
+    }
+
+    select.form-select {
+      min-width: 7.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    td.date-td {
+      min-width: 7.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* To make first column fixed in table in smaller screens alone --starts here */
+    .table th:first-child,
+    .table td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+    }
+
+    .table thead th:first-child {
+      z-index: 4;
+      background: #0f172a;
+      color: #ffffff;
+    }
+
+    tr.bg-danger td:first-child {
+      background: #dc3545;
+    }
+
+    tr.bg-secondary td:first-child {
+      background: #6c757d;
+    }
+
+    tr.table-warning td:first-child {
+      background: #fff3cd;
+    }
+
+    tr:not(.bg-danger):not(.bg-secondary):not(.table-warning) td:first-child {
+      background: white;
+    }
+
+    .table th:first-child,
+    .table td:first-child {
+      box-shadow: 2px 0 6px rgba(0, 0, 0, .15);
+    }
+
+  }
+</style>
+<div id="toast" style="
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 99999;
+"></div>
+<!-- <div class="container py-5"> -->
+<div class="container-lg px-3 px-md-4 py-5">
+<div class="card p-4 mx-auto w-100" id="login-box" style="max-width: 400px;">
+<h5 class="mb-3 text-center">🏸 Shivani Elite Admin Login</h5>
+<label class="form-label small text-muted" for="email">Email</label>
+<input autocomplete="username" class="form-control mb-3" id="email" placeholder="you@example.com" type="email"/>
+<label class="form-label small text-muted" for="password">Password</label>
+<input autocomplete="current-password" class="form-control mb-3" id="password" placeholder="Enter your password" type="password"/>
+<button class="btn btn-primary btn-lg w-100" onclick="login()">
+      Login
+    </button>
+</div>
+<div id="dashboard" style="display:none;">
+<nav class="navbar navbar-expand-md navbar-dark bg-dark rounded-1 mb-3 px-3 sticky-top">
+<div class="container-fluid px-0">
+<!-- Hamburger on left -->
+<button aria-label="Menu" class="navbar-toggler" data-bs-target="#mobileMenu" data-bs-toggle="offcanvas" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+
+<!-- Brand -->
+<span class="navbar-brand fw-bold mb-0 me-auto">&#127891; Academy Admin</span>
+
+<!-- Desktop menu -->
+<div class="collapse navbar-collapse d-none d-md-flex">
+<ul class="navbar-nav ms-auto gap-2 flex-row flex-wrap">
+<li class="nav-item"><button class="btn btn-sm btn-outline-light" onclick="scrollToSection('section-home')">&#127968; Home</button></li>
+<li class="nav-item"><button class="btn btn-sm btn-outline-light" onclick="scrollToSection('section-students')">&#127891; Students</button></li>
+<li class="nav-item"><button class="btn btn-sm btn-outline-light" onclick="scrollToSection('section-batches')">&#128218; Batches</button></li>
+<li class="nav-item"><button class="btn btn-sm btn-outline-light" onclick="scrollToSection('section-fees')">&#128176; Fees</button></li>
+<li class="nav-item"><button class="btn btn-sm btn-outline-light" onclick="scrollToSection('section-attendance')">&#9989; Attendance</button></li>
+<li class="nav-item dropdown">
+<button class="btn btn-sm btn-outline-light dropdown-toggle" data-bs-toggle="dropdown">&#8942; More</button>
+<ul class="dropdown-menu dropdown-menu-end">
+<li ><button class="dropdown-item" onclick="scrollToSection('section-coaches')">&#129489;&#127994;&#8205;&#127940; Coaches</button></li>
+<li ><button class="dropdown-item" onclick="scrollToSection('section-plans')">&#128179; Membership Plans</button></li>
+<li ><button class="dropdown-item" onclick="scrollToSection('section-memberships')">&#128203; Student Memberships</button></li>
+<li ><button class="dropdown-item" onclick="scrollToSection('section-expenses')">&#128202; Expenses</button></li>
+<li ><button class="dropdown-item" onclick="scrollToSection('section-finance')">&#128200; Financial Dashboard</button></li>
+<li ><button class="dropdown-item" onclick="scrollToSection('section-announcements')">&#128226; Announcements</button></li>
+<li ><button class="dropdown-item" onclick="scrollToSection('section-enquiries')">&#128220; Enquiries</button></li>
+</ul>
+</li>
+<!-- Internal Page Link -->
+<li class="nav-item">
+    <a href="/booking-admin/" class="btn btn-sm btn-outline-light">
+        📅 Booking Admin
+    </a>
+</li>
+<li class="nav-item"><button class="btn btn-sm btn-outline-danger" onclick="logout()">Logout</button></li>
+</ul>
+</div>
+</div>
+</nav>
+<div class="offcanvas offcanvas-start" id="mobileMenu" tabindex="-1">
+<div class="offcanvas-header">
+<div class="offcanvas-title fw-bold">Menu</div>
+<button class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close menu"></button>
+</div>
+<div class="offcanvas-body d-flex flex-column gap-2">
+<button class="btn btn-outline-secondary text-start" onclick="scrollToSection('section-home')">&#127968; Home</button>
+<button class="btn btn-outline-secondary text-start" onclick="scrollToSection('section-students')">&#127891; Students</button>
+<button class="btn btn-outline-secondary text-start" onclick="scrollToSection('section-batches')">&#128218; Batches</button>
+<button class="btn btn-outline-secondary text-start" onclick="scrollToSection('section-fees')">&#128176; Fees</button>
+<button class="btn btn-outline-secondary text-start" onclick="scrollToSection('section-attendance')">&#9989; Attendance</button>
+<hr class="my-1">
+<button class="btn btn-outline-secondary text-start" onclick="scrollToSection('section-coaches')">&#129489;&#127994;&#8205;&#127940; Coaches</button>
+<button class="btn btn-outline-secondary text-start" onclick="scrollToSection('section-plans')">&#128179; Membership Plans</button>
+<button class="btn btn-outline-secondary text-start" onclick="scrollToSection('section-memberships')">&#128203; Student Memberships</button>
+<button class="btn btn-outline-secondary text-start" onclick="scrollToSection('section-expenses')">&#128202; Expenses</button>
+<button class="btn btn-outline-secondary text-start" onclick="scrollToSection('section-finance')">&#128200; Financial Dashboard</button>
+<button class="btn btn-outline-secondary text-start" onclick="scrollToSection('section-announcements')">&#128226; Announcements</button>
+<button class="btn btn-outline-secondary text-start" onclick="scrollToSection('section-enquiries')">&#128220; Enquiries</button>
+<hr class="my-1">
+<!-- Internal Page Link -->
+<a href="/booking-admin/" class="btn btn-outline-primary text-start">
+    📅 Booking Admin
+</a>
+<hr class="my-1">
+<button class="btn btn-outline-danger text-start" onclick="logout()">Logout</button>
+</div>
+</div>
+<nav class="navbar fixed-bottom bg-white border-top d-md-none py-1">
+<div class="container-fluid px-1">
+<div class="row w-100 g-0">
+<div class="col text-center">
+<button class="btn btn-sm w-100 text-dark" onclick="scrollToSection('section-home')" style="font-size:0.75rem;">&#127968; Home</button>
+</div><div class="col text-center">
+<button class="btn btn-sm w-100 text-dark" onclick="scrollToSection('section-students')" style="font-size:0.75rem;">&#127891; Students</button>
+</div><div class="col text-center">
+<button class="btn btn-sm w-100 text-dark" onclick="scrollToSection('section-batches')" style="font-size:0.75rem;">&#128218; Batches</button>
+</div><div class="col text-center">
+<button class="btn btn-sm w-100 text-dark" onclick="scrollToSection('section-fees')" style="font-size:0.75rem;">&#128176; Fees</button>
+</div>
+</div>
+</div>
+</nav>
+<!-- <div class="d-md-none" style="height:64px;"></div> -->
+
+<div class="card p-3 mb-4 border-warning" id="section-renewals">
+<div class="d-flex justify-content-between align-items-center mb-2">
+<h4 class="mb-0">🔔 Renewals Due <span class="badge bg-danger" id="renewalsBadge" style="display:none;"></span></h4>
+<div class="d-flex gap-2">
+<select class="form-select form-select-sm" id="renewalsDaysAhead" onchange="loadRenewalsDue()" style="width:auto;">
+<option value="7">Next 7 days</option>
+<option value="15">Next 15 days</option>
+<option value="30">Next 30 days</option>
+<option value="60">Next 60 days</option>
+</select>
+<button class="btn btn-outline-warning btn-sm" onclick="loadRenewalsDue()">Refresh</button>
+</div>
+</div>
+<div class="list-group" id="renewalsList">
+<div class="list-group-item"><span class="skeleton d-block" style="height:18px;width:80%;"></span></div>
+<div class="list-group-item"><span class="skeleton d-block" style="height:18px;width:65%;"></span></div>
+</div>
+<div class="text-end mt-2" id="renewalsViewAllWrap" style="display:none;">
+<button class="btn btn-sm btn-warning" onclick="openAllRenewals()">View All (<span id="renewalsViewAllCount">0</span> more) →</button>
+</div>
+</div>
+<div class="card p-3 mb-4 border-primary" id="section-home">
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h4 class="mb-0">
+          🏠 Home
+          <span class="badge rounded-pill bg-success ms-2" id="liveDot" style="display:none;font-size:0.65rem;vertical-align:middle;">● Live</span>
+</h4>
+<button class="btn btn-outline-primary btn-sm" onclick="loadHomeSummary()">Refresh</button>
+</div>
+<div class="row g-3 mb-3">
+<div class="col-6 col-md-4">
+<div class="card p-3 text-center bg-primary text-white">
+<small>Active Students</small>
+<h4 id="homeActiveStudents"><span class="skeleton d-inline-block" style="height:20px;width:32px;background:rgba(255,255,255,0.35);"></span></h4>
+</div>
+</div>
+<div class="col-6 col-md-4">
+<div class="card p-3 text-center bg-success text-white">
+<small>New in 30 Days</small>
+<h4 id="homeNewStudents"><span class="skeleton d-inline-block" style="height:20px;width:32px;background:rgba(255,255,255,0.35);"></span></h4>
+</div>
+</div>
+<div class="col-6 col-md-4">
+<div class="card p-3 text-center bg-info text-white">
+<small>Active Batches</small>
+<h4 id="homeActiveBatches"><span class="skeleton d-inline-block" style="height:20px;width:32px;background:rgba(255,255,255,0.35);"></span></h4>
+</div>
+</div>
+</div>
+<h6 class="text-muted mb-2">Latest Activity</h6>
+<ul class="list-group" id="homeActivityList">
+<li class="list-group-item"><span class="skeleton d-block" style="height:18px;width:75%;"></span></li>
+<li class="list-group-item"><span class="skeleton d-block" style="height:18px;width:60%;"></span></li>
+<li class="list-group-item"><span class="skeleton d-block" style="height:18px;width:70%;"></span></li>
+</ul>
+<div class="text-end mt-2">
+<button class="btn btn-sm btn-primary" onclick="openAllActivity()">View All →</button>
+</div>
+</div>
+<div class="card p-3 mb-4 border-dark">
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h4 class="mb-0">📋 Today's Report</h4>
+<div>
+<span class="text-muted small me-2" id="dailyReportDate"></span>
+<button class="btn btn-outline-dark btn-sm" onclick="loadDailyReport()">Refresh</button>
+</div>
+</div>
+<div class="row g-3 mb-3">
+<div class="col-6 col-md-3">
+<div class="card p-3 text-center">
+<small class="text-muted">New Joined</small>
+<h4 id="drNewJoined">0</h4>
+</div>
+</div>
+<div class="col-6 col-md-3">
+<div class="card p-3 text-center">
+<small class="text-muted">Fees Paid Today</small>
+<h4 id="drFeesPaid">₹0</h4>
+</div>
+</div>
+<div class="col-6 col-md-3">
+<div class="card p-3 text-center">
+<small class="text-muted">New Memberships Sold Today</small>
+<h4 id="drMembershipBooking">₹0</h4>
+</div>
+</div>
+<div class="col-6 col-md-3">
+<div class="card p-3 text-center">
+<small class="text-muted">Attendance %</small>
+<h4 id="drAttendancePercent">0%</h4>
+</div>
+</div>
+<div class="col-6 col-md-3">
+<div class="card p-3 text-center border-success">
+<small class="text-muted">Court Bookings Today</small>
+<h4><span id="drCourtBookings">0</span> <span class="fs-6 text-muted">(₹<span id="drCourtRevenue">0</span>)</span></h4>
+</div>
+</div>
+</div>
+<div class="d-flex justify-content-between align-items-center mb-2">
+<h6 class="text-muted mb-0">New Enquiries Today (<span id="drEnquiryCount">0</span>)</h6>
+<button class="btn btn-primary btn-sm" onclick="openAddEnquiry(null, '')"><i class="bi bi-person-plus"></i> Add Enquiry</button>
+</div>
+<div class="table-responsive">
+<table class="table table-sm">
+<thead><tr><th>Batch</th><th>Student</th><th>Mobile</th><th>Date</th><th>Notes</th></tr></thead>
+<tbody id="drEnquiryBody"><tr><td class="text-center text-muted" colspan="5">Loading...</td></tr></tbody>
+</table>
+</div>
+</div>
+<div class="card p-3 mb-4">
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+<h4 class="mb-0">🗒️ Enquiries</h4>
+<div class="d-flex gap-2 flex-wrap">
+<select class="form-select form-select-sm" id="enq-filter-status" onchange="paginationState.enquiries = 1; renderEnquiryRows();" style="width:auto;">
+<option value="all">All Statuses</option>
+<option value="New">New</option>
+<option value="Contacted">Contacted</option>
+<option value="Follow-up">Follow-up</option>
+<option value="Interested">Interested</option>
+<option value="Joined">Joined</option>
+<option value="Dropped">Dropped</option>
+<option value="Closed">Closed</option>
+</select>
+<button class="btn btn-outline-secondary btn-sm" onclick="loadEnquiries()">Refresh</button>
+<button class="btn btn-primary btn-sm" onclick="openAddEnquiry(null, '')"><i class="bi bi-person-plus"></i> Add Enquiry</button>
+</div>
+</div>
+<div class="table-responsive">
+<table class="table table-sm align-middle">
+<thead><tr><th>Batch</th><th>Student</th><th>Mobile</th><th>Date</th><th>Notes</th><th>Status</th><th></th></tr></thead>
+<tbody id="enquiryTableBody"><tr><td class="text-center text-muted" colspan="7">Loading...</td></tr></tbody>
+</table>
+</div>
+<div id="enquiriesPagination"></div>
+</div>
+
+<div class="mb-4">
+<ul class="nav nav-tabs" id="reportTabs" role="tablist">
+<li class="nav-item" role="presentation">
+<button class="nav-link active" data-bs-target="#dashboardContent" data-bs-toggle="tab" id="dashboard-tab" role="tab" type="button">
+            📊 Dashboard
+          </button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" data-bs-target="#reportsContent" data-bs-toggle="tab" id="reports-tab" role="tab" type="button">
+            📈 Reports
+          </button>
+</li>
+<!-- Dev-only tab - toggle via the hidden Developer Options panel (click footer copyright 5x) -->
+<li class="nav-item dev-only d-none" role="presentation">
+<button class="nav-link" data-bs-target="#notificationsContent" data-bs-toggle="tab" id="notifications-tab" role="tab" type="button">
+            🔔 Notifications <span class="badge bg-danger ms-1 d-none" id="notificationBadge">0</span>
+</button>
+</li>
+<!-- Dev-only tab - toggle via the hidden Developer Options panel (click footer copyright 5x) -->
+<li class="nav-item dev-only d-none" role="presentation">
+<button class="nav-link" data-bs-target="#auditContent" data-bs-toggle="tab" id="audit-tab" role="tab" type="button">
+            📜 Audit Logs
+          </button>
+</li>
+</ul>
+</div>
+<div class="tab-content">
+<div class="tab-pane fade show active" id="dashboardContent" role="tabpanel">
+
+<div class="card p-3 mb-4 border-info" id="section-finance">
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h4 class="mb-0">💰 Financial Dashboard</h4>
+<div>
+<select class="form-select d-inline w-auto" id="finance-period" onchange="loadFinancialDashboard()">
+<option value="today">Today</option>
+<option value="week">This Week</option>
+<option selected="" value="month">This Month</option>
+<option value="year">This Year</option>
+</select>
+<button class="btn btn-outline-primary btn-sm ms-2" onclick="loadFinancialDashboard()">Refresh</button>
+</div>
+</div>
+<div class="row g-3 mb-3">
+<div class="col-6 col-md-3">
+<div class="card p-3 text-center bg-success text-white">
+<small>Revenue</small>
+<h4 id="financeRevenue">₹0</h4>
+</div>
+</div>
+<div class="col-6 col-md-3">
+<div class="card p-3 text-center bg-danger text-white">
+<small>Expenses</small>
+<h4 id="financeExpenses">₹0</h4>
+</div>
+</div>
+<div class="col-6 col-md-3">
+<div class="card p-3 text-center bg-primary text-white">
+<small>Profit</small>
+<h4 id="financeProfit">₹0</h4>
+</div>
+</div>
+<div class="col-6 col-md-3">
+<div class="card p-3 text-center bg-warning text-dark">
+<small>Margin</small>
+<h4 id="financeMargin">0%</h4>
+</div>
+</div>
+</div>
+<!-- Revenue Breakdown -->
+<div class="row g-3 mb-3">
+<div class="col-6">
+<div class="card p-2 text-center">
+<small class="text-muted">Bookings</small>
+<strong id="financeBookings">₹0</strong>
+</div>
+</div>
+<div class="col-6">
+<div class="card p-2 text-center">
+<small class="text-muted">Memberships</small>
+<strong id="financeFees">₹0</strong>
+</div>
+</div>
+</div>
+<!-- Charts -->
+<div class="row g-3">
+<div class="col-md-7">
+<h6 class="text-muted mb-2">Revenue vs Expense Trend</h6>
+<div style="height:250px;">
+<canvas id="financeChart"></canvas>
+</div>
+</div>
+<div class="col-md-5">
+<h6 class="text-muted mb-2">Expense Chart</h6>
+<div style="height:250px;">
+<canvas id="expenseCategoryChart"></canvas>
+</div>
+</div>
+</div>
+</div>
+<div class="card p-3 mb-4 border-info" id="section-students">
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h4 class="mb-0">🎓 Student Management</h4>
+<button class="btn btn-info text-white" onclick="showStudentForm()">+ Add Student</button>
+</div>
+<!-- Search -->
+<input class="form-control mb-3" id="stu-search" oninput="filterStudents()" placeholder="🔍 Search by name, code, or mobile..."/>
+<!-- Table -->
+<div class="table-responsive">
+<table class="table table-bordered">
+<thead>
+<tr>
+<th>ID</th><th>Code</th><th>Name</th><th>Mobile</th>
+<th>Email</th><th>Joined</th><th>Status</th><th>Action</th>
+</tr>
+</thead>
+<tbody id="studentTableBody"></tbody>
+</table>
+</div>
+<div id="studentsPagination"></div>
+</div>
+<div class="card p-3 mb-4 border-warning" id="section-coaches">
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h4 class="mb-0">🧑‍🏫 Coach Management</h4>
+<button class="btn btn-warning text-white" onclick="showCoachForm()">+ Add Coach</button>
+</div>
+<div class="table-responsive">
+<table class="table table-bordered">
+<thead>
+<tr>
+<th>ID</th><th>Code</th><th>Name</th><th>Mobile</th>
+<th>Specialization</th><th>Batches Handled</th><th>Status</th><th>Action</th>
+</tr>
+</thead>
+<tbody id="coachTableBody"></tbody>
+</table>
+</div>
+</div>
+<div class="card p-3 mb-4 border-success" id="section-batches">
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h4 class="mb-0">📚 Batches</h4>
+<button class="btn btn-success" onclick="showBatchForm()">+ Create Batch</button>
+</div>
+<!-- Card grid — the only view now, works cleanly on mobile and desktop -->
+<div class="row g-3 mb-3" id="batchCardGrid">
+<div class="col-12 text-center text-muted py-3">Loading batches...</div>
+</div>
+</div>
+<div class="card p-3 mb-4 border-danger" id="section-attendance">
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h4 class="mb-0">✅ Attendance</h4>
+<div>
+<label class="small text-muted d-block mb-1">Attendance Date</label>
+<input class="form-control d-inline w-auto mb-2" id="attendance-date" type="date"/>
+<select class="form-select w-100 w-md-auto ms-md-2" id="attendance-batch">
+<option value="">All Batches</option>
+</select>
+<button class="btn btn-primary m-2" onclick="loadAttendance()">Load</button>
+<button class="btn btn-success m-2" onclick="saveAttendance()">Save All</button>
+<button class="btn btn-outline-danger m-2" onclick="openMarkHoliday()"><i class="bi bi-calendar-x"></i> Mark Holiday</button>
+</div>
+</div>
+<p class="text-muted small mb-2">Attendance is saved per batch. If a student is in 2 batches (e.g. Morning + Evening), pick the date, select <strong>Morning</strong> → mark → Save All, then select <strong>Evening</strong> for the same date → mark → Save All again. Already-marked days are editable — just reload that date/batch, change the dropdown, and Save All to overwrite.</p>
+<!-- Mark Holiday Modal -->
+<div class="modal fade" id="markHolidayModal" tabindex="-1">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Mark a Holiday</h5>
+<button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<p class="text-muted small">This marks <strong>every active student in every active batch</strong> as "Holiday" for the selected date — useful for tournaments, festivals, or academy closures. Any existing attendance for that date will be overwritten.</p>
+<label class="form-label">Date</label>
+<input class="form-control" id="holiday-date" type="date"/>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+<button class="btn btn-danger" onclick="confirmMarkHoliday()">Mark Holiday</button>
+</div>
+</div>
+</div>
+</div>
+<div class="table-responsive">
+<table class="table table-bordered">
+<thead>
+<tr>
+<th>Student</th><th>Batch</th><th>Status</th>
+</tr>
+</thead>
+<tbody id="attendanceTableBody">
+<tr><td class="text-center text-muted" colspan="3">Select a date and batch to load attendance.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card p-3 mb-4 border-purple" id="section-plans" style="border-color: #8b5cf6;">
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h4 class="mb-0">💳 Membership Plans</h4>
+<button class="btn btn-primary" onclick="showPlanForm()" style="background:#8b5cf6;border-color:#8b5cf6;">+ Add Plan</button>
+</div>
+<div class="table-responsive">
+<table class="table table-bordered">
+<thead>
+<tr>
+<th>ID</th><th>Name</th><th>Duration (Days)</th>
+<th>Amount (₹)</th><th>Description</th><th>Status</th><th>Action</th>
+</tr>
+</thead>
+<tbody id="planTableBody"></tbody>
+</table>
+</div>
+</div>
+<div class="card p-3 mb-4 border-purple" id="section-memberships" style="border-color: #a78bfa;">
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h4 class="mb-0">📋 Student Memberships</h4>
+<button class="btn btn-primary" onclick="openAssignMembershipModal()" style="background:#a78bfa;border-color:#a78bfa;">+ Assign Membership</button>
+</div>
+<div class="table-responsive">
+<table class="table table-bordered">
+<thead>
+<tr>
+<th>ID</th><th>Student</th><th>Plan</th><th>Batch</th>
+<th>Start</th><th>End</th><th>Amount (₹)</th><th>Status</th><th>Action</th>
+</tr>
+</thead>
+<tbody id="studentMembershipTableBody"></tbody>
+</table>
+</div>
+<div id="membershipsPagination"></div>
+</div>
+<div class="card p-3 mb-4 border-success" id="section-fees">
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+<h4 class="mb-0">📅 Fees Report</h4>
+<div class="d-flex gap-2 flex-wrap">
+<input aria-label="Report Month" class="form-control form-control-sm" id="feesReportMonth" style="width:auto;" title="Report Month" type="month"/>
+<select class="form-select form-select-sm" id="feesReportBatch" style="width:auto;">
+<option value="all">All Active Batches</option>
+</select>
+<button class="btn btn-success btn-sm" onclick="loadFeesReport()">Apply</button>
+</div>
+</div>
+<p class="text-muted small mb-2">Tracked per batch — a student in 2 batches can show as Paid for one and Pending for the other.</p>
+<div class="row g-3 align-items-center mb-2">
+<div class="col-md-5">
+<canvas height="180" id="feesPieChart"></canvas>
+</div>
+<div class="col-md-7">
+<div class="row g-2 mb-2">
+<div class="col-6">
+<div class="card p-3 text-center bg-success text-white" onclick="showFeesList('paid')" style="cursor:pointer;">
+<small>Paid</small>
+<h4 id="feesPaidCount">0</h4>
+</div>
+</div>
+<div class="col-6">
+<div class="card p-3 text-center bg-danger text-white" onclick="showFeesList('pending')" style="cursor:pointer;">
+<small>Pending</small>
+<h4 id="feesPendingCount">0</h4>
+</div>
+</div>
+</div>
+<a href="#" onclick="showAllTransactions(); return false;">🔗 Check all transactions this month</a>
+<div class="mt-2">
+<button class="btn btn-outline-danger btn-sm" onclick="remindAllPending()"><i class="bi bi-whatsapp"></i> Remind All Pending</button>
+</div>
+</div>
+</div>
+<div id="feesListArea"></div>
+</div>
+<div class="card p-3 mb-4 border-purple" style="border-color: #c4b5fd;">
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h4 class="mb-0">💰 Fee Payments</h4>
+<button class="btn btn-primary" onclick="showPaymentForm()" style="background:#c4b5fd;border-color:#c4b5fd;color:#000;">+ Record Payment</button>
+</div>
+<div class="table-responsive">
+<table class="table table-bordered">
+<thead>
+<tr>
+<th>Receipt #</th><th>Student</th><th>Amount (₹)</th>
+<th>Date</th><th>Mode</th><th>Status</th><th>Action</th>
+</tr>
+</thead>
+<tbody id="paymentTableBody"></tbody>
+</table>
+</div>
+<div id="paymentsPagination"></div>
+</div>
+<div class="card p-3 mb-4 border-warning" id="section-expenses">
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h4 class="mb-0">📊 Expense Management</h4>
+<button class="btn btn-warning text-dark" onclick="showExpenseForm()">+ Add Expense</button>
+</div>
+<!-- Filter -->
+<div class="row g-2 mb-3">
+<div class="col-md-3">
+<input class="form-control" id="expense-filter-start" placeholder="Start Date" type="date"/>
+</div>
+<div class="col-md-3">
+<input class="form-control" id="expense-filter-end" placeholder="End Date" type="date"/>
+</div>
+<div class="col-md-3">
+<select class="form-select" id="expense-filter-category">
+<option value="">All Categories</option>
+<option value="Shuttle Purchase">🏸 Shuttle Purchase</option>
+<option value="Court Maintenance">🔧 Court Maintenance</option>
+<option value="Electricity">⚡ Electricity</option>
+<option value="Water">💧 Water</option>
+<option value="Staff Salary">👨‍🏫 Staff Salary</option>
+<option value="Coach Salary">🧑‍🏫 Coach Salary</option>
+<option value="Equipment">🎯 Equipment</option>
+<option value="Cleaning">🧹 Cleaning</option>
+<option value="Repairs">🔨 Repairs</option>
+<option value="Marketing">📢 Marketing</option>
+<option value="Other">📌 Other</option>
+</select>
+</div>
+<div class="col-md-3">
+<button class="btn btn-primary w-100" onclick="loadExpenses()">Apply Filter</button>
+</div>
+</div>
+<div class="table-responsive">
+<table class="table table-bordered">
+<thead>
+<tr>
+<th>ID</th><th>Date</th><th>Category</th>
+<th>Amount (₹)</th><th>Paid To</th><th>Mode</th><th>Action</th>
+</tr>
+</thead>
+<tbody id="expenseTableBody"></tbody>
+</table>
+</div>
+<div id="expensesPagination"></div>
+</div>
+<div class="card p-3 mb-4 border-primary" id="section-announcements">
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h4 class="mb-0">
+      Announcement Management
+    </h4>
+<button class="btn btn-success" onclick="showAnnouncementForm()">
+
+      + Add Announcement
+
+    </button>
+</div>
+<div class="table-responsive">
+<table class="table table-bordered">
+<thead>
+<tr>
+<th>ID</th>
+<th>Title</th>
+<th>Message</th>
+<th>Active</th>
+<th>Marquee</th>
+<th>Alert</th>
+<th>Start</th>
+<th>End</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="announcement-body">
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+<div class="tab-pane fade" id="reportsContent" role="tabpanel">
+<!-- Student Report -->
+<div class="card p-3 mb-4">
+<h4 class="mb-3">📋 Student Report</h4>
+<div class="row g-3 mb-3">
+<div class="col-md-4">
+<select class="form-select" id="report-student">
+<option value="">Select Student</option>
+</select>
+</div>
+<div class="col-md-3">
+<input class="form-control" id="report-start" placeholder="Start Date" type="date"/>
+</div>
+<div class="col-md-3">
+<input class="form-control" id="report-end" placeholder="End Date" type="date"/>
+</div>
+<div class="col-md-2">
+<button class="btn btn-primary w-100" onclick="loadStudentReport()">Generate</button>
+</div>
+</div>
+<div id="studentReportResult" style="display:none;">
+<div class="row g-3 mb-3">
+<div class="col-md-4">
+<div class="card p-3 text-center">
+<h6>Student</h6>
+<h5 id="reportStudentName">-</h5>
+</div>
+</div>
+<div class="col-md-4">
+<div class="card p-3 text-center">
+<h6>Attendance</h6>
+<h5 id="reportAttendance">-</h5>
+</div>
+</div>
+<div class="col-md-4">
+<div class="card p-3 text-center">
+<h6>Total Paid</h6>
+<h5 id="reportTotalPaid">-</h5>
+</div>
+</div>
+</div>
+<div class="table-responsive">
+<table class="table table-bordered table-sm">
+<thead>
+<tr>
+<th>Date</th><th>Type</th><th>Details</th><th>Amount</th>
+</tr>
+</thead>
+<tbody id="reportDetailsBody"></tbody>
+</table>
+</div>
+<div class="text-end">
+<button class="btn btn-outline-success btn-sm" onclick="sendGeneratedReportEmail()"><i class="bi bi-envelope"></i> Send This Report to Student</button>
+</div>
+</div>
+</div>
+<!-- Financial Summary Report -->
+<div class="card p-3 mb-4">
+<h4 class="mb-3">💰 Financial Summary</h4>
+<div class="row g-3 mb-3">
+<div class="col-md-3">
+<input class="form-control" id="finance-report-start" type="date"/>
+</div>
+<div class="col-md-3">
+<input class="form-control" id="finance-report-end" type="date"/>
+</div>
+<div class="col-md-3">
+<button class="btn btn-primary" onclick="loadFinancialSummary()">Generate</button>
+</div>
+<div class="col-md-3">
+<button class="btn btn-success" onclick="exportFinancialCSV()">⬇️ Export CSV</button>
+</div>
+</div>
+<div id="financialSummaryResult">
+<div class="row g-3">
+<div class="col-md-3">
+<div class="card p-2 text-center bg-success text-white">
+<small>Revenue</small>
+<h5 id="fsRevenue">₹0</h5>
+</div>
+</div>
+<div class="col-md-3">
+<div class="card p-2 text-center bg-danger text-white">
+<small>Expenses</small>
+<h5 id="fsExpenses">₹0</h5>
+</div>
+</div>
+<div class="col-md-3">
+<div class="card p-2 text-center bg-primary text-white">
+<small>Profit</small>
+<h5 id="fsProfit">₹0</h5>
+</div>
+</div>
+<div class="col-md-3">
+<div class="card p-2 text-center bg-warning text-dark">
+<small>Margin</small>
+<h5 id="fsMargin">0%</h5>
+</div>
+</div>
+</div>
+<div class="table-responsive mt-3" style="max-height:320px;overflow:auto;">
+<table class="table table-sm table-hover">
+<thead class="table-light" style="position:sticky;top:0;">
+<tr><th>Type</th><th>Date</th><th>Category</th><th class="text-end">Amount</th></tr>
+</thead>
+<tbody id="financialSummaryTableBody">
+<tr><td class="text-center text-muted py-3" colspan="4">Click "Generate" to see the breakdown</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="tab-pane fade" id="notificationsContent" role="tabpanel">
+<div class="card p-3 mb-4">
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h4 class="mb-0">🔔 Notifications</h4>
+<div>
+<button class="btn btn-outline-secondary btn-sm" onclick="markAllNotificationsRead()">Mark All Read</button>
+<button class="btn btn-outline-primary btn-sm ms-2" onclick="loadNotifications()">Refresh</button>
+<button class="btn btn-outline-danger btn-sm ms-2" onclick="checkExpiringMemberships()">Check Expiring</button>
+</div>
+</div>
+<div id="notificationList">
+<p class="text-muted text-center">Loading notifications...</p>
+</div>
+</div>
+</div>
+<div class="tab-pane fade" id="auditContent" role="tabpanel">
+<div class="card p-3 mb-4">
+<h4 class="mb-3">📜 Audit Logs</h4>
+<div class="row g-3 mb-3">
+<div class="col-md-4">
+<select class="form-select" id="audit-table-filter">
+<option value="">All Tables</option>
+<option value="students">Students</option>
+<option value="bookings">Bookings</option>
+<option value="fee_payments">Fee Payments</option>
+<option value="attendance">Attendance</option>
+</select>
+</div>
+<div class="col-md-3">
+<input class="form-control" id="audit-start" type="date"/>
+</div>
+<div class="col-md-3">
+<input class="form-control" id="audit-end" type="date"/>
+</div>
+<div class="col-md-2">
+<button class="btn btn-primary w-100" onclick="loadAuditLogs()">Load</button>
+</div>
+</div>
+<div class="table-responsive">
+<table class="table table-bordered table-sm">
+<thead>
+<tr>
+<th>Time</th><th>User</th><th>Action</th>
+<th>Table</th><th>Record ID</th>
+</tr>
+</thead>
+<tbody id="auditTableBody">
+<tr><td class="text-center text-muted" colspan="5">Select filters and click Load</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+<div class="modal fade" id="studentFormModal" tabindex="-1">
+<div class="modal-dialog modal-lg modal-dialog-scrollable">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="studentFormModalTitle">Add Student</h5>
+<button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<input id="stu-id" type="hidden"/>
+<input id="stu-code" type="hidden"/>
+<div class="row g-2">
+<div class="col-md-6">
+<input class="form-control" id="stu-first" placeholder="First Name *"/>
+</div>
+<div class="col-md-6">
+<input class="form-control" id="stu-last" placeholder="Last Name"/>
+</div>
+<div class="col-md-6">
+<select class="form-select" id="stu-batch">
+<option value="">Assign to Batch (Optional)</option>
+</select>
+</div>
+<div class="col-md-6">
+<select class="form-select" id="stu-gender">
+<option value="">Gender</option>
+<option value="Male">Male</option>
+<option value="Female">Female</option>
+</select>
+</div>
+<div class="col-md-6">
+<label class="form-label small text-muted mb-0">Date of Birth</label>
+<input class="form-control" id="stu-dob" type="date"/>
+</div>
+<div class="col-md-6">
+<label class="form-label small text-muted mb-0">Joining Date</label>
+<input class="form-control" id="stu-join" type="date"/>
+</div>
+<div class="col-md-6">
+<input class="form-control" id="stu-mobile" placeholder="Mobile *"/>
+</div>
+<div class="col-md-6">
+<input class="form-control" id="stu-email" placeholder="Email"/>
+</div>
+<div class="col-md-12">
+<textarea class="form-control" id="stu-address" placeholder="Address" rows="2"></textarea>
+</div>
+<div class="col-md-4">
+<select class="form-select" id="stu-status">
+<option value="active">Active</option>
+<option value="inactive">Inactive</option>
+</select>
+</div>
+<div class="col-md-8">
+<input class="form-control" id="stu-notes" placeholder="Notes"/>
+</div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+<button class="btn btn-primary" onclick="saveStudent()">Save Student</button>
+</div>
+</div>
+</div>
+</div><div class="modal fade" id="studentDetailModal" tabindex="-1">
+<div class="modal-dialog modal-lg modal-dialog-scrollable">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Student Details</h5>
+<button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<div class="text-center mb-3">
+<img alt="Profile Photo" class="rounded-circle border" id="sd-photo" onerror="this.src='https://placehold.co/100x100/E5E7EB/6B7280?text=No+Photo'" src="" style="width:100px;height:100px;object-fit:cover;"/>
+<div class="mt-2">
+<button class="btn btn-sm btn-outline-secondary" onclick="toggleEditPhoto()">✏️ Edit Photo</button>
+</div>
+<div class="mt-2" id="sd-photo-edit" style="display:none;">
+<div class="d-flex gap-2 justify-content-center mb-2">
+<input class="form-control form-control-sm" id="sd-photo-url" placeholder="Photo URL (https://...)" style="max-width:300px;" type="text"/>
+<button class="btn btn-sm btn-primary" onclick="savePhotoUrl()">Save URL</button>
+</div>
+<div class="text-muted small mb-1">— or —</div>
+<div class="d-flex gap-2 justify-content-center align-items-center">
+<input accept="image/*" class="form-control form-control-sm" id="sd-photo-file" style="max-width:220px;" type="file"/>
+<button class="btn btn-sm btn-outline-success" onclick="uploadPrivatePhoto()"><i class="bi bi-lock"></i> Upload Private</button>
+</div>
+<div class="text-muted small mt-1">"Upload Private" stores the photo securely — nobody can view it without admin login, even via direct link.</div>
+</div>
+</div>
+<h4 class="text-center mb-1" id="sd-name"></h4>
+<div class="text-center mb-3">
+<span class="badge" id="sd-status"></span>
+</div>
+<div class="row g-2 mb-3 text-center">
+<div class="col-6">
+<a class="btn btn-outline-success w-100" href="#" id="sd-call"><i class="bi bi-telephone-fill"></i> Call</a>
+</div>
+<div class="col-6">
+<a class="btn btn-outline-success w-100" href="#" id="sd-whatsapp" target="_blank"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+</div>
+</div>
+<table class="table table-sm">
+<tr><th style="width:140px;">Mobile</th><td id="sd-mobile"></td></tr>
+<tr><th>Email</th><td id="sd-email"></td></tr>
+<tr><th>Date of Birth</th><td id="sd-dob"></td></tr>
+<tr><th>Batch Enrolled</th><td id="sd-batch"></td></tr>
+</table>
+<div class="mb-3">
+<small class="text-muted d-block mb-1">Enrolled Days</small>
+<div class="d-flex gap-2" id="sd-days"></div>
+</div>
+<ul class="nav nav-tabs mb-2">
+<li class="nav-item"><button class="nav-link active" data-bs-target="#sd-attendance-pane" data-bs-toggle="tab" type="button">Attendance (This Month)</button></li>
+<li class="nav-item"><button class="nav-link" data-bs-target="#sd-fees-pane" data-bs-toggle="tab" type="button">Fees</button></li>
+</ul>
+<div class="tab-content">
+<div class="tab-pane fade show active" id="sd-attendance-pane">
+<div class="mb-2" id="sd-attendance-summary"></div>
+<div class="table-responsive" style="max-height:200px;overflow:auto;">
+<table class="table table-sm">
+<thead><tr><th>Date</th><th>Batch</th><th>Status</th></tr></thead>
+<tbody id="sd-attendance-body"></tbody>
+</table>
+</div>
+</div>
+<div class="tab-pane fade" id="sd-fees-pane">
+<div class="mb-2" id="sd-fees-summary"></div>
+<div class="table-responsive" style="max-height:200px;overflow:auto;">
+<table class="table table-sm">
+<thead><tr><th>Date</th><th>Amount</th><th>Mode</th><th>Status</th><th>Receipt</th></tr></thead>
+<tbody id="sd-fees-body"></tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="mt-3 d-flex justify-content-end gap-2 flex-wrap">
+<button class="btn btn-outline-success btn-sm" onclick="sendWelcomeEmail()"><i class="bi bi-envelope-heart"></i> Send Welcome Email</button>
+<button class="btn btn-outline-info btn-sm" onclick="sendAttendanceReportEmail()"><i class="bi bi-envelope-check"></i> Email Attendance Report</button>
+<button class="btn btn-outline-secondary btn-sm" onclick="downloadStudentReportCSV()"><i class="bi bi-filetype-csv"></i> Download CSV</button>
+<button class="btn btn-outline-dark btn-sm" onclick="printStudentReport()"><i class="bi bi-printer"></i> Print / Save PDF</button>
+<button class="btn btn-primary btn-sm" onclick="editFromDetail()">Edit Student</button>
+</div>
+</div>
+</div>
+</div>
+</div><div class="modal fade" id="coachFormModal" tabindex="-1">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="coachFormModalTitle">Add Coach</h5>
+<button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<input id="coach-id" type="hidden"/>
+<div class="row g-2">
+<div class="col-md-6">
+<input class="form-control" id="coach-code" placeholder="Coach Code"/>
+</div>
+<div class="col-md-6">
+<input class="form-control" id="coach-name" placeholder="Name *"/>
+</div>
+<div class="col-md-6">
+<input class="form-control" id="coach-mobile" placeholder="Mobile"/>
+</div>
+<div class="col-md-6">
+<input class="form-control" id="coach-email" placeholder="Email"/>
+</div>
+<div class="col-md-6">
+<input class="form-control" id="coach-specialization" placeholder="Specialization"/>
+</div>
+<div class="col-md-6">
+<label class="form-label small text-muted mb-0">Joining Date</label>
+<input class="form-control" id="coach-join" type="date"/>
+</div>
+<div class="col-md-4">
+<select class="form-select" id="coach-status">
+<option value="active">Active</option>
+<option value="inactive">Inactive</option>
+</select>
+</div>
+<div class="col-md-8">
+<input class="form-control" id="coach-notes" placeholder="Notes"/>
+</div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+<button class="btn btn-primary" onclick="saveCoach()">Save Coach</button>
+</div>
+</div>
+</div>
+</div><div class="modal fade" id="batchFormModal" tabindex="-1">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="batchFormModalTitle">Create Batch</h5>
+<button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<input id="batch-id" type="hidden"/>
+<div class="row g-2">
+<div class="col-md-6">
+<input class="form-control" id="batch-name" placeholder="Batch Name *"/>
+</div>
+<div class="col-md-6">
+<select class="form-select" id="batch-coach">
+<option value="">Select Coach</option>
+</select>
+</div>
+<div class="col-md-4">
+<select class="form-select" id="batch-court">
+<option value="1">Court 1</option>
+<option value="2">Court 2</option>
+<option value="3">Court 3</option>
+</select>
+</div>
+<div class="col-md-4">
+<label class="form-label small text-muted mb-0">Start Time</label>
+<input class="form-control" id="batch-start" type="time"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small text-muted mb-0">End Time</label>
+<input class="form-control" id="batch-end" type="time"/>
+</div>
+<div class="col-md-6">
+<input class="form-control" id="batch-days" placeholder="Days (Mon,Wed,Fri)"/>
+</div>
+<div class="col-md-6">
+<input class="form-control" id="batch-capacity" placeholder="Capacity" type="number" value="20"/>
+</div>
+<div class="col-md-6">
+<select class="form-select" id="batch-status">
+<option value="active">Active</option>
+<option value="inactive">Inactive</option>
+</select>
+</div>
+<div class="col-md-12">
+<input class="form-control" id="batch-description" placeholder="Short description (shown on batch card)"/>
+</div>
+</div>
+<div class="mt-4" id="batchEnrolledSection" style="display:none;">
+<hr/>
+<div class="d-flex justify-content-between align-items-center mb-2">
+<h6 class="mb-0">Enrolled Students</h6>
+<button class="btn btn-outline-success btn-sm" onclick="openAssignStudentsModal(document.getElementById('batch-id').value, document.getElementById('batch-name').value)">
+<i class="bi bi-people"></i> Assign More
+            </button>
+</div>
+<div id="batch-students-list">Loading...</div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+<button class="btn btn-primary" onclick="saveBatch()">Save Batch</button>
+</div>
+</div>
+</div>
+</div><div class="modal fade" id="assignStudentsModal" tabindex="-1">
+<div class="modal-dialog modal-dialog-scrollable">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Assign Students to <span id="assignModalBatchName"></span></h5>
+<button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<input id="assign-batch-id" type="hidden"/>
+<label class="form-label small text-muted mb-0">Start Date (applies to everyone selected below)</label>
+<input class="form-control mb-3" id="assign-start" type="date"/>
+<input class="form-control mb-2" id="assign-student-search" oninput="renderAssignStudentChecklist()" placeholder="🔍 Search students..." type="text"/>
+<div class="d-flex justify-content-between align-items-center mb-2">
+<span class="text-muted small"><span id="assignSelectedCount">0</span> selected</span>
+<div>
+<button class="btn btn-link btn-sm p-0 me-2" onclick="toggleAllAssignCheckboxes(true)">Select All</button>
+<button class="btn btn-link btn-sm p-0" onclick="toggleAllAssignCheckboxes(false)">Clear</button>
+</div>
+</div>
+<div class="border rounded p-2" id="assign-student-checklist" style="max-height:260px;overflow-y:auto;"></div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+<button class="btn btn-primary" onclick="assignSelectedStudentsToBatch()">+ Assign Selected</button>
+</div>
+</div>
+</div>
+</div><div class="modal fade" id="enquiryModal" tabindex="-1">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Add New Enquiry</h5>
+<button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<input id="enq-batch-id" type="hidden"/>
+<div class="mb-2">
+<label class="form-label">Batch</label>
+<input class="form-control" id="enq-batch-name" readonly=""/>
+</div>
+<div class="mb-2">
+<label class="form-label">Student Name *</label>
+<input class="form-control" id="enq-student-name" placeholder="Student Name"/>
+</div>
+<div class="mb-2">
+<label class="form-label">Mobile</label>
+<input class="form-control" id="enq-mobile" placeholder="Mobile Number"/>
+</div>
+<div class="mb-2">
+<label class="form-label">Date of Enquiry</label>
+<input class="form-control" id="enq-date" type="date"/>
+</div>
+<div class="mb-2">
+<label class="form-label">Notes</label>
+<textarea class="form-control" id="enq-notes" placeholder="Notes" rows="2"></textarea>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+<button class="btn btn-primary" onclick="submitEnquiry()">Save Enquiry</button>
+</div>
+</div>
+</div>
+</div><div class="modal fade" id="planFormModal" tabindex="-1">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="planFormModalTitle">Add Plan</h5>
+<button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<input id="plan-id" type="hidden"/>
+<div class="row g-2">
+<div class="col-md-12">
+<input class="form-control" id="plan-name" placeholder="Plan Name * (e.g., Monthly)"/>
+</div>
+<div class="col-md-6">
+<label class="form-label small text-muted mb-0">Duration (Days) *</label>
+<input class="form-control" id="plan-duration" placeholder="e.g., 30" type="number"/>
+</div>
+<div class="col-md-6">
+<label class="form-label small text-muted mb-0">Amount (₹) *</label>
+<input class="form-control" id="plan-amount" placeholder="e.g., 1000" type="number"/>
+</div>
+<div class="col-md-8">
+<input class="form-control" id="plan-description" placeholder="Description"/>
+</div>
+<div class="col-md-4">
+<select class="form-select" id="plan-status">
+<option value="active">Active</option>
+<option value="inactive">Inactive</option>
+</select>
+</div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+<button class="btn btn-primary" onclick="savePlan()" style="background:#8b5cf6;border-color:#8b5cf6;">Save Plan</button>
+</div>
+</div>
+</div>
+</div><div class="modal fade" id="membershipEditModal" tabindex="-1">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Edit Membership</h5>
+<button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<input id="sm-id" type="hidden"/>
+<div class="row g-2">
+<div class="col-md-6">
+<select class="form-select" id="sm-student">
+<option value="">Select Student *</option>
+</select>
+</div>
+<div class="col-md-6">
+<select class="form-select" id="sm-plan">
+<option value="">Select Plan *</option>
+</select>
+</div>
+<div class="col-md-12">
+<select class="form-select" id="sm-batch">
+<option value="">Which Batch is this for? (recommended)</option>
+</select>
+</div>
+<div class="col-md-6">
+<label class="form-label small text-muted mb-0">Start Date</label>
+<input class="form-control" id="sm-start" type="date"/>
+</div>
+<div class="col-md-6">
+<select class="form-select" id="sm-status">
+<option value="active">Active</option>
+<option value="expired">Expired</option>
+<option value="cancelled">Cancelled</option>
+</select>
+</div>
+<div class="col-md-6">
+<label class="form-label small text-muted mb-0">Discount (₹)</label>
+<input class="form-control" id="sm-discount" type="number" value="0"/>
+</div>
+<div class="col-md-6">
+<label class="form-label small text-muted mb-0">Final Amount</label>
+<input class="form-control" id="sm-final-amount" readonly="" type="number"/>
+</div>
+<div class="col-md-12">
+<input class="form-control" id="sm-notes" placeholder="Notes"/>
+</div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+<button class="btn btn-primary" onclick="saveStudentMembership()" style="background:#a78bfa;border-color:#a78bfa;">Save Membership</button>
+</div>
+</div>
+</div>
+</div><div class="modal fade" id="assignMembershipModal" tabindex="-1">
+<div class="modal-dialog modal-dialog-scrollable">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Assign Membership to Students</h5>
+<button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<div class="row g-2 mb-2">
+<div class="col-md-6">
+<label class="form-label small text-muted mb-0">Plan *</label>
+<select class="form-select" id="am-plan">
+<option value="">Select Plan *</option>
+</select>
+</div>
+<div class="col-md-6">
+<label class="form-label small text-muted mb-0">Batch</label>
+<select class="form-select" id="am-batch" onchange="onAssignMembershipBatchChange()">
+<option value="">Which Batch is this for? (recommended)</option>
+</select>
+</div>
+<div class="col-md-6">
+<label class="form-label small text-muted mb-0">Start Date</label>
+<input class="form-control" id="am-start" type="date"/>
+</div>
+<div class="col-md-6">
+<label class="form-label small text-muted mb-0">Discount (₹, applies to everyone selected)</label>
+<input class="form-control" id="am-discount" type="number" value="0"/>
+</div>
+<div class="col-md-12">
+<input class="form-control" id="am-notes" placeholder="Notes (applies to everyone selected)"/>
+</div>
+</div>
+<input class="form-control mb-2" id="am-student-search" oninput="renderAssignMembershipChecklist()" placeholder="🔍 Search students..." type="text"/>
+<div class="d-flex justify-content-between align-items-center mb-2">
+<span class="text-muted small"><span id="amSelectedCount">0</span> selected</span>
+<div>
+<button class="btn btn-link btn-sm p-0 me-2" onclick="toggleAllAssignMembershipCheckboxes(true)">Select All</button>
+<button class="btn btn-link btn-sm p-0" onclick="toggleAllAssignMembershipCheckboxes(false)">Clear</button>
+</div>
+</div>
+<div class="border rounded p-2" id="am-student-checklist" style="max-height:260px;overflow-y:auto;"></div>
+<p class="text-muted small mt-2 mb-0">Selecting a batch above auto-checks students already enrolled in it (uncheck any you don't want). Students who already have an active membership for that batch are checked but disabled, so you don't double-assign.</p>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+<button class="btn btn-primary" onclick="assignSelectedMembership()" style="background:#a78bfa;border-color:#a78bfa;">+ Assign Membership</button>
+</div>
+</div>
+</div>
+</div><div class="modal fade" id="markPaidModal" tabindex="-1">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">Mark Fee as Paid</h5>
+<button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<input id="markPaidStudentId" type="hidden"/>
+<input id="markPaidMembershipId" type="hidden"/>
+<p class="mb-2">Student: <strong id="markPaidStudentName"></strong></p>
+<div class="mb-2">
+<label class="form-label">Amount (₹)</label>
+<input class="form-control" id="markPaidAmount" type="number"/>
+</div>
+<div class="mb-2">
+<label class="form-label">Payment Date</label>
+<input class="form-control" id="markPaidDate" type="date"/>
+</div>
+<div class="mb-2">
+<label class="form-label">Payment Mode</label>
+<select class="form-select" id="markPaidMode">
+<option value="cash">Cash</option>
+<option value="upi">UPI</option>
+<option value="bank_transfer">Bank Transfer</option>
+<option value="card">Card</option>
+</select>
+</div>
+<div class="mb-2">
+<label class="form-label">Remarks</label>
+<input class="form-control" id="markPaidRemarks" placeholder="Fees For ..." type="text"/>
+</div>
+<div class="mb-2 dev-only d-none">
+<label class="form-label">Override End Date <span class="text-muted small">(dev only — leave blank for normal auto-renewal)</span></label>
+<input class="form-control" id="markPaidEndDate" type="date"/>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+<button class="btn btn-success" onclick="confirmMarkPaid()">Mark Paid</button>
+</div>
+</div>
+</div>
+</div><div class="modal fade" id="transactionsModal" tabindex="-1">
+<div class="modal-dialog modal-lg modal-dialog-scrollable">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">All Transactions This Month</h5>
+<button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<table class="table table-sm">
+<thead><tr><th>Date</th><th>Student</th><th>Amount</th><th>Mode</th><th>Receipt</th></tr></thead>
+<tbody id="transactionsTableBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+</div><div class="modal fade" id="allRenewalsModal" tabindex="-1">
+<div class="modal-dialog modal-lg modal-dialog-scrollable">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">🔔 All Renewals Due</h5>
+<button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<div class="list-group" id="allRenewalsList"></div>
+</div>
+</div>
+</div>
+</div><div class="modal fade" id="allActivityModal" tabindex="-1">
+<div class="modal-dialog modal-lg modal-dialog-scrollable">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">📋 Latest 50 Activities</h5>
+<button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<ul class="list-group" id="allActivityList">
+<li class="list-group-item text-muted text-center">Loading...</li>
+</ul>
+</div>
+</div>
+</div>
+</div><div class="modal fade" id="receiptModal" tabindex="-1">
+<div class="modal-dialog modal-dialog-centered">
+<div class="modal-content">
+<div class="modal-header bg-success text-white">
+<h5 class="modal-title"><i class="bi bi-receipt"></i> Payment Receipt</h5>
+<button class="btn-close btn-close-white" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<table class="table table-sm">
+<tr><th style="width:160px;">Receipt Number</th><td><code id="rc-number"></code></td></tr>
+<tr><th>Student</th><td id="rc-student"></td></tr>
+<tr><th>Mobile</th><td id="rc-mobile"></td></tr>
+<tr><th>Fee Category</th><td id="rc-category"></td></tr>
+<tr><th>Payment Date</th><td id="rc-date"></td></tr>
+<tr><th>Payment Method</th><td id="rc-mode"></td></tr>
+<tr><th>Amount</th><td class="fw-bold text-success" id="rc-amount"></td></tr>
+<tr><th>Status</th><td id="rc-status"></td></tr>
+<tr><th>Collected By</th><td id="rc-collected"></td></tr>
+<tr><th>Remarks</th><td id="rc-remarks"></td></tr>
+</table>
+</div>
+<div class="modal-footer">
+<button class="btn btn-success btn-sm" onclick="shareReceiptWhatsApp()"><i class="bi bi-whatsapp"></i> Share</button>
+<button class="btn btn-outline-success btn-sm" onclick="sendReceiptEmail()"><i class="bi bi-send"></i> Send Email</button>
+<button class="btn btn-outline-primary btn-sm" onclick="emailReceipt()"><i class="bi bi-envelope"></i> Open in Mail App</button>
+<button class="btn btn-outline-dark btn-sm" onclick="printReceipt()"><i class="bi bi-printer"></i> Print</button>
+<button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+</div>
+</div>
+</div>
+</div><div class="modal fade" id="paymentFormModal" tabindex="-1">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="paymentFormModalTitle">Record Payment</h5>
+<button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<input id="payment-id" type="hidden"/>
+<div class="row g-2">
+<div class="col-md-6">
+<select class="form-select" id="pay-student">
+<option value="">Select Student *</option>
+</select>
+</div>
+<div class="col-md-6">
+<select class="form-select" id="pay-membership">
+<option value="">Select Membership</option>
+</select>
+</div>
+<div class="col-md-6">
+<label class="form-label small text-muted mb-0">Amount (₹) *</label>
+<input class="form-control" id="pay-amount" type="number"/>
+</div>
+<div class="col-md-6">
+<label class="form-label small text-muted mb-0">Payment Date</label>
+<input class="form-control" id="pay-date" type="date"/>
+</div>
+<div class="col-md-6">
+<select class="form-select" id="pay-mode">
+<option value="cash">Cash</option>
+<option value="upi">UPI</option>
+<option value="bank_transfer">Bank Transfer</option>
+<option value="card">Card</option>
+</select>
+</div>
+<div class="col-md-6">
+<select class="form-select" id="pay-status">
+<option value="completed">Completed</option>
+<option value="pending">Pending</option>
+<option value="failed">Failed</option>
+</select>
+</div>
+<div class="col-md-6">
+<input class="form-control" id="pay-reference" placeholder="Reference Number"/>
+</div>
+<div class="col-md-6">
+<input class="form-control" id="pay-remarks" placeholder="Remarks"/>
+</div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+<button class="btn btn-primary" onclick="savePayment()" style="background:#c4b5fd;border-color:#c4b5fd;color:#000;">Save Payment</button>
+</div>
+</div>
+</div>
+</div><div class="modal fade" id="expenseFormModal" tabindex="-1">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="expenseFormModalTitle">Add Expense</h5>
+<button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<input id="expense-id" type="hidden"/>
+<div class="row g-2">
+<div class="col-md-6">
+<label class="form-label small text-muted mb-0">Expense Date</label>
+<input class="form-control" id="expense-date" type="date"/>
+</div>
+<div class="col-md-6">
+<select class="form-select" id="expense-category">
+<option value="">Select Category *</option>
+<option value="Shuttle Purchase">🏸 Shuttle Purchase</option>
+<option value="Court Maintenance">🔧 Court Maintenance</option>
+<option value="Electricity">⚡ Electricity</option>
+<option value="Water">💧 Water</option>
+<option value="Staff Salary">👨‍🏫 Staff Salary</option>
+<option value="Coach Salary">🧑‍🏫 Coach Salary</option>
+<option value="Equipment">🎯 Equipment</option>
+<option value="Cleaning">🧹 Cleaning</option>
+<option value="Repairs">🔨 Repairs</option>
+<option value="Marketing">📢 Marketing</option>
+<option value="Other">📌 Other</option>
+</select>
+</div>
+<div class="col-md-6">
+<label class="form-label small text-muted mb-0">Amount (₹) *</label>
+<input class="form-control" id="expense-amount" type="number"/>
+</div>
+<div class="col-md-6">
+<input class="form-control" id="expense-paid-to" placeholder="Paid To"/>
+</div>
+<div class="col-md-6">
+<select class="form-select" id="expense-payment-mode">
+<option value="cash">Cash</option>
+<option value="upi">UPI</option>
+<option value="bank_transfer">Bank Transfer</option>
+<option value="card">Card</option>
+</select>
+</div>
+<div class="col-md-6">
+<input class="form-control" id="expense-reference" placeholder="Reference #"/>
+</div>
+<div class="col-md-12">
+<input class="form-control" id="expense-remarks" placeholder="Remarks"/>
+</div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+<button class="btn btn-warning text-dark" onclick="saveExpense()">Save Expense</button>
+</div>
+</div>
+</div>
+</div><div class="modal fade" id="announcementFormModal" tabindex="-1">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="announcementFormModalTitle">Add Announcement</h5>
+<button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<input id="ann-id" type="hidden"/>
+<label class="form-label small text-muted mb-0">Title</label>
+<input class="form-control mb-2" id="ann-title" placeholder="Title"/>
+<label class="form-label small text-muted mb-0">Message</label>
+<textarea class="form-control mb-2" id="ann-message" placeholder="Message"></textarea>
+<div class="row g-2">
+<div class="col-md-6">
+<label class="form-label small text-muted mb-0">Start Date</label>
+<input class="form-control" id="ann-start" type="date"/>
+</div>
+<div class="col-md-6">
+<label class="form-label small text-muted mb-0">End Date</label>
+<input class="form-control" id="ann-end" type="date"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small text-muted mb-0">Active</label>
+<select class="form-select" id="ann-active">
+<option value="true">Yes</option>
+<option value="false">No</option>
+</select>
+</div>
+<div class="col-md-4">
+<label class="form-label small text-muted mb-0">Show in Marquee</label>
+<select class="form-select" id="ann-marquee">
+<option value="false">No</option>
+<option value="true">Yes</option>
+</select>
+</div>
+<div class="col-md-4">
+<label class="form-label small text-muted mb-0">Show as Alert</label>
+<select class="form-select" id="ann-alert">
+<option value="false">No</option>
+<option value="true">Yes</option>
+</select>
+</div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+<button class="btn btn-primary" onclick="addAnnouncement()">Save Announcement</button>
+</div>
+</div>
+</div>
+</div><div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="sessionExpiredModal" tabindex="-1">
+<div class="modal-dialog modal-dialog-centered">
+<div class="modal-content border-danger border-3">
+<div class="modal-header bg-danger text-white">
+<h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill"></i> Session Expired</h5>
+</div>
+<div class="modal-body text-center py-4">
+<i class="bi bi-shield-lock text-danger" style="font-size:2.5rem;"></i>
+<p class="mt-3 mb-0">Your session has expired for security reasons.</p>
+<p class="text-muted small">Please log in again to continue. No changes made before this point were lost.</p>
+</div>
+<div class="modal-footer justify-content-center">
+<button class="btn btn-danger" onclick="window.location.reload()">Login Again</button>
+</div>
+</div>
+</div>
+</div><div class="modal fade" id="devOptionsModal" tabindex="-1">
+<div class="modal-dialog modal-dialog-centered">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">🛠️ Developer Options</h5>
+<button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<div class="form-check form-switch">
+<input class="form-check-input" id="devMailToggle" onchange="toggleDevMailMode()" type="checkbox"/>
+<label class="form-check-label" for="devMailToggle">Emails OFF (dev/testing mode)</label>
+</div>
+<p class="text-muted small mt-1 mb-3">When OFF, no real emails are sent anywhere in the app — every "Send Email" action just shows a toast instead, as if it succeeded. Turn back ON before going live.</p>
+<hr/>
+<div class="form-check form-switch">
+<input class="form-check-input" id="devModeToggle" onchange="toggleDevMode()" type="checkbox"/>
+<label class="form-check-label" for="devModeToggle">Developer Mode (show hidden dev fields/tabs)</label>
+</div>
+<p class="text-muted small mt-1 mb-2">Reveals things normal staff don't need: Notifications tab, Audit Logs tab, and the manual End Date override on Mark Paid.</p>
+<div class="d-flex gap-2 flex-wrap" id="devQuickLinks" style="display:none;">
+<button class="btn btn-sm btn-outline-secondary" onclick="switchTopTab('notifications-tab')">Go to Notifications</button>
+<button class="btn btn-sm btn-outline-secondary" onclick="switchTopTab('audit-tab')">Go to Audit Logs</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<footer class="pt-5 pb-3 text-white fw-light" style="background: black;">
+<div class="container">
+<div class="row">
+<div class="col-md-3 mb-3">
+<h5 class="text-warning">
+<i class="bi bi-trophy-fill me-2"></i> Shivani Elite Badminton Academy
+                </h5>
+<p class="text-secondary">
+                    Train, compete, and improve your game on professional badminton courts in Kanchipuram.
+                </p>
+</div>
+<div class="col-md-3 mb-3">
+<h5 class="text-warning">Quick Links</h5>
+<ul>
+<li><a class="text-white text-decoration-none" href="#about">About</a></li>
+<li><a class="text-white text-decoration-none" href="#services">Services</a></li>
+<li><a class="text-white text-decoration-none" href="#features">Features</a></li>
+<li><a class="text-white text-decoration-none" href="#pricing">Pricing</a></li>
+<!--     <li><a href="#portfolio" class="text-white text-decoration-none">Portfolio</a></li> -->
+<li><a class="text-white text-decoration-none" href="#contact">Location</a></li>
+</ul>
+</div>
+<div class="col-md-3 mb-3">
+<h5 class="text-warning">Contact</h5>
+<a class="text-white text-decoration-none" href="https://www.google.com/maps/place/Shivani+Elite+Badminton+Academy/@12.8201424,79.6901959,17z/data=!3m1!4b1!4m6!3m5!1s0x3a52c31bbe89c4cd:0x349e559ae45e732e!8m2!3d12.8201424!4d79.6901959!16s%2Fg%2F11f32wvql9?entry=ttu&amp;g_ep=EgoyMDI2MDUyNy4wIKXMDSoASAFQAw%3D%3D" target="_blank">
+<p class="mb-0"><i class="bi bi-geo-alt me-2"></i>No 57, Pallavan Nagar, Gem Nagar, Kanchipuram, Tamil Nadu - 631502  <i class="bi bi-box-arrow-up-right ms-1"></i></p>
+</a>
+<p class="mt-2"><i class="bi bi-envelope"></i><a class="ms-2 text-decoration-none text-light" href="mailto:sbakpm@gmail.com">sbakpm@gmail.com</a></p>
+<p><i class="bi bi-phone-flip"></i><a class="ms-2 text-decoration-none text-light" href="tel:04412345678">04412345678</a></p>
+<p><i class="bi bi-telephone"></i> <a class="ms-2 text-decoration-none text-light" href="tel:+919840253589">+919840253589</a></p>
+</div>
+<div class="col-md-3 mb-3">
+<h5 class="text-warning">Quick Links</h5>
+<ul>
+<li><a class="text-white text-decoration-none" href="/pages/terms-conditions">Terms and Conditions</a></li>
+<li><a class="text-white text-decoration-none" href="/pages/privacy-policy">Privacy Policy</a></li>
+<li><a class="text-white text-decoration-none" href="/pages/coaching">Coaching</a></li>
+<li><a class="text-white text-decoration-none" href="/pages/bulk-booking">Bulk Booking</a></li>
+<!--  <li><a href="/pages/photo-gallery" class="text-white text-decoration-none">Photo Gallery</a></li> -->
+</ul>
+</div>
+</div>
+<hr style="border-color: rgba(255,255,255,0.2);"/>
+<!-- Social Media Icons -->
+<div class="text-center mb-3 social-icons">
+<i class="bi bi-facebook fs-3 me-3" onclick="window.open('https://www.facebook.com/shivani_elitesports_academy','_blank')" style="color:#1877F2; cursor:pointer;"></i>
+<i class="bi bi-instagram fs-3 me-3" onclick="window.open('https://www.instagram.com/shivani_elitesports_academy/','_blank')" style="color:#E1306C; cursor:pointer;"></i>
+<i class="bi bi-youtube fs-3" onclick="window.open('https://www.youtube.com/@shivani_elitesports_academy','_blank')" style="color:#FF0000; cursor:pointer;"></i>
+<!-- <i class="bi bi-twitter fs-3 me-3" style="color:#1DA1F2; cursor:pointer;"
+                onclick="window.open('https://www.twitter.com/shivani_elitesports_academy','_blank')"></i>     -->
+</div>
+<hr style="border-color: rgba(255,255,255,0.2);"/>
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-center p-4 text-center text-md-start">
+<p class="mb-2 mb-md-0 text-secondary small" onclick="handleDevTrigger()" style="cursor:default;">© 2026 Shivani Elite Badminton Academy | All rights reserved.</p>
+<p class="mb-0 text-secondary small">Made with ❤️ in India</p>
+</div>
+</div>
+<div class="d-none">
+  <!-- whatsapp --><a class="btn btn-success btn-lg shadow" href="https://wa.me/+919840253589" style="position:fixed;bottom:20px;right:20px;border-radius:50px;" target="_blank"><i class="bi bi-whatsapp"></i></a>
+  <!-- callnow -->
+  <a class="btn btn-success position-fixed bottom-0 start-0 m-3 d-md-none" href="tel:+919840253589"><i class="bi bi-telephone-fill"></i></a>
+  <!-- -->
+  <!-- BACK TO TOP BUTTON (Bootstrap Only) -->
+  <button class="btn btn-primary shadow" id="backToTop">
+  <i class="bi bi-arrow-up"></i>
+  </button>
+</div>
+</footer>
+
+</main>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/core.js"></script>
+<script src="/js/shared-utils.js"></script>
+<script src="/js/auth-academy.js"></script>
+<script src="/js/coaches.js"></script>
+<script src="/js/batches.js"></script>
+<script src="/js/attendance.js"></script>
+<script src="/js/students.js"></script>
+<script src="/js/announcements.js"></script>
+<script src="/js/plans.js"></script>
+<script src="/js/memberships.js"></script>
+<script src="/js/payments.js"></script>
+<script src="/js/dropdown-helpers.js"></script>
+<script src="/js/expenses.js"></script>
+<script src="/js/financial-dashboard.js"></script>
+<script src="/js/dashboard.js"></script>
+<script src="/js/reports.js"></script>
+<script src="/js/notifications.js"></script>
+<script src="/js/audit.js"></script>
+<script src="/js/back-to-top.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>

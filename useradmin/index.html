@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login - Shivani Elite</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link href="/theme.css" rel="stylesheet">
+</head>
+<body>
+
+<div id="toast" style="position:fixed;top:20px;right:20px;z-index:99999;"></div>
+
+<div class="container py-5">
+
+  <!-- LOGIN -->
+  <div id="login-box" class="card p-4 mx-auto w-100" style="max-width: 400px;">
+    <h5 class="mb-3 text-center">🏸 Shivani Elite Admin Login</h5>
+    <label for="email" class="form-label small text-muted">Email</label>
+    <input type="email" id="email" class="form-control mb-3" placeholder="you@example.com" autocomplete="username">
+    <label for="password" class="form-label small text-muted">Password</label>
+    <input type="password" id="password" class="form-control mb-3" placeholder="Enter your password" autocomplete="current-password">
+    <button class="btn btn-primary btn-lg w-100" onclick="login()">Login</button>
+  </div>
+
+  <!-- PRODUCT PICKER -->
+  <div id="picker" style="display:none;">
+    <h4 class="text-center mb-4">Choose a Product</h4>
+    <div class="row g-4 justify-content-center">
+
+      <div class="col-12 col-md-5">
+        <a href="/booking-admin" class="text-decoration-none">
+          <div class="card p-4 text-center h-100">
+            <div style="font-size:3rem;">🏸</div>
+            <h5 class="mt-2 mb-1">Court Booking Admin</h5>
+            <p class="text-muted small mb-0">Slots, bookings, court dashboard</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-12 col-md-5">
+        <a href="/academy-admin" class="text-decoration-none">
+          <div class="card p-4 text-center h-100">
+            <div style="font-size:3rem;">🎓</div>
+            <h5 class="mt-2 mb-1">Academy Admin</h5>
+            <p class="text-muted small mb-0">Students, batches, fees, attendance</p>
+          </div>
+        </a>
+      </div>
+
+    </div>
+    <div class="text-center mt-4">
+      <button class="btn btn-outline-danger btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function showToast(msg, type = "success") {
+  const colors = { success: "#198754", error: "#dc3545", warning: "#ffc107" };
+  const el = document.createElement("div");
+  el.textContent = msg;
+  el.style.cssText = `background:${colors[type]||colors.success};color:#fff;padding:10px 16px;border-radius:8px;margin-top:8px;box-shadow:0 4px 12px rgba(0,0,0,.15);`;
+  document.getElementById("toast").appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+async function login() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const response = await fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+
+  if (!response.ok) {
+    showToast("Invalid login", "error");
+    return;
+  }
+
+  showPicker();
+}
+
+async function logout() {
+  await fetch('/api/logout');
+  location.reload();
+}
+
+function showPicker() {
+  document.getElementById("login-box").style.display = "none";
+  document.getElementById("picker").style.display = "block";
+}
+
+async function checkUser() {
+  const response = await fetch('/api/me', { credentials: "include" });
+  if (response.status === 401) {
+    document.getElementById("login-box").style.display = "block";
+    return;
+  }
+  showPicker();
+}
+
+checkUser();
+</script>
+
+</body>
+</html>
