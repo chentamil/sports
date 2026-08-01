@@ -1,0 +1,334 @@
+/* ============================================================
+   theme.css — design system for Shivani Elite Academy
+   Bootstrap 5.2.3 stays for: grid, utilities, modal, collapse, offcanvas.
+   Everything visual (color, radius, shadow, spacing, typography) is
+   overridden here. Safe to remove this one file to fully revert.
+   ============================================================ */
+
+:root {
+  /* ---- Color: kept close to the app's existing green brand accent,
+     just tuned for contrast + a fuller supporting palette ---- */
+  --color-primary: #198754;
+  --color-primary-dark: #146c43;
+  --color-primary-light: #d1e7dd;
+  --color-accent: #0d6efd;
+  --color-warning: #f59e0b;
+  --color-danger: #dc3545;
+  --color-success: #198754;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f8f9fa;
+  --color-border: #e5e7eb;
+  --color-text: #1f2937;
+  --color-text-muted: #6b7280;
+
+  /* ---- Spacing: 8px base scale ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+  --space-6: 48px;
+
+  /* ---- Shape ---- */
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-pill: 999px;
+
+  /* ---- Elevation (soft, layered shadows, not harsh drop-shadows) ---- */
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.08);
+  --shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.12);
+
+  /* ---- Motion ---- */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 220ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ---- Touch targets ---- */
+  --tap-target: 44px;
+
+  /* ---- Typography ---- */
+  --font-body: 'Poppins', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--color-surface-alt);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* ============================================================
+   BUTTONS — premium feel: soft shadow, spring-like press, min tap size
+   ============================================================ */
+.btn {
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  padding: 10px 18px;
+  min-height: var(--tap-target);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
+  border-width: 1.5px;
+}
+.btn:active {
+  transform: scale(0.97);
+}
+.btn-sm {
+  min-height: 36px;
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+.btn-primary {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+.btn-primary:hover, .btn-primary:focus {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  box-shadow: var(--shadow-md);
+}
+.btn-success {
+  background: var(--color-success);
+  border-color: var(--color-success);
+}
+.btn-outline-primary, .btn-outline-success, .btn-outline-secondary,
+.btn-outline-danger, .btn-outline-warning, .btn-outline-dark, .btn-outline-info {
+  background: var(--color-surface);
+}
+
+/* Floating action button */
+.fab {
+  position: fixed;
+  right: var(--space-4);
+  bottom: calc(var(--space-4) + 64px); /* clears bottom nav on mobile */
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  box-shadow: var(--shadow-lg);
+  z-index: 1040;
+  transition: transform var(--transition-fast);
+}
+.fab:active {
+  transform: scale(0.94);
+}
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* ============================================================
+   FORMS — larger tap targets, clearer focus states
+   ============================================================ */
+.form-control, .form-select {
+  border-radius: var(--radius-sm);
+  border-color: var(--color-border);
+  min-height: var(--tap-target);
+  padding: 10px 14px;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+.form-label {
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+/* Visible focus ring everywhere (accessibility: keyboard navigation) */
+a:focus-visible, button:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+  outline: 3px solid var(--color-primary-light);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   BADGES
+   ============================================================ */
+.badge {
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.01em;
+}
+
+/* ============================================================
+   ALERTS
+   ============================================================ */
+.alert {
+  border: none;
+  border-radius: var(--radius-sm);
+  border-left: 4px solid transparent;
+  box-shadow: var(--shadow-sm);
+}
+.alert-success { border-left-color: var(--color-success); }
+.alert-warning { border-left-color: var(--color-warning); }
+.alert-danger  { border-left-color: var(--color-danger); }
+.alert-info    { border-left-color: var(--color-accent); }
+
+/* ============================================================
+   TABLES — clean, breathable; card-style rows on small screens
+   ============================================================ */
+.table {
+  --bs-table-border-color: var(--color-border);
+}
+.table thead th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  border-bottom-width: 1px;
+  background: var(--color-surface-alt);
+}
+
+@media (max-width: 576px) {
+  /* Responsive card-style table rows on phones — no horizontal scrolling */
+  .table-responsive-cards thead {
+    display: none;
+  }
+  .table-responsive-cards, .table-responsive-cards tbody, .table-responsive-cards tr, .table-responsive-cards td {
+    display: block;
+    width: 100%;
+  }
+  .table-responsive-cards tr {
+    margin-bottom: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-2);
+  }
+  .table-responsive-cards td {
+    border: none;
+    padding: 6px var(--space-2);
+    text-align: right;
+  }
+  .table-responsive-cards td::before {
+    content: attr(data-label);
+    float: left;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+  }
+}
+
+/* ============================================================
+   MODALS — feel like native bottom sheets on mobile
+   ============================================================ */
+.modal-content {
+  border: none;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+}
+@media (max-width: 576px) {
+  .modal.fade .modal-dialog {
+    transition: transform var(--transition-base);
+  }
+  .modal-dialog {
+    margin: 0;
+    display: flex;
+    align-items: flex-end;
+    min-height: 100vh;
+  }
+  .modal-content {
+    width: 100%;
+    max-height: 92vh;
+    border-radius: var(--radius) var(--radius) 0 0;
+    overflow-y: auto;
+  }
+  /* Drag-handle affordance, purely visual (no swipe-to-dismiss logic added) */
+  .modal-header::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    border-radius: var(--radius-pill);
+    background: var(--color-border);
+  }
+  .modal-header {
+    position: relative;
+    padding-top: 20px;
+  }
+}
+
+/* ============================================================
+   NAV / STICKY HEADER / BOTTOM NAV
+   ============================================================ */
+.navbar {
+  box-shadow: var(--shadow-sm);
+}
+nav.fixed-bottom {
+  box-shadow: 0 -2px 12px rgba(16, 24, 40, 0.08);
+}
+nav.fixed-bottom .btn, nav.fixed-bottom button {
+  min-height: var(--tap-target);
+}
+
+/* ============================================================
+   TOASTS — snackbar feel (slide up, rounded, colored left border)
+   ============================================================ */
+.toast, .app-toast {
+  border-radius: var(--radius-sm);
+  border: none;
+  box-shadow: var(--shadow-lg);
+  border-left: 4px solid var(--color-primary);
+}
+
+/* ============================================================
+   SKELETON LOADERS
+   ============================================================ */
+.skeleton {
+  background: linear-gradient(90deg, var(--color-border) 25%, #f0f0f0 37%, var(--color-border) 63%);
+  background-size: 400% 100%;
+  animation: skeleton-shimmer 1.4s ease infinite;
+  border-radius: var(--radius-sm);
+}
+@keyframes skeleton-shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+/* ============================================================
+   MICRO-INTERACTIONS
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  .card, .btn, .modal-content {
+    animation: fade-in-up var(--transition-base) both;
+  }
+}
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Respect reduced-motion preference everywhere */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
