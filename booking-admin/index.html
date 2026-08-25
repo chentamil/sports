@@ -520,6 +520,85 @@
   transform: scale(1.2);
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
+
+/* Enhanced modal styles */
+#slotDetailsModal .modal-lg {
+  max-width: 700px;
+}
+
+#slotDetailsModal .detail-item {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 100%;
+}
+
+#slotDetailsModal .detail-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+#slotDetailsModal .modal-content {
+  animation: modalSlideIn 0.3s ease;
+}
+
+#slotEditForm .form-control,
+#slotEditForm .form-select {
+  border-radius: 10px;
+  border: 2px solid #e2e8f0;
+  transition: border-color 0.2s ease;
+}
+
+#slotEditForm .form-control:focus,
+#slotEditForm .form-select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+#slotEditForm label {
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Status dot enhancements */
+.status-dot {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+}
+
+.status-dot:hover {
+  transform: scale(1.2);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Form transition */
+#slotEditForm {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 /* Click dot for details css modal ends here */
 
 /* Hide the main table but keep functionality */
@@ -1400,9 +1479,10 @@
 </div>
 </div>
 </div>
-<!-- Slot Details Modal - For Availability Dashboard -->
+
+<!-- Slot Details Modal - With Edit Functionality -->
 <div class="modal fade" id="slotDetailsModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content border-0 shadow-lg" style="border-radius:20px;">
       <div class="modal-header" style="border-bottom:2px solid #f1f5f9; padding:1.25rem 1.5rem;">
         <h5 class="modal-title fw-bold">
@@ -1414,16 +1494,74 @@
         <div id="slotDetailsContent">
           <!-- Dynamically populated -->
         </div>
+        <!-- Edit Form (hidden by default) -->
+        <div id="slotEditForm" style="display:none;">
+          <input type="hidden" id="edit-slot-id">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Date</label>
+              <input class="form-control" id="edit-slot-date" type="date">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Court</label>
+              <select class="form-select" id="edit-slot-court">
+                <option value="1">Court 1</option>
+                <option value="2">Court 2</option>
+                <option value="3">Court 3</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Start Time</label>
+              <div class="d-flex gap-2">
+                <select class="form-select" id="edit-slot-start"></select>
+                <select class="form-select" id="edit-slot-start-period" style="max-width:90px;">
+                  <option value="AM">AM</option>
+                  <option value="PM">PM</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">End Time</label>
+              <div class="d-flex gap-2">
+                <select class="form-select" id="edit-slot-end"></select>
+                <select class="form-select" id="edit-slot-end-period" style="max-width:90px;">
+                  <option value="AM">AM</option>
+                  <option value="PM">PM</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Price</label>
+              <input class="form-control" id="edit-slot-price" type="number" value="400">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Status</label>
+              <select class="form-select" id="edit-slot-status">
+                <option value="available">Available</option>
+                <option value="booked">Booked</option>
+                <option value="closed">Closed</option>
+                <option value="disabled">Disabled</option>
+              </select>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="modal-footer" style="border-top:2px solid #f1f5f9; padding:1rem 1.5rem;">
         <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button class="btn btn-primary" id="slotDetailsEditBtn" onclick="openSlotForEditing()">
+        <button class="btn btn-primary" id="slotDetailsEditBtn" onclick="toggleSlotEditMode()">
           <i class="bi bi-pencil me-1"></i> Edit Slot
+        </button>
+        <button class="btn btn-success" id="slotDetailsSaveBtn" style="display:none;" onclick="saveSlotEdit()">
+          <i class="bi bi-check-circle me-1"></i> Save Changes
+        </button>
+        <button class="btn btn-secondary" id="slotDetailsCancelBtn" style="display:none;" onclick="cancelSlotEdit()">
+          Cancel
         </button>
       </div>
     </div>
   </div>
 </div>
+
 <footer class="pt-5 pb-3 text-white fw-light" style="background: black;">
 <div class="container">
 <div class="row">

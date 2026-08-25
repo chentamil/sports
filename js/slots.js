@@ -1213,11 +1213,12 @@ function renderAvailabilityChart() {
 }
 
 // =========================
-// SLOT DETAILS MODAL
+// SLOT DETAILS MODAL WITH EDIT
 // =========================
 
-// Store the currently viewed slot ID for edit functionality
+// Store the currently viewed slot ID
 let currentViewSlotId = null;
+let isEditMode = false;
 
 function showSlotDetails(slotId) {
   // Find the slot in allData
@@ -1228,9 +1229,14 @@ function showSlotDetails(slotId) {
   }
   
   currentViewSlotId = slotId;
+  isEditMode = false;
   
   // Get the modal instance
   const modal = new bootstrap.Modal(document.getElementById('slotDetailsModal'));
+  
+  // Generate time options for edit form
+  generateTimeOptions("edit-slot-start");
+  generateTimeOptions("edit-slot-end");
   
   // Build the details HTML
   const statusColors = {
@@ -1254,8 +1260,12 @@ function showSlotDetails(slotId) {
     'disabled': 'Disabled'
   };
   
+  // Parse time for display
+  const startTime = slot.start_time || '';
+  const endTime = slot.end_time || '';
+  
   const content = `
-    <div class="slot-details">
+    <div class="slot-details" id="slotDetailsView">
       <div class="row g-3">
         <div class="col-6">
           <div class="detail-item p-3 rounded-3" style="background:#f8fafc;">
@@ -1272,13 +1282,13 @@ function showSlotDetails(slotId) {
         <div class="col-6">
           <div class="detail-item p-3 rounded-3" style="background:#f8fafc;">
             <div class="text-muted small fw-semibold text-uppercase" style="font-size:0.65rem;letter-spacing:0.5px;">Start Time</div>
-            <div class="fw-bold fs-5">🕐 ${slot.start_time || 'N/A'}</div>
+            <div class="fw-bold fs-5">🕐 ${startTime || 'N/A'}</div>
           </div>
         </div>
         <div class="col-6">
           <div class="detail-item p-3 rounded-3" style="background:#f8fafc;">
             <div class="text-muted small fw-semibold text-uppercase" style="font-size:0.65rem;letter-spacing:0.5px;">End Time</div>
-            <div class="fw-bold fs-5">🕐 ${slot.end_time || 'N/A'}</div>
+            <div class="fw-bold fs-5">🕐 ${endTime || 'N/A'}</div>
           </div>
         </div>
         <div class="col-6">
@@ -1324,52 +1334,196 @@ function showSlotDetails(slotId) {
   // Set the content
   document.getElementById('slotDetailsContent').innerHTML = content;
   
+  // Hide edit form, show view
+  document.getElementById('slotEditForm').style.display = 'none';
+  document.getElementById('slotDetailsView').style.display = 'block';
+  
+  // Show Edit button, hide Save/Cancel buttons
+  document.getElementById('slotDetailsEditBtn').style.display = 'inline-block';
+  document.getElementById('slotDetailsSaveBtn').style.display = 'none';
+  document.getElementById('slotDetailsCancelBtn').style.display = 'none';
+  
   // Show the modal
   modal.show();
 }
 
-// Function to open the slot in the main edit table
-function openSlotForEditing() {
-  if (!currentViewSlotId) {
-    showToast("No slot selected", "warning");
+// Toggle between view and edit mode
+function toggleSlotEditMode() {
+  if (isEditMode) {
+    // If already in edit mode, just return
     return;
   }
   
-  // Close the modal
-  const modal = bootstrap.Modal.getInstance(document.getElementById('slotDetailsModal'));
-  if (modal) modal.hide();
+  isEditMode = true;
   
-  // Find the slot in the table and scroll to it
-  const row = document.querySelector(`.slot-checkbox[data-id="${currentViewSlotId}"]`);
-  if (row) {
-    const tableContainer = row.closest('.table-responsive');
-    if (tableContainer) {
-      // Scroll the container to the row
-      const rowElement = row.closest('tr');
-      if (rowElement) {
-        // Highlight the row
-        rowElement.style.transition = 'background 0.3s ease';
-        rowElement.style.background = '#dbeafe';
-        setTimeout(() => {
-          rowElement.style.background = '';
-        }, 3000);
-        
-        // Scroll to row
-        rowElement.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'center',
-          inline: 'nearest'
-        });
-      }
-    }
-    showToast(`Jumped to Slot #${currentViewSlotId}`, "success");
-  } else {
-    showToast("Slot not found in table", "warning");
+  // Find the slot
+  const slot = allData.find(s => s.id === currentViewSlotId);
+  if (!slot) {
+    showToast("Slot not found", "error");
+    return;
   }
+  
+  // Hide view, show edit form
+  document.getElementById('slotDetailsView').style.display = 'none';
+  document.getElementById('slotEditForm').style.display = 'block';
+  
+  // Populate edit form with current values
+  document.getElementById('edit-slot-id').value = slot.id;
+  document.getElementById('edit-slot-date').value = slot.date || '';
+  document.getElementById('edit-slot-court').value = slot.court_id || 1;
+  document.getElementById('edit-slot-price').value = slot.price || 400;
+  document.getElementById('edit-slot-status').value = slot.status || 'available';
+  
+  // Parse and set time values
+  if (slot.start_time) {
+    const startParts = parseTimeString(slot.start_time);
+    document.getElementById('edit-slot-start').value = startParts.time;
+    document.getElementById('edit-slot-start-period').value = startParts.period;
+  }
+  
+  if (slot.end_time) {
+    const endParts = parseTimeString(slot.end_time);
+    document.getElementById('edit-slot-end').value = endParts.time;
+    document.getElementById('edit-slot-end-period').value = endParts.period;
+  }
+  
+  // Hide Edit button, show Save/Cancel buttons
+  document.getElementById('slotDetailsEditBtn').style.display = 'none';
+  document.getElementById('slotDetailsSaveBtn').style.display = 'inline-block';
+  document.getElementById('slotDetailsCancelBtn').style.display = 'inline-block';
+}
+
+// Cancel edit mode
+function cancelSlotEdit() {
+  isEditMode = false;
+  
+  // Show view, hide edit form
+  document.getElementById('slotDetailsView').style.display = 'block';
+  document.getElementById('slotDetailsEditForm').style.display = 'none';
+  
+  // Show Edit button, hide Save/Cancel buttons
+  document.getElementById('slotDetailsEditBtn').style.display = 'inline-block';
+  document.getElementById('slotDetailsSaveBtn').style.display = 'none';
+  document.getElementById('slotDetailsCancelBtn').style.display = 'none';
+}
+
+// Save edited slot
+async function saveSlotEdit() {
+  const id = parseInt(document.getElementById('edit-slot-id').value);
+  const date = document.getElementById('edit-slot-date').value;
+  const court_id = document.getElementById('edit-slot-court').value;
+  const price = document.getElementById('edit-slot-price').value;
+  const status = document.getElementById('edit-slot-status').value;
+  
+  // Get start time with period
+  const startTime = document.getElementById('edit-slot-start').value;
+  const startPeriod = document.getElementById('edit-slot-start-period').value;
+  const start_time = `${startTime}${startPeriod}`;
+  
+  // Get end time with period
+  const endTime = document.getElementById('edit-slot-end').value;
+  const endPeriod = document.getElementById('edit-slot-end-period').value;
+  const end_time = `${endTime}${endPeriod}`;
+  
+  // Validate
+  if (!date || !startTime || !endTime) {
+    showToast("Please fill all required fields", "warning");
+    return;
+  }
+  
+  // Check for duplicate (excluding current slot)
+  const duplicate = allData.find(s => 
+    s.id !== id &&
+    s.date === date &&
+    String(s.court_id) === String(court_id) &&
+    s.start_time === start_time
+  );
+  
+  if (duplicate) {
+    showToast("Another slot already exists at this time on this court", "warning");
+    return;
+  }
+  
+  // Prepare update data
+  const updateData = {
+    date: date,
+    court_id: court_id,
+    start_time: start_time,
+    end_time: end_time,
+    time: `${start_time} - ${end_time}`,
+    price: price,
+    status: status
+  };
+  
+  try {
+    // Send update to server
+    const response = await fetch('/api/admin', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        action: 'update',
+        id: id,
+        data: updateData
+      })
+    });
+    
+    if (!response.ok) {
+      showToast("Update failed", "error");
+      return;
+    }
+    
+    showToast("Slot updated successfully!", "success");
+    
+    // Close the modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('slotDetailsModal'));
+    if (modal) modal.hide();
+    
+    // Reload data
+    await loadSlots();
+    
+    // Refresh the availability chart
+    renderAvailabilityChart();
+    
+  } catch (err) {
+    console.error(err);
+    showToast("Error updating slot", "error");
+  }
+}
+
+// Helper function to parse time string like "10:00AM" into {time: "10:00", period: "AM"}
+function parseTimeString(timeStr) {
+  if (!timeStr) return { time: '12:00', period: 'AM' };
+  
+  const clean = timeStr.trim().toUpperCase();
+  let period = 'AM';
+  let time = clean;
+  
+  if (clean.includes('PM')) {
+    period = 'PM';
+    time = clean.replace('PM', '');
+  } else if (clean.includes('AM')) {
+    period = 'AM';
+    time = clean.replace('AM', '');
+  }
+  
+  // Ensure time has colon format
+  if (!time.includes(':')) {
+    // If it's like "100", convert to "1:00"
+    if (time.length <= 2) {
+      time = `${time}:00`;
+    } else {
+      const hours = time.slice(0, -2);
+      const mins = time.slice(-2);
+      time = `${hours}:${mins}`;
+    }
+  }
+  
+  return { time: time.trim(), period: period };
 }
 
 // Keep the old function for backward compatibility (optional)
 function scrollToSlotRow(slotId) {
   showSlotDetails(slotId);
 }
-
