@@ -978,6 +978,42 @@ updateFilterButtonStyles();
   }
 
 // ---- Visual Availability Chart (V5 Executive Dashboard) ----
+// =========================
+// TIME SORTING HELPERS
+// =========================
+
+/**
+ * Converts a 12-hour time string to minutes since midnight for sorting
+ * @param {string} timeStr - Time in format like "10:00AM", "10:00 PM", "12:30PM"
+ * @returns {number} - Minutes since midnight (0-1439)
+ */
+function timeToMinutes(timeStr) {
+  if (!timeStr) return 0;
+  
+  const clean = timeStr.replace(/\s/g, '').toUpperCase();
+  const isPM = clean.includes('PM');
+  const isAM = clean.includes('AM');
+  
+  const timeOnly = clean.replace(/[AP]M$/, '');
+  const [hours, minutes = 0] = timeOnly.split(':').map(Number);
+  
+  let hour24 = hours;
+  if (isPM && hours !== 12) hour24 += 12;
+  if (isAM && hours === 12) hour24 = 0;
+  
+  return hour24 * 60 + minutes;
+}
+
+/**
+ * Compare two time strings for sorting
+ * @param {string} a - First time string
+ * @param {string} b - Second time string
+ * @returns {number} - Negative if a < b, positive if a > b, 0 if equal
+ */
+function compareTimes(a, b) {
+  return timeToMinutes(a) - timeToMinutes(b);
+}
+// helper ends
 function renderAvailabilityChart() {
   const dateInput = document.getElementById("chart-date");
   const date = dateInput.value || new Date().toLocaleDateString('sv-SE');
