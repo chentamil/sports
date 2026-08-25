@@ -1743,3 +1743,13 @@ function parseTimeString(timeStr) {
 function scrollToSlotRow(slotId) {
   showSlotDetails(slotId);
 }
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Load slots first, then bookings
+  loadSlots().then(() => {
+    if (typeof loadBookings === 'function') {
+      loadBookings();
+    }
+  });
+});
