@@ -1367,15 +1367,18 @@ function showSlotDetails(slotId) {
   // Show/Hide action buttons based on status
   const deleteBtn = document.getElementById('slotDetailsDeleteBtn');
   const bookBtn = document.getElementById('slotDetailsBookBtn');
-  
+  const viewBookingBtn = document.getElementById('slotDetailsViewBookingBtn');
+
   // Show delete button always (but with confirmation)
   deleteBtn.style.display = 'inline-block';
-  
+
   // Show Book button only if slot is NOT booked
   if (slot.status === 'booked') {
     bookBtn.style.display = 'none';
+    viewBookingBtn.style.display = 'inline-block';
   } else {
     bookBtn.style.display = 'inline-block';
+    viewBookingBtn.style.display = 'none';
   }
   
   // Show Edit button, hide Save/Cancel buttons
@@ -1427,9 +1430,10 @@ function toggleSlotEditMode() {
     document.getElementById('edit-slot-end-period').value = endParts.period;
   }
   
-  // Hide action buttons (Delete, Book) and Edit button
+  // Hide action buttons (Delete, Book, ViewBooking) and Edit button
   document.getElementById('slotDetailsDeleteBtn').style.display = 'none';
   document.getElementById('slotDetailsBookBtn').style.display = 'none';
+  document.getElementById('slotDetailsViewBookingBtn').style.display = 'none';
   document.getElementById('slotDetailsEditBtn').style.display = 'none';
   
   // Show Save/Cancel buttons
@@ -1454,8 +1458,10 @@ function cancelSlotEdit() {
     // Show Book button only if not booked
     if (slot.status === 'booked') {
       document.getElementById('slotDetailsBookBtn').style.display = 'none';
+      document.getElementById('slotDetailsViewBookingBtn').style.display = 'inline-block';
     } else {
       document.getElementById('slotDetailsBookBtn').style.display = 'inline-block';
+      document.getElementById('slotDetailsViewBookingBtn').style.display = 'none';
     }
   }
   
@@ -1749,6 +1755,32 @@ function bookSlotFromModal() {
   // Small delay to allow slot modal to close first
   setTimeout(() => {
     openBookingModal(currentViewSlotId);
+  }, 300);
+}
+
+// View booking from modal - opens the existing booking details modal
+function viewBookingFromModal() {
+  if (!currentViewSlotId) {
+    showToast("No slot selected", "warning");
+    return;
+  }
+  
+  // Find the booking for this slot
+  const booking = window.allBookings?.find(b => b.slot_id == currentViewSlotId);
+  
+  if (!booking) {
+    showToast("No booking found for this slot", "warning");
+    return;
+  }
+  
+  // Close the slot details modal
+  const modal = bootstrap.Modal.getInstance(document.getElementById('slotDetailsModal'));
+  if (modal) modal.hide();
+  
+  // Small delay to allow slot modal to close first
+  setTimeout(() => {
+    // Use the existing viewBookingDetails function with the slot ID
+    viewBookingDetails(currentViewSlotId);
   }, 300);
 }
 

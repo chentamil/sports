@@ -153,13 +153,26 @@ function viewBookingDetails(slotId) {
   };
 
   document.getElementById("view-delete-btn").onclick = () => {
+    // Close the view modal
     bootstrap.Modal.getInstance(document.getElementById("viewBookingModal")).hide();
+    // Also close the slot details modal if it's open
+    const slotModal = bootstrap.Modal.getInstance(document.getElementById('slotDetailsModal'));
+    if (slotModal) slotModal.hide();
+    // Then delete
     deleteBooking(booking.id);
   };
 
-  new bootstrap.Modal(
-    document.getElementById("viewBookingModal")
-  ).show();
+  // Show the modal
+  const viewModal = new bootstrap.Modal(document.getElementById("viewBookingModal"));
+  viewModal.show();
+
+  // When the view modal is hidden, refresh the slot details if slot modal is open
+  document.getElementById("viewBookingModal").addEventListener('hidden.bs.modal', function() {
+    // Refresh the availability chart and slot data
+    if (typeof renderAvailabilityChart === 'function') {
+      renderAvailabilityChart();
+    }
+  }, { once: true });
 }
 
 // Booking Modal starts here
@@ -383,8 +396,20 @@ async function deleteBooking(id) {
     sendMail(booking.customer_email, "Booking Cancelled - Shivani Elite Badminton Academy", html);
   }
 
+  // Close any open modals
+  const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewBookingModal'));
+  if (viewModal) viewModal.hide();
+
+  const slotModal = bootstrap.Modal.getInstance(document.getElementById('slotDetailsModal'));
+  if (slotModal) slotModal.hide();
+
   loadBookings();
   loadSlots();
+
+  // Refresh the availability chart
+  if (typeof renderAvailabilityChart === 'function') {
+    setTimeout(renderAvailabilityChart, 500);
+  }
 }
 
 // EXPORT BOOKINGS AS CSV

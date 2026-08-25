@@ -662,6 +662,21 @@
   }
 }
 
+/* View Booking button style */
+#slotDetailsViewBookingBtn {
+  background: #0dcaf0;
+  border-color: #0dcaf0;
+  color: #000;
+}
+
+#slotDetailsViewBookingBtn:hover {
+  background: #31d2f2;
+  border-color: #25cff2;
+  color: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(13, 202, 240, 0.3);
+}
+
 
 </style>
 <div id="toast" style="
@@ -1603,6 +1618,9 @@
           </button>
           <button class="btn btn-success" id="slotDetailsBookBtn" onclick="bookSlotFromModal()">
             <i class="bi bi-check-circle me-1"></i> Book
+          </button>
+          <button class="btn btn-info" id="slotDetailsViewBookingBtn" style="display:none;" onclick="viewBookingFromModal()">
+            <i class="bi bi-eye me-1"></i> View Booking
           </button>
         </div>
         <!-- Right side: Edit/Save/Cancel/Close -->
