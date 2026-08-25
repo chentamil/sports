@@ -302,11 +302,29 @@ async function saveBooking(){
     )
     .hide();
 
+  // IMPORTANT FIX: Update the slot data with booking details before reloading
+  // Find the slot in allData and update it with booking info
+  const slotToUpdate = allData.find(s => s.id == slot_id);
+  if (slotToUpdate) {
+    slotToUpdate.status = 'booked';
+    slotToUpdate.booking_name = customer_name;
+    slotToUpdate.booking_mobile = customer_mobile;
+    slotToUpdate.booking_email = customer_email;
+    slotToUpdate.booking_notes = booking_notes;
+    slotToUpdate.payment_status = payment_status;
+  }
+
+  // Now reload everything
   loadSlots();
   loadBookings(); // ← AUTO REFRESH bottom Booking Management table
 
-
+  // If the slot details modal is open, close it
+  const slotModal = bootstrap.Modal.getInstance(document.getElementById('slotDetailsModal'));
+  if (slotModal) {
+    slotModal.hide();
+  }
 }
+
 // 
 async function deleteBooking(id) {
 

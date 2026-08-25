@@ -76,22 +76,47 @@
 
       allData = data;
 
-    renderTable(data);
+      // Merge booking data from bookings API into slots
+      try {
+        const bookingRes = await fetch('/api/admin-bookings');
+        if (bookingRes.ok) {
+          const bookings = await bookingRes.json();
+          // For each booking, merge the booking details into the corresponding slot
+          bookings.forEach(booking => {
+            const slot = allData.find(s => s.id === booking.slot_id);
+            if (slot) {
+              slot.booking_name = booking.customer_name;
+              slot.booking_mobile = booking.customer_mobile;
+              slot.booking_email = booking.customer_email;
+              slot.booking_notes = booking.booking_notes;
+              slot.payment_status = booking.payment_status;
+              // Ensure status is booked if there's a booking
+              if (slot.status !== 'booked') {
+                slot.status = 'booked';
+              }
+            }
+          });
+        }
+      } catch (bookingErr) {
+        console.warn('Could not load bookings for slot merge:', bookingErr);
+      }
 
-    updateAnalytics(data);
+      renderTable(data);
 
-    renderCharts(data);
+      updateAnalytics(data);
 
-    if (document.getElementById("chart-date")) {
-      renderAvailabilityChart();
-    }
+      renderCharts(data);
 
-    } catch (err) {
+      if (document.getElementById("chart-date")) {
+        renderAvailabilityChart();
+      }
 
-      console.error(err);
+      } catch (err) {
 
-      showToast("Unable to load slots", "error");
-    }
+        console.error(err);
+
+        showToast("Unable to load slots", "error");
+      }
   }
 
 
@@ -1307,26 +1332,27 @@ function showSlotDetails(slotId) {
             </div>
           </div>
         </div>
-        ${slot.status === 'booked' ? `
-        <div class="col-12">
-          <div class="detail-item p-3 rounded-3" style="background:#f0f7ff;border-left:4px solid #2563eb;">
-            <div class="text-muted small fw-semibold text-uppercase" style="font-size:0.65rem;letter-spacing:0.5px;">Booking Details</div>
-            <div class="mt-1">
-              <div><strong>Customer:</strong> ${slot.booking_name || 'N/A'}</div>
-              <div><strong>Mobile:</strong> ${slot.booking_mobile || 'N/A'}</div>
-              <div><strong>Email:</strong> ${slot.booking_email || 'N/A'}</div>
-              <div><strong>Payment:</strong> ${slot.payment_status || 'N/A'}</div>
+          ${slot.status === 'booked' ? `
+          <div class="col-12">
+            <div class="detail-item p-3 rounded-3" style="background:#f0f7ff;border-left:4px solid #2563eb;">
+              <div class="text-muted small fw-semibold text-uppercase" style="font-size:0.65rem;letter-spacing:0.5px;">Booking Details</div>
+              <div class="mt-1">
+                <div><strong>Customer:</strong> ${slot.booking_name || slot.customer_name || 'N/A'}</div>
+                <div><strong>Mobile:</strong> ${slot.booking_mobile || slot.customer_mobile || 'N/A'}</div>
+                <div><strong>Email:</strong> ${slot.booking_email || slot.customer_email || 'N/A'}</div>
+                <div><strong>Payment:</strong> ${slot.payment_status || 'N/A'}</div>
+                ${slot.booking_notes ? `<div><strong>Notes:</strong> ${slot.booking_notes}</div>` : ''}
+              </div>
             </div>
           </div>
-        </div>
-        ` : `
-        <div class="col-12">
-          <div class="detail-item p-3 rounded-3" style="background:#f8fafc;border-left:4px solid #94a3b8;">
-            <div class="text-muted small fw-semibold text-uppercase" style="font-size:0.65rem;letter-spacing:0.5px;">Slot ID</div>
-            <div class="fw-bold">#${slot.id}</div>
+          ` : `
+          <div class="col-12">
+            <div class="detail-item p-3 rounded-3" style="background:#f8fafc;border-left:4px solid #94a3b8;">
+              <div class="text-muted small fw-semibold text-uppercase" style="font-size:0.65rem;letter-spacing:0.5px;">Slot ID</div>
+              <div class="fw-bold">#${slot.id}</div>
+            </div>
           </div>
-        </div>
-        `}
+          `}
       </div>
     </div>
   `;
@@ -1475,7 +1501,7 @@ async function saveSlotEdit() {
     return;
   }
   
-  // Prepare update data
+  // Prepare update data - preserve booking details if status is booked
   const updateData = {
     date: date,
     court_id: court_id,
@@ -1485,6 +1511,25 @@ async function saveSlotEdit() {
     price: price,
     status: status
   };
+
+  // If status is being changed to booked, we need to keep booking details
+  // If status is being changed from booked to something else, we should clear booking details
+  const originalSlot = allData.find(s => s.id === id);
+  if (status === 'booked' && originalSlot && originalSlot.status === 'booked') {
+    // Preserve existing booking details
+    if (originalSlot.booking_name) updateData.booking_name = originalSlot.booking_name;
+    if (originalSlot.booking_mobile) updateData.booking_mobile = originalSlot.booking_mobile;
+    if (originalSlot.booking_email) updateData.booking_email = originalSlot.booking_email;
+    if (originalSlot.booking_notes) updateData.booking_notes = originalSlot.booking_notes;
+    if (originalSlot.payment_status) updateData.payment_status = originalSlot.payment_status;
+  } else if (status !== 'booked' && originalSlot && originalSlot.status === 'booked') {
+    // Clearing booking details when changing from booked to something else
+    updateData.booking_name = null;
+    updateData.booking_mobile = null;
+    updateData.booking_email = null;
+    updateData.booking_notes = null;
+    updateData.payment_status = null;
+  }
   
   try {
     // Send update to server
@@ -1742,3 +1787,13 @@ function parseTimeString(timeStr) {
 function scrollToSlotRow(slotId) {
   showSlotDetails(slotId);
 }
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Load slots first, then bookings
+  loadSlots().then(() => {
+    if (typeof loadBookings === 'function') {
+      loadBookings();
+    }
+  });
+});
