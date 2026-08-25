@@ -985,7 +985,11 @@ function renderAvailabilityChart() {
 
   const daySlots = allData.filter(s => s.date === date);
   const courts = [...new Set(daySlots.map(s => Number(s.court_id)))].sort((a, b) => a - b);
-  const times = [...new Set(daySlots.map(s => s.start_time || s.time || ""))].sort();
+  //const times = [...new Set(daySlots.map(s => s.start_time || s.time || ""))].sort();
+  //NEW FIX: Get unique times and sort chronologically
+  const times = [...new Set(daySlots.map(s => s.start_time || s.time || ""))]
+    .filter(t => t) // Remove empty strings
+    .sort(compareTimes);
 
   const container = document.getElementById("availabilityChartBody");
 
