@@ -1181,7 +1181,7 @@ function renderAvailabilityChart() {
       const status = slot ? slot.status : null;
       const slotId = slot ? slot.id : null;
       const dotClass = status ? `status-dot ${status}` : 'status-dot';
-      const clickAttr = slotId ? `onclick="scrollToSlotRow(${slotId})"` : '';
+      const clickAttr = slotId ? `onclick="showSlotDetails(${slotId})" title="Click to view details"` : '';
       tableHtml += `
         <td>
           <span class="${dotClass}" ${clickAttr} title="${status || 'Empty'}"></span>
@@ -1205,19 +1205,171 @@ function renderAvailabilityChart() {
       <span><span class="legend-dot booked"></span><span class="legend-text">Booked</span></span>
       <span><span class="legend-dot closed"></span><span class="legend-text">Closed</span></span>
       <span><span class="legend-dot disabled"></span><span class="legend-text">Disabled</span></span>
-      <span class="text-muted"><i class="bi bi-hand-index-thumb"></i> Click dot to jump to slot</span>
+      <span class="text-muted"><i class="bi bi-hand-index-thumb"></i> Click dot for details</span>
     </div>
   `;
 
   container.innerHTML = cardsHtml + tableHtml + legendHtml;
 }
 
-// Optional nice-to-have: clicking a chart cell jumps to that row in the main table
-function scrollToSlotRow(slotId) {
-  const row = document.querySelector(`.slot-checkbox[data-id="${slotId}"]`);
+// =========================
+// SLOT DETAILS MODAL
+// =========================
+
+// Store the currently viewed slot ID for edit functionality
+let currentViewSlotId = null;
+
+function showSlotDetails(slotId) {
+  // Find the slot in allData
+  const slot = allData.find(s => s.id === slotId);
+  if (!slot) {
+    showToast("Slot not found", "error");
+    return;
+  }
+  
+  currentViewSlotId = slotId;
+  
+  // Get the modal instance
+  const modal = new bootstrap.Modal(document.getElementById('slotDetailsModal'));
+  
+  // Build the details HTML
+  const statusColors = {
+    'available': 'success',
+    'booked': 'danger',
+    'closed': 'warning',
+    'disabled': 'secondary'
+  };
+  
+  const statusIcons = {
+    'available': '✅',
+    'booked': '🔴',
+    'closed': '🟡',
+    'disabled': '⚫'
+  };
+  
+  const statusLabels = {
+    'available': 'Available',
+    'booked': 'Booked',
+    'closed': 'Closed',
+    'disabled': 'Disabled'
+  };
+  
+  const content = `
+    <div class="slot-details">
+      <div class="row g-3">
+        <div class="col-6">
+          <div class="detail-item p-3 rounded-3" style="background:#f8fafc;">
+            <div class="text-muted small fw-semibold text-uppercase" style="font-size:0.65rem;letter-spacing:0.5px;">Date</div>
+            <div class="fw-bold fs-5">${slot.date || 'N/A'}</div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="detail-item p-3 rounded-3" style="background:#f8fafc;">
+            <div class="text-muted small fw-semibold text-uppercase" style="font-size:0.65rem;letter-spacing:0.5px;">Court</div>
+            <div class="fw-bold fs-5">🏸 Court ${slot.court_id || 'N/A'}</div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="detail-item p-3 rounded-3" style="background:#f8fafc;">
+            <div class="text-muted small fw-semibold text-uppercase" style="font-size:0.65rem;letter-spacing:0.5px;">Start Time</div>
+            <div class="fw-bold fs-5">🕐 ${slot.start_time || 'N/A'}</div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="detail-item p-3 rounded-3" style="background:#f8fafc;">
+            <div class="text-muted small fw-semibold text-uppercase" style="font-size:0.65rem;letter-spacing:0.5px;">End Time</div>
+            <div class="fw-bold fs-5">🕐 ${slot.end_time || 'N/A'}</div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="detail-item p-3 rounded-3" style="background:#f8fafc;">
+            <div class="text-muted small fw-semibold text-uppercase" style="font-size:0.65rem;letter-spacing:0.5px;">Price</div>
+            <div class="fw-bold fs-5">💰 ₹${slot.price || 0}</div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="detail-item p-3 rounded-3" style="background:#f8fafc;">
+            <div class="text-muted small fw-semibold text-uppercase" style="font-size:0.65rem;letter-spacing:0.5px;">Status</div>
+            <div class="fw-bold fs-5">
+              <span class="badge bg-${statusColors[slot.status] || 'secondary'}">
+                ${statusIcons[slot.status] || '⬜'} ${statusLabels[slot.status] || slot.status}
+              </span>
+            </div>
+          </div>
+        </div>
+        ${slot.status === 'booked' ? `
+        <div class="col-12">
+          <div class="detail-item p-3 rounded-3" style="background:#f0f7ff;border-left:4px solid #2563eb;">
+            <div class="text-muted small fw-semibold text-uppercase" style="font-size:0.65rem;letter-spacing:0.5px;">Booking Details</div>
+            <div class="mt-1">
+              <div><strong>Customer:</strong> ${slot.booking_name || 'N/A'}</div>
+              <div><strong>Mobile:</strong> ${slot.booking_mobile || 'N/A'}</div>
+              <div><strong>Email:</strong> ${slot.booking_email || 'N/A'}</div>
+              <div><strong>Payment:</strong> ${slot.payment_status || 'N/A'}</div>
+            </div>
+          </div>
+        </div>
+        ` : `
+        <div class="col-12">
+          <div class="detail-item p-3 rounded-3" style="background:#f8fafc;border-left:4px solid #94a3b8;">
+            <div class="text-muted small fw-semibold text-uppercase" style="font-size:0.65rem;letter-spacing:0.5px;">Slot ID</div>
+            <div class="fw-bold">#${slot.id}</div>
+          </div>
+        </div>
+        `}
+      </div>
+    </div>
+  `;
+  
+  // Set the content
+  document.getElementById('slotDetailsContent').innerHTML = content;
+  
+  // Show the modal
+  modal.show();
+}
+
+// Function to open the slot in the main edit table
+function openSlotForEditing() {
+  if (!currentViewSlotId) {
+    showToast("No slot selected", "warning");
+    return;
+  }
+  
+  // Close the modal
+  const modal = bootstrap.Modal.getInstance(document.getElementById('slotDetailsModal'));
+  if (modal) modal.hide();
+  
+  // Find the slot in the table and scroll to it
+  const row = document.querySelector(`.slot-checkbox[data-id="${currentViewSlotId}"]`);
   if (row) {
-    row.closest("tr").scrollIntoView({ behavior: "smooth", block: "center" });
-    row.closest("tr").style.outline = "3px solid #0d6efd";
-    setTimeout(() => { row.closest("tr").style.outline = ""; }, 1500);
+    const tableContainer = row.closest('.table-responsive');
+    if (tableContainer) {
+      // Scroll the container to the row
+      const rowElement = row.closest('tr');
+      if (rowElement) {
+        // Highlight the row
+        rowElement.style.transition = 'background 0.3s ease';
+        rowElement.style.background = '#dbeafe';
+        setTimeout(() => {
+          rowElement.style.background = '';
+        }, 3000);
+        
+        // Scroll to row
+        rowElement.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center',
+          inline: 'nearest'
+        });
+      }
+    }
+    showToast(`Jumped to Slot #${currentViewSlotId}`, "success");
+  } else {
+    showToast("Slot not found in table", "warning");
   }
 }
+
+// Keep the old function for backward compatibility (optional)
+function scrollToSlotRow(slotId) {
+  showSlotDetails(slotId);
+}
+
