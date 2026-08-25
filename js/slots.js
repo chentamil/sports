@@ -1213,7 +1213,7 @@ function renderAvailabilityChart() {
 }
 
 // =========================
-// SLOT DETAILS MODAL WITH EDIT
+// SLOT DETAILS MODAL WITH FULL ACTIONS
 // =========================
 
 // Store the currently viewed slot ID
@@ -1338,6 +1338,20 @@ function showSlotDetails(slotId) {
   document.getElementById('slotEditForm').style.display = 'none';
   document.getElementById('slotDetailsView').style.display = 'block';
   
+  // Show/Hide action buttons based on status
+  const deleteBtn = document.getElementById('slotDetailsDeleteBtn');
+  const bookBtn = document.getElementById('slotDetailsBookBtn');
+  
+  // Show delete button always (but with confirmation)
+  deleteBtn.style.display = 'inline-block';
+  
+  // Show Book button only if slot is NOT booked
+  if (slot.status === 'booked') {
+    bookBtn.style.display = 'none';
+  } else {
+    bookBtn.style.display = 'inline-block';
+  }
+  
   // Show Edit button, hide Save/Cancel buttons
   document.getElementById('slotDetailsEditBtn').style.display = 'inline-block';
   document.getElementById('slotDetailsSaveBtn').style.display = 'none';
@@ -1387,8 +1401,12 @@ function toggleSlotEditMode() {
     document.getElementById('edit-slot-end-period').value = endParts.period;
   }
   
-  // Hide Edit button, show Save/Cancel buttons
+  // Hide action buttons (Delete, Book) and Edit button
+  document.getElementById('slotDetailsDeleteBtn').style.display = 'none';
+  document.getElementById('slotDetailsBookBtn').style.display = 'none';
   document.getElementById('slotDetailsEditBtn').style.display = 'none';
+  
+  // Show Save/Cancel buttons
   document.getElementById('slotDetailsSaveBtn').style.display = 'inline-block';
   document.getElementById('slotDetailsCancelBtn').style.display = 'inline-block';
 }
@@ -1399,9 +1417,22 @@ function cancelSlotEdit() {
   
   // Show view, hide edit form
   document.getElementById('slotDetailsView').style.display = 'block';
-  document.getElementById('slotDetailsEditForm').style.display = 'none';
+  document.getElementById('slotEditForm').style.display = 'none';
   
-  // Show Edit button, hide Save/Cancel buttons
+  // Show action buttons and Edit button
+  const slot = allData.find(s => s.id === currentViewSlotId);
+  if (slot) {
+    // Show delete button
+    document.getElementById('slotDetailsDeleteBtn').style.display = 'inline-block';
+    
+    // Show Book button only if not booked
+    if (slot.status === 'booked') {
+      document.getElementById('slotDetailsBookBtn').style.display = 'none';
+    } else {
+      document.getElementById('slotDetailsBookBtn').style.display = 'inline-block';
+    }
+  }
+  
   document.getElementById('slotDetailsEditBtn').style.display = 'inline-block';
   document.getElementById('slotDetailsSaveBtn').style.display = 'none';
   document.getElementById('slotDetailsCancelBtn').style.display = 'none';
@@ -1476,6 +1507,172 @@ async function saveSlotEdit() {
     
     showToast("Slot updated successfully!", "success");
     
+    // Reload data
+    await loadSlots();
+    
+    // Refresh the availability chart
+    renderAvailabilityChart();
+    
+    // Update the modal with new data (instead of closing)
+    // Reset edit mode
+    isEditMode = false;
+    
+    // Get the updated slot
+    const updatedSlot = allData.find(s => s.id === id);
+    if (updatedSlot) {
+      // Rebuild the view with updated data
+      const statusColors = {
+        'available': 'success',
+        'booked': 'danger',
+        'closed': 'warning',
+        'disabled': 'secondary'
+      };
+      
+      const statusIcons = {
+        'available': '✅',
+        'booked': '🔴',
+        'closed': '🟡',
+        'disabled': '⚫'
+      };
+      
+      const statusLabels = {
+        'available': 'Available',
+        'booked': 'Booked',
+        'closed': 'Closed',
+        'disabled': 'Disabled'
+      };
+      
+      const startTimeDisplay = updatedSlot.start_time || '';
+      const endTimeDisplay = updatedSlot.end_time || '';
+      
+      const content = `
+        <div class="slot-details" id="slotDetailsView">
+          <div class="row g-3">
+            <div class="col-6">
+              <div class="detail-item p-3 rounded-3" style="background:#f8fafc;">
+                <div class="text-muted small fw-semibold text-uppercase" style="font-size:0.65rem;letter-spacing:0.5px;">Date</div>
+                <div class="fw-bold fs-5">${updatedSlot.date || 'N/A'}</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="detail-item p-3 rounded-3" style="background:#f8fafc;">
+                <div class="text-muted small fw-semibold text-uppercase" style="font-size:0.65rem;letter-spacing:0.5px;">Court</div>
+                <div class="fw-bold fs-5">🏸 Court ${updatedSlot.court_id || 'N/A'}</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="detail-item p-3 rounded-3" style="background:#f8fafc;">
+                <div class="text-muted small fw-semibold text-uppercase" style="font-size:0.65rem;letter-spacing:0.5px;">Start Time</div>
+                <div class="fw-bold fs-5">🕐 ${startTimeDisplay || 'N/A'}</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="detail-item p-3 rounded-3" style="background:#f8fafc;">
+                <div class="text-muted small fw-semibold text-uppercase" style="font-size:0.65rem;letter-spacing:0.5px;">End Time</div>
+                <div class="fw-bold fs-5">🕐 ${endTimeDisplay || 'N/A'}</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="detail-item p-3 rounded-3" style="background:#f8fafc;">
+                <div class="text-muted small fw-semibold text-uppercase" style="font-size:0.65rem;letter-spacing:0.5px;">Price</div>
+                <div class="fw-bold fs-5">💰 ₹${updatedSlot.price || 0}</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="detail-item p-3 rounded-3" style="background:#f8fafc;">
+                <div class="text-muted small fw-semibold text-uppercase" style="font-size:0.65rem;letter-spacing:0.5px;">Status</div>
+                <div class="fw-bold fs-5">
+                  <span class="badge bg-${statusColors[updatedSlot.status] || 'secondary'}">
+                    ${statusIcons[updatedSlot.status] || '⬜'} ${statusLabels[updatedSlot.status] || updatedSlot.status}
+                  </span>
+                </div>
+              </div>
+            </div>
+            ${updatedSlot.status === 'booked' ? `
+            <div class="col-12">
+              <div class="detail-item p-3 rounded-3" style="background:#f0f7ff;border-left:4px solid #2563eb;">
+                <div class="text-muted small fw-semibold text-uppercase" style="font-size:0.65rem;letter-spacing:0.5px;">Booking Details</div>
+                <div class="mt-1">
+                  <div><strong>Customer:</strong> ${updatedSlot.booking_name || 'N/A'}</div>
+                  <div><strong>Mobile:</strong> ${updatedSlot.booking_mobile || 'N/A'}</div>
+                  <div><strong>Email:</strong> ${updatedSlot.booking_email || 'N/A'}</div>
+                  <div><strong>Payment:</strong> ${updatedSlot.payment_status || 'N/A'}</div>
+                </div>
+              </div>
+            </div>
+            ` : `
+            <div class="col-12">
+              <div class="detail-item p-3 rounded-3" style="background:#f8fafc;border-left:4px solid #94a3b8;">
+                <div class="text-muted small fw-semibold text-uppercase" style="font-size:0.65rem;letter-spacing:0.5px;">Slot ID</div>
+                <div class="fw-bold">#${updatedSlot.id}</div>
+              </div>
+            </div>
+            `}
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('slotDetailsContent').innerHTML = content;
+      
+      // Hide edit form, show view
+      document.getElementById('slotEditForm').style.display = 'none';
+      document.getElementById('slotDetailsView').style.display = 'block';
+      
+      // Show/Hide action buttons based on status
+      const deleteBtn = document.getElementById('slotDetailsDeleteBtn');
+      const bookBtn = document.getElementById('slotDetailsBookBtn');
+      
+      deleteBtn.style.display = 'inline-block';
+      
+      if (updatedSlot.status === 'booked') {
+        bookBtn.style.display = 'none';
+      } else {
+        bookBtn.style.display = 'inline-block';
+      }
+      
+      // Show Edit button, hide Save/Cancel
+      document.getElementById('slotDetailsEditBtn').style.display = 'inline-block';
+      document.getElementById('slotDetailsSaveBtn').style.display = 'none';
+      document.getElementById('slotDetailsCancelBtn').style.display = 'none';
+    }
+    
+  } catch (err) {
+    console.error(err);
+    showToast("Error updating slot", "error");
+  }
+}
+
+// Delete slot from modal
+async function deleteSlotFromModal() {
+  if (!currentViewSlotId) {
+    showToast("No slot selected", "warning");
+    return;
+  }
+  
+  // Confirm deletion
+  if (!confirm(`Are you sure you want to delete Slot #${currentViewSlotId}?`)) {
+    return;
+  }
+  
+  try {
+    const response = await fetch('/api/admin', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        action: 'delete',
+        id: currentViewSlotId
+      })
+    });
+    
+    if (!response.ok) {
+      showToast("Delete failed", "error");
+      return;
+    }
+    
+    showToast("Slot deleted successfully!", "success");
+    
     // Close the modal
     const modal = bootstrap.Modal.getInstance(document.getElementById('slotDetailsModal'));
     if (modal) modal.hide();
@@ -1488,8 +1685,26 @@ async function saveSlotEdit() {
     
   } catch (err) {
     console.error(err);
-    showToast("Error updating slot", "error");
+    showToast("Error deleting slot", "error");
   }
+}
+
+// Book slot from modal - opens the booking modal
+function bookSlotFromModal() {
+  if (!currentViewSlotId) {
+    showToast("No slot selected", "warning");
+    return;
+  }
+  
+  // Close the slot details modal
+  const modal = bootstrap.Modal.getInstance(document.getElementById('slotDetailsModal'));
+  if (modal) modal.hide();
+  
+  // Open the booking modal for this slot
+  // Small delay to allow slot modal to close first
+  setTimeout(() => {
+    openBookingModal(currentViewSlotId);
+  }, 300);
 }
 
 // Helper function to parse time string like "10:00AM" into {time: "10:00", period: "AM"}

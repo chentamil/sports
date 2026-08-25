@@ -613,6 +613,55 @@
   user-select: none;
 }
 
+/* Modal footer action buttons */
+#slotDetailsModal .modal-footer .btn {
+  border-radius: 10px;
+  font-weight: 600;
+  padding: 0.5rem 1.25rem;
+  transition: all 0.2s ease;
+}
+
+#slotDetailsModal .modal-footer .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+#slotDetailsModal .modal-footer .btn-danger:hover {
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+#slotDetailsModal .modal-footer .btn-success:hover {
+  box-shadow: 0 4px 12px rgba(25, 135, 84, 0.3);
+}
+
+#slotDetailsModal .modal-footer .btn-primary:hover {
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+/* Mobile responsive */
+@media (max-width: 576px) {
+  #slotDetailsModal .modal-footer {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  #slotDetailsModal .modal-footer .d-flex {
+    width: 100%;
+    justify-content: center !important;
+  }
+  
+  #slotDetailsModal .modal-footer .me-auto {
+    margin-right: 0 !important;
+  }
+  
+  #slotDetailsModal .modal-footer .btn {
+    flex: 1;
+    min-width: 80px;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
+
 
 </style>
 <div id="toast" style="
@@ -1480,7 +1529,7 @@
 </div>
 </div>
 
-<!-- Slot Details Modal - With Edit Functionality -->
+<!-- Slot Details Modal - With Full Actions -->
 <div class="modal fade" id="slotDetailsModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content border-0 shadow-lg" style="border-radius:20px;">
@@ -1547,16 +1596,28 @@
         </div>
       </div>
       <div class="modal-footer" style="border-top:2px solid #f1f5f9; padding:1rem 1.5rem;">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button class="btn btn-primary" id="slotDetailsEditBtn" onclick="toggleSlotEditMode()">
-          <i class="bi bi-pencil me-1"></i> Edit Slot
-        </button>
-        <button class="btn btn-success" id="slotDetailsSaveBtn" style="display:none;" onclick="saveSlotEdit()">
-          <i class="bi bi-check-circle me-1"></i> Save Changes
-        </button>
-        <button class="btn btn-secondary" id="slotDetailsCancelBtn" style="display:none;" onclick="cancelSlotEdit()">
-          Cancel
-        </button>
+        <!-- Left side: Action buttons -->
+        <div class="d-flex gap-2 me-auto">
+          <button class="btn btn-danger" id="slotDetailsDeleteBtn" onclick="deleteSlotFromModal()">
+            <i class="bi bi-trash me-1"></i> Delete
+          </button>
+          <button class="btn btn-success" id="slotDetailsBookBtn" onclick="bookSlotFromModal()">
+            <i class="bi bi-check-circle me-1"></i> Book
+          </button>
+        </div>
+        <!-- Right side: Edit/Save/Cancel/Close -->
+        <div class="d-flex gap-2">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button class="btn btn-primary" id="slotDetailsEditBtn" onclick="toggleSlotEditMode()">
+            <i class="bi bi-pencil me-1"></i> Edit
+          </button>
+          <button class="btn btn-success" id="slotDetailsSaveBtn" style="display:none;" onclick="saveSlotEdit()">
+            <i class="bi bi-check-circle me-1"></i> Save
+          </button>
+          <button class="btn btn-secondary" id="slotDetailsCancelBtn" style="display:none;" onclick="cancelSlotEdit()">
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   </div>
