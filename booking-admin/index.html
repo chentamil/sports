@@ -1139,6 +1139,49 @@
 </div>
 </div>
 
+
+
+<!-- Multi Select js ends here -->
+<!-- TABLE -->
+<div class="table-responsive shadow-sm bg-white mt-3" style="
+    max-height: 420px;
+    overflow-y: auto;
+    border-radius:20px;
+  ">
+<table class="table table-bordered bg-white w-100">
+<thead class="sticky-top text-white" style="
+    background:
+    linear-gradient(135deg,#0f172a,#1e293b);
+  ">
+<tr class="text-center">
+<th><input id="select-all" onclick="toggleAllCheckboxes(this)" type="checkbox"/></th>
+<th>ID</th>
+<th>Date</th>
+<th>Court</th>
+<th>Start</th>
+<th>End</th>
+<th>Price</th>
+<th>Status</th>
+<th>Actions</th>
+<th>Booking</th>
+</tr>
+</thead>
+<tbody id="table-body"></tbody>
+</table>
+</div>
+<!-- Save All Changes -->
+<div class="d-grid gap-2 col-6 mx-auto mt-4">
+<button class="btn btn-success btn-lg" onclick="saveAllChanges()">
+          Save All
+        </button>
+</div>
+</div>
+<div class="card p-3 my-4 border-success" id="section-bookings">
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h4 class="mb-0">Booking Management</h4>
+<button class="btn btn-outline-success btn-sm" onclick="exportBookingsCSV()">⬇️ Export CSV</button>
+</div>
+
 <!-- Visual Availability Chart - V5 Executive Dashboard -->
 <div class="accordion mb-3">
   <div class="accordion-item">
@@ -1185,47 +1228,8 @@
   </div>
 </div>
 
-<!-- Multi Select js ends here -->
-<!-- TABLE -->
-<div class="table-responsive shadow-sm bg-white mt-3" style="
-    max-height: 420px;
-    overflow-y: auto;
-    border-radius:20px;
-  ">
-<table class="table table-bordered bg-white w-100">
-<thead class="sticky-top text-white" style="
-    background:
-    linear-gradient(135deg,#0f172a,#1e293b);
-  ">
-<tr class="text-center">
-<th><input id="select-all" onclick="toggleAllCheckboxes(this)" type="checkbox"/></th>
-<th>ID</th>
-<th>Date</th>
-<th>Court</th>
-<th>Start</th>
-<th>End</th>
-<th>Price</th>
-<th>Status</th>
-<th>Actions</th>
-<th>Booking</th>
-</tr>
-</thead>
-<tbody id="table-body"></tbody>
-</table>
-</div>
-<!-- Save All Changes -->
-<div class="d-grid gap-2 col-6 mx-auto mt-4">
-<button class="btn btn-success btn-lg" onclick="saveAllChanges()">
-          Save All
-        </button>
-</div>
-</div>
-<div class="card p-3 my-4 border-success" id="section-bookings">
-<div class="d-flex justify-content-between align-items-center mb-3">
-<h4 class="mb-0">Booking Management</h4>
-<button class="btn btn-outline-success btn-sm" onclick="exportBookingsCSV()">⬇️ Export CSV</button>
-</div>
 <!-- Payment Filter Buttons -->
+<p class="mb-2 fs-6 fw-bold">Payment Filter Buttons :</p>
 <div class="btn-group mb-3" role="group">
 <button class="btn btn-outline-secondary btn-sm active" id="filter-all" onclick="filterBookings('all')">All</button>
 <button class="btn btn-outline-warning btn-sm" id="filter-pending" onclick="filterBookings('pending')">⏳ Pending</button>
