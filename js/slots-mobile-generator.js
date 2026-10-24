@@ -71,7 +71,6 @@
       return;
     }
 
-    // Convert time string to number (24h format)
     function timeToNumber(t) {
       const match = t.match(/^(\d+)(?::(\d+))?\s*(AM|PM)$/i);
       if (!match) return null;
@@ -80,21 +79,18 @@
       const period = match[3].toUpperCase();
       if (period === "PM" && h !== 12) h += 12;
       if (period === "AM" && h === 12) h = 0;
-      if (m !== 0 && m !== 30) return null; // Only 0 or 30 minutes allowed
+      if (m !== 0 && m !== 30) return null;
       return h + m / 60;
     }
 
-    // Convert number back to string
     function numberToTime(n) {
       const h = Math.floor(n);
       const m = Math.round((n - h) * 60);
       const period = h >= 12 ? "PM" : "AM";
       let hh = h % 12;
       if (hh === 0) hh = 12;
-      // return m === 0 ? `${hh}${period}` : `${hh}:${m}${period}`; //6AM 7AM not like 6:00AM format
-       const mm = String(m).padStart(2, "0");
-       return `${hh}:${mm}${period}`;
-      
+      const mm = String(m).padStart(2, "0");
+      return `${hh}:${mm}${period}`;
     }
 
     const startNum = timeToNumber(from);
@@ -116,13 +112,14 @@
       return;
     }
 
+    // Build the full list first
     const slots = [];
     let current = startNum;
 
     while (current < endNum) {
       const slotStart = numberToTime(current);
-      const slotEnd = numberToTime(current + 1); // 1-hour slots only
-      //Duplicate Slot Warning 
+      const slotEnd = numberToTime(current + 1);
+
       const duplicate = allData.find(s =>
         s.date === date &&
         String(s.court_id) === String(court_id) &&
@@ -130,57 +127,44 @@
         s.end_time === slotEnd
       );
 
-      if (duplicate) {
-        current += 1;
-        continue;
+      if (!duplicate) {
+        slots.push({
+          date,
+          court_id,
+          start_time: slotStart,
+          end_time: slotEnd,
+          time: `${slotStart} - ${slotEnd}`,
+          price,
+          status,
+          _sortKey: current   // numeric hour used only for sorting, stripped before POST
+        });
       }
-      //Duplicate Slot Warning ends 
-
-      slots.push({
-        date,
-        court_id,
-        start_time: slotStart,
-        end_time: slotEnd,
-        time: `${slotStart} - ${slotEnd}`,
-        price: price,
-        status
-      });
-      current += 1; // 1-hour step
+      current += 1;
     }
 
-    // slots.forEach(async s => {
-    //   await fetch('/api/admin', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify({
-    //       action: 'add',
-    //       data: s
-    //     })
-    //   });
-    // });
+    if (slots.length === 0) {
+      showToast("All selected slots already exist — nothing generated", "info");
+      return;
+    }
 
+    // Sort chronologically (AM 1AM..12PM, then PM 1PM..11PM), then strip _sortKey
+    slots.sort((a, b) => a._sortKey - b._sortKey);
+    slots.forEach(s => delete s._sortKey);
+
+    // POST sequentially in sorted order
     for (const s of slots) {
-
       const response = await fetch('/api/admin', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          action: 'add',
-          data: s
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'add', data: s })
       });
-
       if (!response.ok) {
-        showToast("Failed creating slot", "error");
+        showToast(`Failed on slot ${s.start_time}`, "error");
         return;
       }
     }
 
-    showToast(`Generated ${slots.length} slots for Court ${court_id}`);
+    showToast(`Generated ${slots.length} slots for Court ${court_id} (${slots[0].start_time} → ${slots[slots.length - 1].end_time})`);
     setTimeout(loadSlots, 500);
   }
 
