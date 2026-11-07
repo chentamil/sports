@@ -121,12 +121,22 @@
 
 
 
-function renderTable(data) {
+  function renderTable(data) {
 
-  const body = document.getElementById("table-body");
-  body.innerHTML = "";
+    const body = document.getElementById("table-body");
+    body.innerHTML = "";
 
-  data.forEach(slot => {
+    // Defensive: sort a *copy* chronologically by (date, court_id, start_time).
+    // Keeps `allData` and callers untouched — pure display-layer fix.
+    // compareTimes() is defined later in this file (timeToMinutes helper).
+    const sorted = [...data].sort((a, b) => {
+      if (a.date !== b.date) return (a.date || "") < (b.date || "") ? -1 : 1;
+      const ac = Number(a.court_id) || 0, bc = Number(b.court_id) || 0;
+      if (ac !== bc) return ac - bc;
+      return compareTimes(a.start_time || a.time || "", b.start_time || b.time || "");
+    });
+
+    sorted.forEach(slot => {
 
     let rowClass = "";
 
