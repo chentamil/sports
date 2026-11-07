@@ -496,6 +496,10 @@ function filterSlots(type) {
       })
     });
 
+    if (response.status === 409) {
+      showToast("Slot already exists", "warning");
+      return;
+    }
     if (!response.ok) {
       showToast("Add failed");
       return;

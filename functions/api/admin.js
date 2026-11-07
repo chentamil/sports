@@ -61,7 +61,6 @@ export async function onRequest(context) {
       // ==================
 
       if (body.action === "add") {
-
         const response = await fetch(
           `${SUPABASE_URL}/rest/v1/slots`,
           {
@@ -75,10 +74,16 @@ export async function onRequest(context) {
           }
         );
 
-        return new Response(
-          response.ok ? "ok" : "Add failed",
-          { status: response.ok ? 200 : 500 }
-        );
+        if (response.ok) {
+          return new Response("ok", { status: 200 });
+        }
+
+        const errText = await response.text();
+        // Postgres unique_violation = 23505 → duplicate slot, not a real error
+        if (errText.includes("23505") || errText.includes("slots_unique_date_court_time")) {
+          return new Response("Duplicate", { status: 409 });
+        }
+        return new Response("Add failed", { status: 500 });
       }
 
       // ==================

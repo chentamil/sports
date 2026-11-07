@@ -152,16 +152,24 @@
     slots.forEach(s => delete s._sortKey);
 
     // POST sequentially in sorted order
+    let created = 0, skipped = 0;
     for (const s of slots) {
       const response = await fetch('/api/admin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'add', data: s })
       });
+      if (response.status === 409) { skipped++; continue; }
       if (!response.ok) {
         showToast(`Failed on slot ${s.start_time}`, "error");
         return;
       }
+      created++;
+    }
+    if (skipped > 0) {
+      showToast(`Created ${created} slot${created !== 1 ? "s" : ""} · ${skipped} already existed`, "info");
+    } else {
+      showToast(`Generated ${created} slots for Court ${court_id} (${slots[0].start_time} → ${slots[slots.length - 1].end_time})`);
     }
 
     showToast(`Generated ${slots.length} slots for Court ${court_id} (${slots[0].start_time} → ${slots[slots.length - 1].end_time})`);
