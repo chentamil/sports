@@ -112,22 +112,37 @@
       return;
     }
 
-    // Build the full list first
+    // Build the full list first.
+    // Overlap check considers BOTH existing slots (allData) AND slots already
+    // queued in this same run, so "6:00-7:00 + 6:30-7:30" in one click is
+    // properly detected even though allData hasn't refreshed yet.
+    const existing = allData.filter(s =>
+      s.date === date && String(s.court_id) === String(court_id)
+    ).map(s => ({
+      start: timeToNumber(s.start_time || ""),
+      end:   timeToNumber(s.end_time   || "")
+    })).filter(r => r.start !== null && r.end !== null);
+
     const slots = [];
     let current = startNum;
 
     while (current < endNum) {
       const slotStart = numberToTime(current);
-      const slotEnd = numberToTime(current + 1);
+      const slotEnd   = numberToTime(current + 1);
+      const newStart  = current;
+      const newEnd    = current + 1;
 
-      const duplicate = allData.find(s =>
-        s.date === date &&
-        String(s.court_id) === String(court_id) &&
-        s.start_time === slotStart &&
-        s.end_time === slotEnd
+      // Check against existing DB slots
+      const dbConflict = existing.find(r =>
+        newStart < r.end && newEnd > r.start
       );
 
-      if (!duplicate) {
+      // Check against slots already queued in this loop
+      const queuedConflict = slots.find(s =>
+        newStart < s._endNum && newEnd > s._startNum
+      );
+
+      if (!dbConflict && !queuedConflict) {
         slots.push({
           date,
           court_id,
@@ -136,20 +151,28 @@
           time: `${slotStart} - ${slotEnd}`,
           price,
           status,
-          _sortKey: current   // numeric hour used only for sorting, stripped before POST
+          _sortKey: current,
+          _startNum: newStart,
+          _endNum: newEnd
         });
       }
       current += 1;
     }
+    // 
 
     if (slots.length === 0) {
       showToast("All selected slots already exist — nothing generated", "info");
       return;
     }
 
-    // Sort chronologically (AM 1AM..12PM, then PM 1PM..11PM), then strip _sortKey
+    // Sort chronologically (AM 1AM..12PM, then PM 1PM..11PM),
+    // then strip internal bookkeeping fields before POSTing.
     slots.sort((a, b) => a._sortKey - b._sortKey);
-    slots.forEach(s => delete s._sortKey);
+    slots.forEach(s => {
+      delete s._sortKey;
+      delete s._startNum;
+      delete s._endNum;
+    });
 
     // POST sequentially in sorted order
     let created = 0, skipped = 0;

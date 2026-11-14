@@ -462,14 +462,31 @@ function filterSlots(type) {
       document.getElementById("slot-status").value;
 
       //Duplicate Slot Warning 
-      const duplicate = allData.find(s =>
-        s.date === date &&
-        String(s.court_id) === String(court_id) &&
-        s.start_time === start_time
-      );
+      // Overlap check — block any new slot whose time range intersects an
+      // existing slot on the same date + court. Uses the file's existing
+      // timeToMinutes() helper; half-open comparison so 6–7 and 7–8 are OK.
+      const newStart = timeToMinutes(start_time);
+      const newEnd   = timeToMinutes(end_time);
 
-      if (duplicate) {
-        showToast("Slot already exists", "warning");
+      if (!newEnd || newEnd <= newStart) {
+        showToast("End time must be after start time", "warning");
+        return;
+      }
+
+      const conflict = allData.find(s => {
+        if (s.date !== date) return false;
+        if (String(s.court_id) !== String(court_id)) return false;
+        const sStart = timeToMinutes(s.start_time || "");
+        const sEnd   = timeToMinutes(s.end_time   || "");
+        if (!sStart && !sEnd) return false;
+        return newStart < sEnd && newEnd > sStart;
+      });
+
+      if (conflict) {
+        showToast(
+          `Overlaps with existing ${conflict.start_time}–${conflict.end_time} on Court ${conflict.court_id}`,
+          "warning"
+        );
         return;
       } 
       //Duplicate Slot Warning  ends 
@@ -497,7 +514,7 @@ function filterSlots(type) {
     });
 
     if (response.status === 409) {
-      showToast("Slot already exists", "warning");
+       showToast("Slot already exists or overlaps — refresh and try again", "warning");
       return;
     }
     if (!response.ok) {
@@ -1509,17 +1526,33 @@ async function saveSlotEdit() {
   }
   
   // Check for duplicate (excluding current slot)
-  const duplicate = allData.find(s => 
-    s.id !== id &&
-    s.date === date &&
-    String(s.court_id) === String(court_id) &&
-    s.start_time === start_time
-  );
-  
-  if (duplicate) {
-    showToast("Another slot already exists at this time on this court", "warning");
+  // Overlap check — exclude the slot being edited (its own old row).
+  const newStart = timeToMinutes(start_time);
+  const newEnd   = timeToMinutes(end_time);
+
+  if (!newEnd || newEnd <= newStart) {
+    showToast("End time must be after start time", "warning");
     return;
   }
+
+  const conflict = allData.find(s => {
+    if (s.id === id) return false;                          // ignore self
+    if (s.date !== date) return false;
+    if (String(s.court_id) !== String(court_id)) return false;
+    const sStart = timeToMinutes(s.start_time || "");
+    const sEnd   = timeToMinutes(s.end_time   || "");
+    if (!sStart && !sEnd) return false;
+    return newStart < sEnd && newEnd > sStart;
+  });
+
+  if (conflict) {
+    showToast(
+      `Overlaps with existing ${conflict.start_time}–${conflict.end_time} on Court ${conflict.court_id}`,
+      "warning"
+    );
+    return;
+  }
+  // 
   
   // Prepare update data - preserve booking details if status is booked
   const updateData = {
