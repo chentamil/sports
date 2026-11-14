@@ -39,6 +39,26 @@
   let courtRevenueChart = null;
   let statusChart = null;
 
+ // =========================
+// PROCESSING OVERLAY
+// =========================
+// Blocking overlay for long-running operations.
+// Call showProcessing("Generating slots…") before, hideProcessing() in finally{}.
+function showProcessing(title, subtitle) {
+  const el = document.getElementById("processingOverlay");
+  if (!el) return;
+  const t = document.getElementById("processingTitle");
+  const s = document.getElementById("processingSubtitle");
+  if (t) t.textContent = title    || "Working…";
+  if (s) s.textContent = subtitle || "Please wait";
+  el.style.display = "flex";
+}
+
+function hideProcessing() {
+  const el = document.getElementById("processingOverlay");
+  if (el) el.style.display = "none";
+}
+
   // =========================
   // TOAST
   // =========================

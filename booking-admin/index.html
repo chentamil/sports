@@ -679,6 +679,29 @@
 
 
 </style>
+<!-- Processing overlay: shown during slot generation / add -->
+<div id="processingOverlay" style="
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,0.55);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 99998;
+  display: none;
+  align-items: center;
+  justify-content: center;
+">
+  <div class="card shadow-lg border-0" style="border-radius:20px; min-width:260px;">
+    <div class="card-body text-center p-4">
+      <div class="spinner-border text-primary mb-3" role="status" style="width:2.5rem;height:2.5rem;">
+        <span class="visually-hidden">Working…</span>
+      </div>
+      <div class="fw-bold mb-1" id="processingTitle">Working…</div>
+      <div class="text-muted small" id="processingSubtitle">Please wait</div>
+    </div>
+  </div>
+</div>
+<!-- toast msgs -->
 <div id="toast" style="
   position: fixed;
   top: 20px;

@@ -52,6 +52,8 @@
 
 
   async function generateSlotsStandalone() {
+    showProcessing("Generating slots…", "Preparing…");
+    try {
     const date = document.getElementById("gen-slot-date").value;
     const court_id = document.getElementById("gen-slot-court").value;
     const from = convertTo12Hour(
@@ -176,7 +178,12 @@
 
     // POST sequentially in sorted order
     let created = 0, skipped = 0;
-    for (const s of slots) {
+    for (let i = 0; i < slots.length; i++) {
+      const s = slots[i];
+      showProcessing(
+        "Generating slots…",
+        `Creating ${i + 1} of ${slots.length} (${s.start_time})`
+      );
       const response = await fetch('/api/admin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -189,14 +196,19 @@
       }
       created++;
     }
-    if (skipped > 0) {
+    if (slots.length === 0) {
+      showToast("All selected slots already exist — nothing generated", "info");
+    } else if (skipped > 0) {
       showToast(`Created ${created} slot${created !== 1 ? "s" : ""} · ${skipped} already existed`, "info");
     } else {
-      showToast(`Generated ${created} slots for Court ${court_id} (${slots[0].start_time} → ${slots[slots.length - 1].end_time})`);
+      showToast(`Generated ${created} slots for Court ${court_id}`);
     }
 
-    showToast(`Generated ${slots.length} slots for Court ${court_id} (${slots[0].start_time} → ${slots[slots.length - 1].end_time})`);
     setTimeout(loadSlots, 500);
+
+    } finally {
+      hideProcessing();
+    }
   }
 
   // =====================
