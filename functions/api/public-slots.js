@@ -28,17 +28,35 @@ export async function onRequest(context) {
 
   try {
 
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/slots?select=*,courts(id,name)`,
-      {
-        headers: {
-          apikey: SUPABASE_KEY,
-          Authorization: `Bearer ${SUPABASE_KEY}`
-        }
-      }
-    );
+    // PostgREST caps unbounded selects at 1000 rows. Paginate to get everything.
+    const PAGE = 1000;
+    let allRows = [];
+    let offset = 0;
 
-    const data = await res.json();
+    while (true) {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/slots?select=*,courts(id,name)&order=id.asc&limit=${PAGE}&offset=${offset}`,
+        {
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`
+          }
+        }
+      );
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`Supabase ${res.status}: ${errText}`);
+      }
+
+      const page = await res.json();
+      allRows = allRows.concat(page);
+
+      if (page.length < PAGE) break;
+      offset += PAGE;
+    }
+
+    const data = allRows;
 
     const response = new Response(JSON.stringify(data), {
       headers: {

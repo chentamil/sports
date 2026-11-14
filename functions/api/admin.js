@@ -39,13 +39,32 @@ export async function onRequest(context) {
 
     if (request.method === "GET") {
 
-      const response = await fetch(
-        `${SUPABASE_URL}/rest/v1/slots?select=*&order=date.asc,court_id.asc,start_time.asc`,
-        { headers: authHeaders }
-      );
+      const PAGE = 1000;
+      let allRows = [];
+      let offset = 0;
 
-      const data = await response.json();
-      return Response.json(data);
+      while (true) {
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/slots?select=*&order=date.asc,court_id.asc,start_time.asc,id.asc&limit=${PAGE}&offset=${offset}`,
+          { headers: authHeaders }
+        );
+
+        if (!response.ok) {
+          const errText = await response.text();
+          return new Response(
+            JSON.stringify({ error: `Supabase ${response.status}: ${errText}` }),
+            { status: 500 }
+          );
+        }
+
+        const page = await response.json();
+        allRows = allRows.concat(page);
+
+        if (page.length < PAGE) break;
+        offset += PAGE;
+      }
+
+      return Response.json(allRows);
     }
 
     // ==================
