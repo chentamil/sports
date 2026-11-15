@@ -83,8 +83,6 @@ export async function onRequest(context) {
 
     if (!ins.ok) {
       const t = await ins.text();
-      if (t.includes("br_one_pending_per_slot") || t.includes("23505"))
-        return Response.json({ error: "A request for this slot is already pending" }, { status: 409 });
       if (t.includes("row-level security") || t.includes("42501"))
         return Response.json({ error: "Request blocked by database policy. Contact admin." }, { status: 500 });
       return Response.json({ error: "Could not save request" }, { status: 500 });
