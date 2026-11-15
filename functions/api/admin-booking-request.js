@@ -20,7 +20,7 @@ export async function onRequest(context) {
   try {
     if (request.method === "GET") {
       const r = await fetch(
-        `${SUPABASE_URL}/rest/v1/booking_requests?select=*,slots(date,start_time,end_time,court_id,price)&order=created_at.desc&limit=500`,
+        `${SUPABASE_URL}/rest/v1/booking_requests?select=*,slots(id,date,start_time,end_time,court_id,price,status)&order=created_at.desc&limit=500`,
         { headers: auth }
       );
       return Response.json(await r.json());
@@ -31,7 +31,7 @@ export async function onRequest(context) {
 
     if (body.action === "list") {
       const r = await fetch(
-        `${SUPABASE_URL}/rest/v1/booking_requests?select=*,slots(date,start_time,end_time,court_id,price)&order=created_at.desc&limit=500`,
+        `${SUPABASE_URL}/rest/v1/booking_requests?select=*,slots(id,date,start_time,end_time,court_id,price,status)&order=created_at.desc&limit=500`,
         { headers: auth }
       );
       return Response.json(await r.json());

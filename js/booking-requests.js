@@ -110,7 +110,8 @@ function renderBookingRequests(list) {
   if (desktopBody) {
     desktopBody.innerHTML = filtered.map(r => {
       const sl = _brSlotLine(r);
-      const canAct = r.status === "pending" && (r.slots?.status === "available");
+      const canAct = r.status === "pending"
+  && (!r.slots || r.slots.status === undefined || r.slots.status === "available");
       const acceptBtn = r.status === "pending"
         ? (canAct
             ? `<button class="btn btn-success btn-sm" onclick="openAcceptBR(${r.id})" title="Accept"><i class="bi bi-check-lg"></i> Accept</button>`
@@ -153,7 +154,8 @@ function renderBookingRequests(list) {
   if (mobileList) {
     mobileList.innerHTML = filtered.map(r => {
       const sl = _brSlotLine(r);
-      const canAct = r.status === "pending" && (r.slots?.status === "available");
+      const canAct = r.status === "pending"
+  && (!r.slots || r.slots.status === undefined || r.slots.status === "available");
       const acceptBtn = r.status === "pending"
         ? (canAct
             ? `<button class="btn btn-success btn-sm flex-fill" onclick="openAcceptBR(${r.id})"><i class="bi bi-check-lg"></i> Accept</button>`
@@ -204,9 +206,21 @@ function renderBookingRequests(list) {
 
 // ---------- Accept flow ----------
 
-function openAcceptBR(id) {
-  const r = window.allBookingRequests.find(x => x.id === id);
+async function openAcceptBR(id) {
+  // Re-fetch to be sure we're working with fresh data
+  let r = window.allBookingRequests.find(x => x.id === id);
+  if (!r) {
+    // Maybe the cache is stale — refresh from server before giving up
+    try {
+      const res = await fetch("/api/admin-booking-request", { credentials: "include" });
+      if (res.ok) {
+        window.allBookingRequests = await res.json();
+        r = window.allBookingRequests.find(x => x.id === id);
+      }
+    } catch (_) {}
+  }
   if (!r) { showToast("Request not found", "error"); return; }
+  if (r.status !== "pending") { showToast("This request is already " + r.status, "warning"); return; }
 
   const s = r.slots || {};
   document.getElementById("br-accept-id").value = r.id;
@@ -322,9 +336,18 @@ async function deleteBR(id) {
 
 // ---------- Edit flow ----------
 
-function openEditBR(id) {
-  const r = window.allBookingRequests.find(x => x.id === id);
-  if (!r) return;
+async function openEditBR(id) {
+  let r = window.allBookingRequests.find(x => x.id === id);
+  if (!r) {
+    try {
+      const res = await fetch("/api/admin-booking-request", { credentials: "include" });
+      if (res.ok) {
+        window.allBookingRequests = await res.json();
+        r = window.allBookingRequests.find(x => x.id === id);
+      }
+    } catch (_) {}
+  }
+  if (!r) { showToast("Request not found", "error"); return; }
   const s = r.slots || {};
   document.getElementById("br-edit-id").value = r.id;
   document.getElementById("brEditSlotInfo").textContent =
@@ -375,7 +398,10 @@ async function bulkAcceptBR() {
   const ids = _selectedBrIds();
   const pending = ids.filter(id => {
     const r = window.allBookingRequests.find(x => x.id === id);
-    return r && r.status === "pending" && r.slots?.status === "available";
+    // If slot.status isn't loaded (older API payload), trust pending.
+    // Server will reject on accept if the slot really isn't available.
+    const slotOk = !r?.slots || r.slots.status === undefined || r.slots.status === "available";
+    return r && r.status === "pending" && slotOk;
   });
   if (!pending.length) { showToast("No acceptable pending requests selected", "warning"); return; }
   if (!confirm(`Accept ${pending.length} request(s)? A confirmation modal per request will open.`)) return;
