@@ -1199,6 +1199,30 @@
         </button>
 </div>
 </div>
+<!-- public booking req start -->
+ <div class="card p-3 my-4 border-info" id="section-booking-requests">
+  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h4 class="mb-0">📥 Booking Requests <span id="brPendingBadge" class="badge bg-warning text-dark d-none">0</span></h4>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-secondary btn-sm" onclick="loadBookingRequests()">Refresh</button>
+      <button class="btn btn-outline-danger btn-sm" onclick="deleteAllDeclinedBR()">Clean Declined</button>
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-bordered align-middle">
+      <thead><tr>
+        <th><input type="checkbox" id="br-select-all" onclick="toggleAllBR(this)"></th>
+        <th>#</th><th>Slot</th><th>Player</th><th>Contact</th><th>Notes</th><th>Status</th><th>Actions</th>
+      </tr></thead>
+      <tbody id="brBody"><tr><td colspan="8" class="text-center text-muted py-3">Loading…</td></tr></tbody>
+    </table>
+  </div>
+  <div class="d-flex gap-2">
+    <button class="btn btn-success btn-sm" onclick="bulkAcceptBR()">Accept Selected</button>
+    <button class="btn btn-danger btn-sm" onclick="bulkDeleteBR()">Delete Selected</button>
+  </div>
+</div>
+<!-- end -->
 <div class="card p-3 my-4 border-success" id="section-bookings">
 <div class="d-flex justify-content-between align-items-center mb-3">
 <h4 class="mb-0">Booking Management</h4>
@@ -1750,5 +1774,6 @@
 <script src="/js/bookings.js"></script>
 <script src="/js/back-to-top.js"></script>
 <script src="/js/main.js"></script>
+<script src="/js/booking-requests.js"></script>
 </body>
 </html>
