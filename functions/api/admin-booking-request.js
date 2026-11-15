@@ -103,6 +103,21 @@ export async function onRequest(context) {
       return Response.json({ ok: true });
     }
 
+        if (body.action === "update") {
+      const id = Number(body.id);
+      const data = body.data || {};
+      const patch = {};
+      if (data.player_name   != null) patch.player_name   = String(data.player_name).trim();
+      if (data.player_mobile != null) patch.player_mobile = String(data.player_mobile).trim();
+      if (data.player_email  != null) patch.player_email  = String(data.player_email).trim().toLowerCase();
+      if (data.notes         != null) patch.notes         = String(data.notes).trim();
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/booking_requests?id=eq.${id}`, {
+        method: "PATCH", headers: auth, body: JSON.stringify(patch)
+      });
+      if (!r.ok) return Response.json({ error: "Update failed" }, { status: 500 });
+      return Response.json({ ok: true });
+    }
+
     return new Response("Invalid", { status: 400 });
   } catch (err) {
     return Response.json({ error: err.message }, { status: 500 });
