@@ -77,6 +77,11 @@ function showDashboard() {
 
   loadBookings();
 
+    // Load public booking requests
+  if (typeof loadBookingRequests === "function") {
+    loadBookingRequests();
+  }
+
   loadPublicSettings();
 
 }
