@@ -1011,7 +1011,8 @@ document.getElementById('next-day').addEventListener('click', () => {
           if (status==="available") {
             badgeText="Available"; badgeClass="text-success-small";
             const msg = encodeURIComponent(`Hi, I want to book ${displayTime} at ${courtName} for ₹${slot.price}`);
-            btnHTML=`<a href="https://wa.me/${PHONE}?text=${msg}" target="_blank" class="btn btn-sm btn-primary">Book</a>`;
+            // btnHTML=`<a href="https://wa.me/${PHONE}?text=${msg}" target="_blank" class="btn btn-sm btn-primary">Book</a>`;
+            btnHTML = `<button type="button" class="btn btn-sm btn-primary" onclick="openPBR(${slot.id})">Book</button>`;
           } else if (status==="booked") {
             badgeText="Booked"; badgeClass="text-danger-small";
             btnHTML=`<button class="btn btn-sm btn-danger" disabled>Booked</button>`;
@@ -1201,6 +1202,171 @@ function renderAlerts(data) {
     });
     </script>
 
+<!-- Public Booking Request Modal -->
+<div class="modal fade" id="pbrModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:20px;">
+      <div class="modal-header">
+        <h5 class="modal-title">📅 Request This Slot</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="pbrSlotInfo" class="alert alert-info py-2 mb-3"></div>
+        <div id="pbrAlert" class="alert d-none"></div>
+        <input type="hidden" id="pbr-slot-id">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Your Name</label>
+          <input type="text" class="form-control" id="pbr-name" maxlength="120" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Email</label>
+          <input type="email" class="form-control" id="pbr-email" maxlength="200" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Mobile</label>
+          <input type="tel" class="form-control" id="pbr-mobile" maxlength="20" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Notes (optional)</label>
+          <textarea class="form-control" id="pbr-notes" maxlength="1000" rows="2"></textarea>
+        </div>
+        <p class="text-muted small mb-0"><i class="bi bi-shield-check"></i> Protected by reCAPTCHA.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-success" id="pbrSubmitBtn" onclick="submitPBR()">Submit Request</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Success + Pay Modal -->
+<div class="modal fade" id="pbrSuccessModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:20px;">
+      <div class="modal-body text-center p-4">
+        <div class="display-4 text-success mb-2">✅</div>
+        <h5 class="fw-bold">Request Sent!</h5>
+        <p class="text-muted" id="pbrSuccessText"></p>
+        <button class="btn btn-primary w-100 mb-2" id="pbrPayBtn">Pay Now</button>
+        <button class="btn btn-outline-secondary w-100" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Uses the existing `allData` array from renderSlots() and showToast()
+window._pbrLastSlot = null;
+
+function openPBR(slotId) {
+  const slot = (allData || []).find(s => s.id == slotId);
+  if (!slot || (slot.status || "").toLowerCase() !== "available") {
+    showToast("Slot unavailable", "warning");
+    return;
+  }
+  window._pbrLastSlot = slot;
+
+  document.getElementById("pbr-slot-id").value = slot.id;
+  document.getElementById("pbrSlotInfo").textContent =
+    `${slot.date} · ${slot.start_time} - ${slot.end_time} · Court ${slot.court_id} · ₹${slot.price}`;
+
+  ["pbr-name", "pbr-email", "pbr-mobile", "pbr-notes"].forEach(id =>
+    document.getElementById(id).value = ""
+  );
+  document.getElementById("pbrAlert").className = "alert d-none";
+  document.getElementById("pbrSubmitBtn").disabled = false;
+  document.getElementById("pbrSubmitBtn").textContent = "Submit Request";
+
+  new bootstrap.Modal(document.getElementById("pbrModal")).show();
+}
+
+async function submitPBR() {
+  const slotId = document.getElementById("pbr-slot-id").value;
+  const name = document.getElementById("pbr-name").value.trim();
+  const email = document.getElementById("pbr-email").value.trim();
+  const mobile = document.getElementById("pbr-mobile").value.trim();
+  const notes = document.getElementById("pbr-notes").value.trim();
+  const alertEl = document.getElementById("pbrAlert");
+  const btn = document.getElementById("pbrSubmitBtn");
+
+  const showErr = (m) => {
+    alertEl.className = "alert alert-danger";
+    alertEl.textContent = m;
+    alertEl.classList.remove("d-none");
+  };
+
+  if (!name) return showErr("Name required");
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return showErr("Invalid email");
+  if (!/^[0-9+\-\s()]{7,20}$/.test(mobile)) return showErr("Invalid mobile");
+  if (/[<>;`\\]/.test(name + email + mobile + notes)) return showErr("Invalid characters");
+
+  btn.disabled = true;
+  btn.textContent = "Sending…";
+
+  try {
+    // Reuse your existing reCAPTCHA v3 site key + helper
+    if (typeof grecaptcha === "undefined") throw new Error("reCAPTCHA not loaded");
+    const token = await new Promise((res, rej) => {
+      grecaptcha.ready(async () => {
+        try { res(await grecaptcha.execute("6Led3dQsAAAAAJ3gbHohRpri-isc6Y8LcG1RwI4H", { action: "booking_request" })); }
+        catch (e) { rej(e); }
+      });
+    });
+
+    const r = await fetch("/api/public-booking-request", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        slot_id: Number(slotId), player_name: name, player_email: email,
+        player_mobile: mobile, notes, recaptcha_token: token
+      })
+    });
+    const data = await r.json();
+
+    if (!r.ok) {
+      showErr(data.error || "Request failed");
+      btn.disabled = false; btn.textContent = "Submit Request";
+      return;
+    }
+
+    // Hide form modal, show success modal
+    bootstrap.Modal.getInstance(document.getElementById("pbrModal")).hide();
+    const slot = window._pbrLastSlot;
+    document.getElementById("pbrSuccessText").textContent =
+      `${slot.date} · ${slot.start_time} - ${slot.end_time} · ₹${slot.price}. We'll email you once approved.`;
+
+    // Pay button: UPI deep link on mobile, QR on desktop
+    const payBtn = document.getElementById("pbrPayBtn");
+    const UPI_ID = "9994589034@sbi"; // ← your UPI ID
+    const UPI_NAME = "Shivani Elite Badminton";
+    const amount = slot.price || 0;
+    const note = `Court ${slot.court_id} ${slot.date} ${slot.start_time}`;
+
+    const upiUri = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(UPI_NAME)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
+
+    payBtn.onclick = () => {
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (isMobile) {
+        window.location.href = upiUri;
+      } else {
+        // Desktop: show your static QR image in a new window
+        const w = window.open("", "_blank");
+        w.document.write(`<html><body style="text-align:center;font-family:sans-serif;padding:20px;">
+          <h3>Scan to pay ₹${amount}</h3>
+          <p>${note}</p>
+          <img src="/images/one-hr-qr.jpeg" style="max-width:320px;" />
+        </body></html>`);
+      }
+    };
+
+    new bootstrap.Modal(document.getElementById("pbrSuccessModal")).show();
+  } catch (e) {
+    showErr(e.message || "Something went wrong");
+    btn.disabled = false; btn.textContent = "Submit Request";
+  }
+}
+</script>
 
 
 </body>
