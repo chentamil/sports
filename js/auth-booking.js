@@ -81,6 +81,9 @@ function showDashboard() {
   if (typeof loadBookingRequests === "function") {
     loadBookingRequests();
   }
+  // If loadPublicRequests no longer exists, delete that line. If it still exists elsewhere, keep both — they're independent.
+  if (typeof loadBookingRequests === "function") loadBookingRequests();
+  if (typeof startBrPolling === "function") startBrPolling();
 
   loadPublicSettings();
 
