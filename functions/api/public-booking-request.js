@@ -1,6 +1,6 @@
 // POST /api/public-booking-request
-// Body: { slot_id, player_name, player_email, player_mobile, notes, recaptcha_token }
-// No cookie. Uses anon key + RLS. Server verifies slot + reCAPTCHA.
+// Body: { slot_id, player_name, player_email, player_mobile, notes, recaptcha_token, group_id }
+// No cookie. Uses anon key + RLS. Server verifies slot + reCAPTCHA + past date.
 
 export async function onRequest(context) {
   const SUPABASE_URL = context.env.SUPABASE_URL;
@@ -29,6 +29,7 @@ export async function onRequest(context) {
     const mobile = String(body.player_mobile || "").trim();
     const notes = String(body.notes || "").trim();
     const token = String(body.recaptcha_token || "");
+    const group_id = String(body.group_id || ""); // <--- NEW: capture group_id
 
     // Sanitize: alphanumeric + basic punctuation only. No angle brackets, semicolons, backticks.
     const bad = /[<>;`\\]/;
@@ -49,7 +50,7 @@ export async function onRequest(context) {
     if (!token)
       return Response.json({ error: "reCAPTCHA missing" }, { status: 400 });
 
-    // reCAPTCHA v3 verify [citation:4]
+    // reCAPTCHA v3 verify
     const v = await fetch("https://www.google.com/recaptcha/api/siteverify", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -71,13 +72,20 @@ export async function onRequest(context) {
     if (slot.status !== "available")
       return Response.json({ error: "Slot unavailable" }, { status: 409 });
 
+    // STRICT PAST-DATE BLOCK (NEW)
+    const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+    if (slot.date < today) {
+      return Response.json({ error: "Past dates are not allowed" }, { status: 400 });
+    }
+
     // Insert via anon (RLS restricts to pending rows only)
     const ins = await fetch(`${SUPABASE_URL}/rest/v1/booking_requests`, {
       method: "POST",
       headers: { ...anon, Prefer: "return=minimal" },
       body: JSON.stringify([{
         slot_id, player_name: name, player_email: email,
-        player_mobile: mobile, notes: notes || null, status: "pending"
+        player_mobile: mobile, notes: notes || null, status: "pending",
+        group_id: group_id || null // <--- NEW: write group_id
       }])
     });
 
@@ -88,7 +96,6 @@ export async function onRequest(context) {
       return Response.json({ error: "Could not save request" }, { status: 500 });
     }
 
-    // Return the slot info so the frontend can render the success modal + UPI details
     return Response.json({
       ok: true,
       slot: { date: slot.date, start_time: slot.start_time, end_time: slot.end_time, price: slot.price }

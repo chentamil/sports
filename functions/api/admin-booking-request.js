@@ -41,13 +41,28 @@ export async function onRequest(context) {
       const id = Number(body.id);
       if (!Number.isInteger(id)) return Response.json({ error: "Invalid id" }, { status: 400 });
 
+      // 1. Fetch the request
       const rr = await fetch(`${SUPABASE_URL}/rest/v1/booking_requests?id=eq.${id}&select=*,slots(*)`, { headers: auth });
       const req = (await rr.json())[0];
       if (!req) return Response.json({ error: "Not found" }, { status: 404 });
       if (req.status !== "pending") return Response.json({ error: "Already processed" }, { status: 409 });
-      if (req.slots.status !== "available") return Response.json({ error: "Slot no longer available" }, { status: 409 });
 
-      // Allow admin overrides from the modal; fall back to request values
+      // 2. If grouped, find all sibling requests
+      let targetRequests = [req];
+      if (req.group_id) {
+        const grpRes = await fetch(`${SUPABASE_URL}/rest/v1/booking_requests?group_id=eq.${req.group_id}&status=eq.pending&select=*,slots(*)`, { headers: auth });
+        const grpReqs = await grpRes.json();
+        if (grpReqs && grpReqs.length > 0) targetRequests = grpReqs;
+      }
+
+      // 3. Verify all slots are still available
+      for (const r of targetRequests) {
+        if (r.slots.status !== "available") {
+          return Response.json({ error: `Slot ${r.slots.start_time} is no longer available` }, { status: 409 });
+        }
+      }
+
+      // 4. Admin overrides (apply to main req, or default)
       const o = body.overrides || {};
       const finalName   = (o.customer_name   || req.player_name).toString().trim();
       const finalMobile = (o.customer_mobile || req.player_mobile).toString().trim();
@@ -55,41 +70,68 @@ export async function onRequest(context) {
       const finalNotes  = (o.booking_notes   != null ? o.booking_notes : req.notes) || null;
       const finalPay    = (o.payment_status  || "pending").toString();
 
-      const br = await fetch(`${SUPABASE_URL}/rest/v1/bookings`, {
+      // 5. Create one booking group for the whole set
+      const totalPrice = targetRequests.reduce((sum, r) => sum + Number(r.slots.price || 0), 0);
+      const gRes = await fetch(`${SUPABASE_URL}/rest/v1/booking_groups`, {
         method: "POST",
-        headers: { ...auth, Prefer: "return=representation" },
+        headers: { ...auth, "Content-Type": "application/json", Prefer: "return=representation" },
         body: JSON.stringify([{
-          slot_id: req.slot_id,
-          customer_name: finalName,
-          customer_email: finalEmail,
-          customer_mobile: finalMobile,
-          booking_notes: finalNotes,
-          payment_status: finalPay
+          customer_name: finalName, customer_email: finalEmail, customer_mobile: finalMobile,
+          booking_notes: finalNotes, payment_status: finalPay, total_price: totalPrice
         }])
       });
-      if (!br.ok) return Response.json({ error: "Booking insert failed" }, { status: 500 });
-      const booking = (await br.json())[0];
+      if (!gRes.ok) return Response.json({ error: "Group creation failed" }, { status: 500 });
+      const group = (await gRes.json())[0];
 
-      await fetch(`${SUPABASE_URL}/rest/v1/slots?id=eq.${req.slot_id}`, {
-        method: "PATCH", headers: auth,
-        body: JSON.stringify({ status: "booked" })
+      // 6. Create bookings for EACH slot
+      let mainBookingId = null;
+      const slotIdsToFlip = [];
+
+      for (const r of targetRequests) {
+        const br = await fetch(`${SUPABASE_URL}/rest/v1/bookings`, {
+          method: "POST",
+          headers: { ...auth, Prefer: "return=representation" },
+          body: JSON.stringify([{
+            slot_id: r.slot_id, customer_name: finalName, customer_email: finalEmail,
+            customer_mobile: finalMobile, booking_notes: finalNotes, payment_status: finalPay,
+            group_id: group.id
+          }])
+        });
+        if (br.ok) {
+          const b = (await br.json())[0];
+          if (r.id === id) mainBookingId = b.id; // capture for response
+        }
+        slotIdsToFlip.push(r.slot_id);
+      }
+
+      // 7. Flip all slots
+      await fetch(`${SUPABASE_URL}/rest/v1/slots?id=in.(${slotIdsToFlip.join(",")})`, {
+        method: "PATCH", headers: auth, body: JSON.stringify({ status: "booked" })
       });
 
-      await fetch(`${SUPABASE_URL}/rest/v1/booking_requests?id=eq.${id}`, {
+      // 8. Mark all as accepted
+      const reqIds = targetRequests.map(r => r.id).join(",");
+      await fetch(`${SUPABASE_URL}/rest/v1/booking_requests?id=in.(${reqIds})`, {
         method: "PATCH", headers: auth,
-        body: JSON.stringify({
-          status: "accepted",
-          booking_id: booking.id,
-          reviewed_at: new Date().toISOString()
-        })
+        body: JSON.stringify({ status: "accepted", booking_id: mainBookingId, reviewed_at: new Date().toISOString() })
       });
 
-      return Response.json({ ok: true, booking_id: booking.id, slot_id: req.slot_id });
+      return Response.json({ ok: true, booking_id: mainBookingId, slot_id: req.slot_id });
     }
 
     if (body.action === "decline") {
       const id = Number(body.id);
-      await fetch(`${SUPABASE_URL}/rest/v1/booking_requests?id=eq.${id}`, {
+      const rr = await fetch(`${SUPABASE_URL}/rest/v1/booking_requests?id=eq.${id}&select=group_id`, { headers: auth });
+      const req = (await rr.json())[0];
+      
+      let reqIds = [id];
+      if (req && req.group_id) {
+         const grp = await fetch(`${SUPABASE_URL}/rest/v1/booking_requests?group_id=eq.${req.group_id}&status=eq.pending&select=id`, { headers: auth });
+         const grpReqs = await grp.json();
+         if (grpReqs) reqIds = grpReqs.map(r => r.id);
+      }
+      
+      await fetch(`${SUPABASE_URL}/rest/v1/booking_requests?id=in.(${reqIds.join(",")})`, {
         method: "PATCH", headers: auth,
         body: JSON.stringify({ status: "declined", reviewed_at: new Date().toISOString() })
       });

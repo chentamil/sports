@@ -423,18 +423,93 @@
                   font-size: 1.1rem;
               }
           </style>
-        <!-- Date picker with custom calendar icon ends here -->
-
-        <button id="next-day" class="btn btn-outline-primary" aria-label="Next day">
-            <i class="bi bi-chevron-right" aria-hidden="true"></i>
-        </button>
-
+<div class="bg-white p-3 rounded-4 shadow-sm mb-4" id="mhPublicHeader">
+  
+  <!-- Date Scroller (Next 4 days) -->
+  <div class="d-flex justify-content-between mb-3 overflow-auto pb-1" id="mh-public-date-tabs" style="gap:8px; scrollbar-width:none;"></div>
+  
+  <!-- Custom Date Row -->
+  <div class="d-flex gap-2 mb-3">
+    <div class="flex-grow-1 position-relative">
+       <input type="date" id="selected-date" class="form-control fw-bold" min="2026-11-16" onchange="mhPublicPickCustomDate(this.value)" style="border-radius:12px; background:#f8fafc; border:none; padding:12px;">
     </div>
+  </div>
 
-    <p class="text-center text-muted">
-        📍 Kanchipuram | Live slot availability below
-    </p>
-    <h2 id="selected-date-label" class="text-center fw-bold text-primary mb-4 fs-5"></h2>
+  <!-- Court Tabs & Duration -->
+  <div class="d-flex flex-wrap gap-2 mb-3">
+    <div class="d-flex bg-light rounded-pill p-1 flex-grow-1" id="mh-public-court-tabs"></div>
+  </div>
+  
+  <div class="d-flex justify-content-between align-items-center mb-3">
+      <h6 class="fw-bold mb-0 text-uppercase text-muted" style="letter-spacing:1px; font-size:0.75rem;">Available Slots</h6>
+      <select id="mh-public-duration" class="form-select form-select-sm fw-bold" style="width:auto; border-radius:20px; border:none; background:#f1f5f9;" onchange="mhPublicUpdate()">
+        <option value="1">1 hr</option>
+        <option value="2">2 hrs</option>
+        <option value="3">3 hrs</option>
+        <option value="4">4 hrs</option>
+      </select>
+  </div>
+
+  <!-- Slots List -->
+  <div id="mh-public-slots" class="d-flex flex-column gap-2 mb-4"></div>
+
+  <!-- Sticky Proceed Button -->
+  <div class="sticky-bottom bg-white pt-2 pb-2">
+      <button class="btn btn-primary w-100 py-3 rounded-pill fw-bold fs-5 shadow-lg" onclick="mhPublicProceed()">
+         Proceed <span id="mh-public-total" class="ms-2 opacity-75"></span>
+      </button>
+  </div>
+</div>
+
+<!-- Clean Modal -->
+<div class="modal fade" id="mhModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:24px; border:none;">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold">Confirm Booking</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body pt-2">
+        <div class="alert alert-info py-2 mb-3" id="mh-summary-slots"></div>
+        <div id="mhAlert" class="alert d-none"></div>
+        
+        <div class="mb-3">
+          <label class="form-label fw-bold small text-muted">Your Name</label>
+          <input type="text" class="form-control bg-light" id="mh-name" placeholder="Full name" style="border:none;">
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold small text-muted">Mobile Number</label>
+          <input type="tel" class="form-control bg-light" id="mh-mobile" placeholder="10 digit number" style="border:none;">
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold small text-muted">Email Address</label>
+          <input type="email" class="form-control bg-light" id="mh-email" placeholder="you@email.com" style="border:none;">
+        </div>
+        <div class="mb-2">
+          <label class="form-label fw-bold small text-muted">Notes (Optional)</label>
+          <textarea class="form-control bg-light" id="mh-notes" rows="2" style="border:none;"></textarea>
+        </div>
+        <p class="text-muted small"><i class="bi bi-shield-check"></i> Protected by reCAPTCHA.</p>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button class="btn btn-success w-100 py-2 rounded-pill fw-bold" id="mh-submit-btn" onclick="mhSubmit()">Submit Request</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="pbrSuccessModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center p-4" style="border-radius:24px; border:none;">
+      <div class="display-1 text-success mb-2">✅</div>
+      <h4 class="fw-bold">Request Sent!</h4>
+      <p class="text-muted small" id="pbrSuccessText"></p>
+      <button class="btn btn-primary w-100 py-2 rounded-pill fw-bold mb-2" id="pbrPayBtn">Pay Now</button>
+      <button class="btn btn-light w-100 py-2 rounded-pill fw-bold" data-bs-dismiss="modal">Close</button>
+    </div>
+  </div>
+</div>
 
     <div id="slots-container" class="row g-4"></div>
 
@@ -1378,26 +1453,17 @@ function renderAlerts(data) {
 </div>
 
 <script>
-/* ==================================================
- * Multi-hour booking UI
- * ==================================================
- * Uses the existing `allData` global from renderSlots().
- * State:
- *   mhSelectedDate  "YYYY-MM-DD"
- *   mhSelectedCourt number
- *   mhSelectedStart string ("6:00PM")
- *   mhSelectedDuration number (1..N)
- *   mhSelectedSlotIds []   // computed from start + duration
- * ================================================== */
+/* ================================================== */
+/* CLEAN MULTI-HOUR BOOKING UI (State Machine)        */
+/* ================================================== */
 
-window.mhSelectedDate = null;
-window.mhSelectedCourt = null;
+window.mhDate = new Date().toLocaleDateString('en-CA');
+window.mhCourt = 1;
 window.mhSelectedStart = null;
 window.mhSelectedDuration = 1;
 window.mhSelectedSlotIds = [];
 
-// ---- helpers ----
-function mhTimeToMin(t) {
+function mhT2M(t) {
   if (!t) return 0;
   const s = t.replace(/\s/g, "").toUpperCase();
   const m = s.match(/^(\d+)(?::(\d+))?\s*(AM|PM)$/);
@@ -1408,265 +1474,194 @@ function mhTimeToMin(t) {
   if (m[3] === "AM" && h === 12) h = 0;
   return h * 60 + mm;
 }
-
-function mhFmtDate(d) {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
-function mhUpcomingDates(n) {
-  const out = [];
-  const today = new Date();
-  for (let i = 0; i < n; i++) {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    out.push(mhFmtDate(d));
-  }
-  return out;
-}
-
-function mhPrettyDate(iso) {
-  const d = new Date(iso + "T00:00:00");
-  return d.toLocaleDateString("en-GB", { weekday: "short", day: "2-digit", month: "short" });
-}
-
-function mhSlotsFor(date, court) {
-  return (allData || [])
-    .filter(s => s.date === date && Number(s.court_id) === Number(court))
-    .sort((a, b) => mhTimeToMin(a.start_time || a.time) - mhTimeToMin(b.start_time || b.time));
-}
-
-function mhAvailableSlotsFor(date, court) {
-  return mhSlotsFor(date, court).filter(s => (s.status || "").toLowerCase() === "available");
-}
-
-function mhDurationOptions(startTime, allSlots) {
-  // Count how many consecutive 1-hour slots we can chain
-  const byStart = {};
-  allSlots.forEach(s => { byStart[s.start_time] = s; });
-
-  const startMin = mhTimeToMin(startTime);
-  let maxHours = 0;
-  for (let h = 1; h <= 10; h++) {
-    const key = mhMinToTime(startMin + (h - 1) * 60);
-    const slot = byStart[key];
-    if (!slot || slot.status !== "available") break;
-    maxHours++;
-  }
-  return maxHours;
-}
-
-function mhMinToTime(min) {
+function mhM2T(min) {
   let h = Math.floor(min / 60);
   const m = min % 60;
-  const period = h >= 12 ? "PM" : "AM";
+  const p = h >= 12 ? "PM" : "AM";
   if (h > 12) h -= 12;
   if (h === 0) h = 12;
-  return `${h}:${String(m).padStart(2, "0")}${period}`;
+  return `${h}:${String(m).padStart(2, "0")}${p}`;
 }
 
-// ---- open modal ----
-function openBookingModal(slotId) {
-  // ignore; kept only for backward-compat.
+document.addEventListener("DOMContentLoaded", () => {
+    if(document.getElementById("mhPublicHeader")) mhPublicRender();
+});
+
+function mhPublicRender() {
+  // 1. Render Date Tabs (Next 4 days)
+  const dTabs = document.getElementById("mh-public-date-tabs");
+  let dHTML = "";
+  for(let i=0; i<4; i++) {
+    let d = new Date();
+    d.setDate(d.getDate() + i);
+    let iso = d.toLocaleDateString('en-CA');
+    let dayName = i === 0 ? "TODAY" : d.toLocaleDateString('en-GB', {weekday:'short'}).toUpperCase();
+    let dayNum = d.getDate();
+    let active = iso === window.mhDate;
+    
+    dHTML += `
+      <div onclick="mhPublicPickDate('${iso}')" class="text-center p-2 rounded-3 cursor-pointer ${active ? 'bg-warning text-dark' : 'bg-light text-muted'}" style="min-width:65px; cursor:pointer; transition:0.2s;">
+        <div class="small fw-bold" style="font-size:0.65rem;">${dayName}</div>
+        <div class="fs-4 fw-bold lh-1">${dayNum}</div>
+      </div>
+    `;
+  }
+  dTabs.innerHTML = dHTML;
+  document.getElementById("selected-date").value = window.mhDate;
+
+  // 2. Render Court Tabs
+  const courts = [...new Set((allData||[]).filter(s => s.date === window.mhDate).map(s => Number(s.court_id)))].sort();
+  if(courts.length > 0 && !courts.includes(window.mhCourt)) window.mhCourt = courts[0];
+  
+  const cTabs = document.getElementById("mh-public-court-tabs");
+  cTabs.innerHTML = courts.map(c => `
+    <button class="btn flex-fill rounded-pill fw-bold ${window.mhCourt===c ? 'btn-dark' : 'btn-light text-muted'}" style="border:none;" onclick="mhPublicPickCourt(${c})">Court ${c}</button>
+  `).join("");
+
+  // 3. Render Slots
+  mhPublicUpdate();
 }
 
-function openMH(slotId) {
-  const startSlot = (allData || []).find(s => s.id == slotId);
-  if (!startSlot) { showToast("Slot not found", "error"); return; }
+function mhPublicPickDate(iso) {
+  window.mhDate = iso;
+  window.mhSelectedStart = null;
+  mhPublicRender();
+}
+function mhPublicPickCustomDate(iso) {
+  if(!iso) return;
+  window.mhDate = iso;
+  window.mhSelectedStart = null;
+  mhPublicRender();
+}
+function mhPublicPickCourt(c) {
+  window.mhCourt = c;
+  window.mhSelectedStart = null;
+  mhPublicRender();
+}
 
-  window.mhSelectedDate = startSlot.date;
-  window.mhSelectedCourt = Number(startSlot.court_id);
-  window.mhSelectedStart = startSlot.start_time;
-  window.mhSelectedDuration = 1;
-  window.mhSelectedSlotIds = [];
+function mhPublicUpdate() {
+  const dur = Number(document.getElementById("mh-public-duration").value) || 1;
+  window.mhSelectedDuration = dur;
 
-  // Reset form
+  const slots = (allData||[]).filter(s => s.date === window.mhDate && Number(s.court_id) === window.mhCourt).sort((a,b)=>mhT2M(a.start_time)-mhT2M(b.start_time));
+  const avail = slots.filter(s => s.status === "available");
+  
+  const container = document.getElementById("mh-public-slots");
+  if(!slots.length) {
+     container.innerHTML = `<div class="text-center text-muted py-4">No slots available for this date.</div>`;
+     document.getElementById("mh-public-total").textContent = "";
+     return;
+  }
+
+  // We only show slots that can accommodate the selected duration
+  let validStarts = [];
+  avail.forEach((s, i) => {
+     let canDo = true;
+     let startMin = mhT2M(s.start_time);
+     for(let h=0; h<dur; h++) {
+        let key = mhM2T(startMin + (h*60));
+        if(!avail.find(x => x.start_time === key)) { canDo = false; break; }
+     }
+     if(canDo) validStarts.push(s.start_time);
+  });
+
+  // If nothing selected or invalid, pick first valid
+  if(!window.mhSelectedStart || !validStarts.includes(window.mhSelectedStart)) {
+     window.mhSelectedStart = validStarts.length ? validStarts[0] : null;
+  }
+
+  container.innerHTML = "";
+  
+  // Group by Morning / Evening
+  const morning = slots.filter(s => mhT2M(s.start_time) < 720);
+  const evening = slots.filter(s => mhT2M(s.start_time) >= 720);
+
+  const drawGroup = (title, group) => {
+      if(!group.length) return;
+      container.innerHTML += `<div class="fw-bold small text-muted mt-2 mb-1">${title}</div>`;
+      group.forEach(s => {
+          let isAvail = s.status === "available";
+          let canChain = validStarts.includes(s.start_time);
+          let isSelected = window.mhSelectedStart === s.start_time;
+          
+          let cls = "bg-light border-0";
+          if(isSelected) cls = "bg-primary text-white shadow";
+          else if(!canChain) cls = "bg-white text-muted border border-light";
+          
+          let badge = !isAvail ? `<span class="badge bg-secondary">Booked</span>` : 
+                      (!canChain && isAvail ? `<span class="badge bg-warning text-dark">N/A for ${dur}h</span>` : 
+                      (isSelected ? `<span class="badge bg-white text-primary">Selected</span>` : `<span class="badge bg-white text-dark border">Free</span>`));
+
+          container.innerHTML += `
+            <div class="d-flex justify-content-between align-items-center p-3 rounded-4 ${cls}" 
+                 style="transition:0.2s; ${canChain ? 'cursor:pointer;' : 'opacity:0.6;'}"
+                 onclick="${canChain ? `mhPublicPickStart('${s.start_time}')` : ''}">
+               <div class="d-flex align-items-center gap-3">
+                  <div class="fs-4 fw-bold mb-0">${s.start_time.replace(':00','')} <span class="fs-6 fw-normal">${s.start_time.includes('PM')?'PM':'AM'}</span></div>
+               </div>
+               <div>${badge}</div>
+            </div>
+          `;
+      });
+  };
+
+  drawGroup("MORNING", morning);
+  drawGroup("EVENING", evening);
+
+  mhPublicUpdateTotal();
+}
+
+function mhPublicPickStart(t) {
+   window.mhSelectedStart = t;
+   mhPublicUpdate();
+}
+
+function mhPublicUpdateTotal() {
+  if(!window.mhSelectedStart) {
+     document.getElementById("mh-public-total").textContent = "";
+     window.mhSelectedSlotIds = [];
+     return;
+  }
+
+  let total = 0;
+  let ids = [];
+  let startM = mhT2M(window.mhSelectedStart);
+  
+  for(let h=0; h<window.mhSelectedDuration; h++) {
+     let key = mhM2T(startM + (h*60));
+     let slot = allData.find(s => s.date === window.mhDate && Number(s.court_id) === window.mhCourt && s.start_time === key);
+     if(slot) { total += Number(slot.price); ids.push(slot.id); }
+  }
+  
+  window.mhSelectedSlotIds = ids;
+  document.getElementById("mh-public-total").textContent = `• ₹${total}`;
+}
+
+function mhPublicProceed() {
+  if(!window.mhSelectedSlotIds.length) return showToast("Please select a valid start time", "warning");
+  
+  // Populate modal summary
+  let summary = [];
+  let startM = mhT2M(window.mhSelectedStart);
+  for(let h=0; h<window.mhSelectedDuration; h++) {
+      let key = mhM2T(startM + (h*60));
+      let endKey = mhM2T(startM + ((h+1)*60));
+      summary.push(`${key} - ${endKey}`);
+  }
+  document.getElementById("mh-summary-slots").innerHTML = `<strong>Date:</strong> ${window.mhDate} <br> <strong>Court:</strong> ${window.mhCourt} <br> <strong>Slots:</strong> ${summary.join(', ')}`;
+
+  // Reset Form
   document.getElementById("mh-name").value = "";
   document.getElementById("mh-mobile").value = "";
   document.getElementById("mh-email").value = "";
   document.getElementById("mh-notes").value = "";
   document.getElementById("mhAlert").className = "alert d-none";
   document.getElementById("mh-submit-btn").disabled = false;
-  document.getElementById("mh-submit-btn").textContent = "Submit Booking Request";
-
-  mhRenderDateTabs();
-  mhRenderCourtTabs();
-  mhRenderStartSelect();
-  mhRenderDurationSelect();
-  mhRenderSlotList();
-  mhUpdateSummary();
+  document.getElementById("mh-submit-btn").textContent = "Submit Request";
 
   new bootstrap.Modal(document.getElementById("mhModal")).show();
 }
 
-// ---- render tabs ----
-function mhRenderDateTabs() {
-  const tabs = document.getElementById("mh-date-tabs");
-  const dates = mhUpcomingDates(14);
-  tabs.innerHTML = dates.map(d => `
-    <button type="button" class="date-tab ${d === window.mhSelectedDate ? "active" : ""}"
-      onclick="mhPickDate('${d}')">${mhPrettyDate(d)}</button>
-  `).join("");
-  document.getElementById("mh-date-label").textContent =
-    mhPrettyDate(window.mhSelectedDate);
-}
-
-function mhPickDate(iso) {
-  window.mhSelectedDate = iso;
-  // If the currently selected court has no slots for this date, fall back to first with slots
-  const courts = [...new Set((allData || []).filter(s => s.date === iso).map(s => Number(s.court_id)))].sort((a,b)=>a-b);
-  if (!courts.includes(window.mhSelectedCourt) && courts.length > 0) {
-    window.mhSelectedCourt = courts[0];
-  }
-  window.mhSelectedStart = null;
-  window.mhSelectedDuration = 1;
-
-  mhRenderDateTabs();
-  mhRenderCourtTabs();
-  mhRenderStartSelect();
-  mhRenderDurationSelect();
-  mhRenderSlotList();
-  mhUpdateSummary();
-}
-
-function mhRenderCourtTabs() {
-  const tabs = document.getElementById("mh-court-tabs");
-  const courts = [...new Set((allData || []).filter(s => s.date === window.mhSelectedDate).map(s => Number(s.court_id)))].sort((a,b)=>a-b);
-  if (courts.length === 0) {
-    tabs.innerHTML = `<span class="text-muted small">No courts for this date</span>`;
-    return;
-  }
-  tabs.innerHTML = courts.map(c => `
-    <button type="button" class="court-tab ${c === window.mhSelectedCourt ? "active" : ""}"
-      onclick="mhPickCourt(${c})">Court ${c}</button>
-  `).join("");
-}
-
-function mhPickCourt(courtId) {
-  window.mhSelectedCourt = courtId;
-  window.mhSelectedStart = null;
-  window.mhSelectedDuration = 1;
-  mhRenderCourtTabs();
-  mhRenderStartSelect();
-  mhRenderDurationSelect();
-  mhRenderSlotList();
-  mhUpdateSummary();
-}
-
-function mhRenderStartSelect() {
-  const sel = document.getElementById("mh-start-select");
-  const slots = mhAvailableSlotsFor(window.mhSelectedDate, window.mhSelectedCourt);
-  if (slots.length === 0) {
-    sel.innerHTML = `<option value="">No available slots</option>`;
-    window.mhSelectedStart = null;
-    return;
-  }
-  if (!window.mhSelectedStart || !slots.some(s => s.start_time === window.mhSelectedStart)) {
-    window.mhSelectedStart = slots[0].start_time;
-  }
-  sel.innerHTML = slots.map(s => `
-    <option value="${s.start_time}" ${s.start_time === window.mhSelectedStart ? "selected" : ""}>
-      ${s.start_time} - ${s.end_time}
-    </option>
-  `).join("");
-}
-
-function mhRenderDurationSelect() {
-  const sel = document.getElementById("mh-duration-select");
-  const allSlots = mhSlotsFor(window.mhSelectedDate, window.mhSelectedCourt);
-  const maxH = window.mhSelectedStart ? mhDurationOptions(window.mhSelectedStart, allSlots) : 1;
-  if (maxH < 1) maxH = 1;
-  let options = "";
-  for (let h = 1; h <= maxH; h++) {
-    options += `<option value="${h}" ${h === window.mhSelectedDuration ? "selected" : ""}>${h} hour${h > 1 ? "s" : ""}</option>`;
-  }
-  sel.innerHTML = options;
-  if (window.mhSelectedDuration > maxH) window.mhSelectedDuration = maxH;
-  sel.disabled = maxH <= 1 && (document.querySelectorAll("#mh-start-select option").length <= 1);
-}
-
-function mhOnStartChange() {
-  window.mhSelectedStart = document.getElementById("mh-start-select").value;
-  window.mhSelectedDuration = 1;
-  mhRenderDurationSelect();
-  mhRenderSlotList();
-  mhUpdateSummary();
-}
-
-function mhOnDurationChange() {
-  window.mhSelectedDuration = Number(document.getElementById("mh-duration-select").value) || 1;
-  mhUpdateSummary();
-}
-
-function mhRenderSlotList() {
-  const container = document.getElementById("mh-slot-list");
-  const slots = mhSlotsFor(window.mhSelectedDate, window.mhSelectedCourt);
-  if (slots.length === 0) {
-    container.innerHTML = `<div class="text-muted small">No slots for this date/court.</div>`;
-    return;
-  }
-  // Group by morning / evening for readability
-  const morning = slots.filter(s => mhTimeToMin(s.start_time) < 720);
-  const evening = slots.filter(s => mhTimeToMin(s.start_time) >= 720);
-
-  const render = (label, list) => {
-    if (!list.length) return "";
-    return `<div class="fw-semibold small text-muted mt-2 mb-1">${label}</div>` +
-      list.map(s => {
-        const avail = (s.status || "").toLowerCase() === "available";
-        const selected = s.start_time === window.mhSelectedStart;
-        return `<button type="button" class="mh-slot-btn ${selected ? "selected" : ""}"
-          ${avail ? "" : "disabled"} onclick="mhPickStart('${s.start_time}')">
-          <span class="mh-slot-time">${s.start_time} - ${s.end_time}</span>
-          <span class="mh-slot-price">₹${s.price || 0}</span>
-        </button>`;
-      }).join("");
-  };
-
-  container.innerHTML = render("🌅 Morning", morning) + render("🌙 Evening", evening);
-}
-
-function mhPickStart(start) {
-  window.mhSelectedStart = start;
-  window.mhSelectedDuration = 1;
-  document.getElementById("mh-start-select").value = start;
-  mhRenderDurationSelect();
-  mhRenderSlotList();
-  mhUpdateSummary();
-}
-
-function mhUpdateSummary() {
-  const allSlots = mhSlotsFor(window.mhSelectedDate, window.mhSelectedCourt);
-  const byStart = {};
-  allSlots.forEach(s => { byStart[s.start_time] = s; });
-
-  const picked = [];
-  const startMin = mhTimeToMin(window.mhSelectedStart);
-  let total = 0;
-  for (let i = 0; i < window.mhSelectedDuration; i++) {
-    const key = mhMinToTime(startMin + i * 60);
-    const slot = byStart[key];
-    if (slot && slot.status === "available") {
-      picked.push(slot);
-      total += Number(slot.price || 0);
-    }
-  }
-  window.mhSelectedSlotIds = picked.map(s => s.id);
-
-  const summary = document.getElementById("mh-summary-slots");
-  if (!picked.length) {
-    summary.innerHTML = `<span class="text-muted">Pick a start time to see availability.</span>`;
-  } else {
-    summary.innerHTML = picked.map(s =>
-      `<span class="badge bg-primary me-1 mb-1">${s.start_time} - ${s.end_time}</span>`
-    ).join("");
-  }
-  document.getElementById("mh-summary-total").textContent = "₹" + total;
-}
-
-// ---- submit ----
 async function mhSubmit() {
   const name = document.getElementById("mh-name").value.trim();
   const mobile = document.getElementById("mh-mobile").value.trim();
@@ -1675,38 +1670,17 @@ async function mhSubmit() {
   const alertEl = document.getElementById("mhAlert");
   const btn = document.getElementById("mh-submit-btn");
 
-  const showErr = (m) => {
-    alertEl.className = "alert alert-danger";
-    alertEl.textContent = m;
-    alertEl.classList.remove("d-none");
-  };
+  const showErr = (m) => { alertEl.className = "alert alert-danger"; alertEl.textContent = m; alertEl.classList.remove("d-none"); };
 
-  if (!window.mhSelectedSlotIds.length) return showErr("Please pick at least one slot.");
   if (!name) return showErr("Name required.");
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return showErr("Invalid email.");
   if (!/^[0-9+\-\s()]{7,20}$/.test(mobile)) return showErr("Invalid mobile.");
-  if (/[<>;`\\]/.test(name + email + mobile + notes)) return showErr("Invalid characters.");
 
   btn.disabled = true;
   btn.textContent = "Sending…";
   alertEl.className = "alert d-none";
 
   try {
-    const slot_ids = window.mhSelectedSlotIds;
-    const primary_slot = slot_ids[0];
-
-    // Submit ONE request per slot (so admin's accept flow stays 1-to-1 with slots).
-    // The accept modal can accept the group by selecting them together.
-    const requests = slot_ids.map(sid => ({
-      slot_id: sid,
-      player_name: name,
-      player_email: email,
-      player_mobile: mobile,
-      notes,
-      recaptcha_token: null
-    }));
-
-    // Get one reCAPTCHA token, reuse it for all sub-requests
     if (typeof grecaptcha === "undefined") throw new Error("reCAPTCHA not loaded");
     const token = await new Promise((res, rej) => {
       grecaptcha.ready(async () => {
@@ -1715,36 +1689,47 @@ async function mhSubmit() {
       });
     });
 
-    let okCount = 0;
-    for (const body of requests) {
-      body.recaptcha_token = token;
+    // Generate a group_id for these slots (client-side uuid to link them)
+    const group_id = 'grp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+
+    // Send requests one by one (token is single-use, so we'll wait to fetch new tokens per slot)
+    // Wait, we only have one token. We need to execute a fresh token for each.
+    for (let i=0; i<window.mhSelectedSlotIds.length; i++) {
+      const sid = window.mhSelectedSlotIds[i];
+      // fresh token for each request
+      const t = await new Promise((res, rej) => {
+        grecaptcha.ready(async () => {
+          try { res(await grecaptcha.execute("6Led3dQsAAAAAJ3gbHohRpri-isc6Y8LcG1RwI4H", { action: "booking_request" })); }
+          catch (e) { rej(e); }
+        });
+      });
+
       const r = await fetch("/api/public-booking-request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
+        body: JSON.stringify({
+          slot_id: sid, player_name: name, player_email: email, player_mobile: mobile,
+          notes: notes, recaptcha_token: t, group_id: group_id
+        })
       });
-      if (r.ok) okCount++;
-      else {
+      
+      if (!r.ok) {
         const d = await r.json().catch(() => ({}));
-        throw new Error(d.error || `Failed at slot ${body.slot_id}`);
+        throw new Error(d.error || `Failed at slot ${sid}`);
       }
     }
 
-    // Hide modal, show success
     bootstrap.Modal.getInstance(document.getElementById("mhModal")).hide();
-    const total = window.mhSelectedSlotIds.reduce((sum, sid) => {
-      const s = (allData || []).find(x => x.id === sid);
-      return sum + Number(s?.price || 0);
-    }, 0);
-
-    document.getElementById("pbrSuccessText").textContent =
-      `${okCount} slot request(s) sent · total ₹${total}. We'll email you once approved.`;
+    
+    let total = window.mhSelectedSlotIds.reduce((sum, id) => sum + Number(allData.find(x=>x.id===id)?.price||0), 0);
+    document.getElementById("pbrSuccessText").textContent = `${window.mhSelectedSlotIds.length} slot(s) requested for ₹${total}. We'll email you once approved.`;
 
     const payBtn = document.getElementById("pbrPayBtn");
-    const UPI_ID = "9994589034@sbi";
+    const UPI_ID = "9840253589@upi";
     const UPI_NAME = "Shivani Elite Badminton";
-    const note = `Court ${window.mhSelectedCourt} ${window.mhSelectedDate} ${window.mhSelectedStart}`;
+    const note = `Court ${window.mhCourt} ${window.mhDate} ${window.mhSelectedStart}`;
     const upiUri = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(UPI_NAME)}&am=${total}&cu=INR&tn=${encodeURIComponent(note)}`;
+    
     payBtn.onclick = () => {
       const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
       if (isMobile) window.location.href = upiUri;
@@ -1757,11 +1742,12 @@ async function mhSubmit() {
       }
     };
     new bootstrap.Modal(document.getElementById("pbrSuccessModal")).show();
+
   } catch (err) {
     showErr(err.message || "Something went wrong.");
   } finally {
     btn.disabled = false;
-    btn.textContent = "Submit Booking Request";
+    btn.textContent = "Submit Request";
   }
 }
 </script>
