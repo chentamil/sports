@@ -62,6 +62,99 @@ export async function onRequest(context) {
       const body = await request.json();
 
       // ==================
+      // ADD GROUP BOOKING (multi-hour)
+      // ==================
+      if (body.action === "add_group") {
+        const d = body.data || {};
+        const slot_ids = Array.isArray(d.slot_ids) ? d.slot_ids.map(Number) : [];
+        const customer_name   = String(d.customer_name   || "").trim();
+        const customer_email  = String(d.customer_email  || "").trim().toLowerCase();
+        const customer_mobile = String(d.customer_mobile || "").trim();
+        const booking_notes   = String(d.booking_notes   || "").trim() || null;
+        const payment_status  = String(d.payment_status  || "pending");
+
+        if (slot_ids.length < 1 || slot_ids.length > 10)
+          return new Response("slot_ids must be 1–10 entries", { status: 400 });
+        if (!customer_name)   return new Response("Name required",   { status: 400 });
+        if (!customer_email)  return new Response("Email required",  { status: 400 });
+        if (!customer_mobile) return new Response("Mobile required", { status: 400 });
+
+        // 1. Re-fetch ALL slots from DB — never trust browser
+        const sRes = await fetch(
+          `${SUPABASE_URL}/rest/v1/slots?id=in.(${slot_ids.join(",")})&select=id,date,court_id,start_time,end_time,price,status`,
+          { headers: authHeaders }
+        );
+        const slots = await sRes.json();
+
+        if (!Array.isArray(slots) || slots.length !== slot_ids.length)
+          return new Response("One or more slots not found", { status: 404 });
+
+        if (slots.some(s => s.status !== "available"))
+          return new Response("One or more slots are unavailable", { status: 409 });
+
+        // 2. Same date + court
+        const dates = new Set(slots.map(s => s.date));
+        const courts = new Set(slots.map(s => s.court_id));
+        if (dates.size !== 1 || courts.size !== 1)
+          return new Response("Slots must be on the same date and court", { status: 400 });
+
+        // 3. Create group
+        const total = slots.reduce((sum, s) => sum + Number(s.price || 0), 0);
+        const gRes = await fetch(`${SUPABASE_URL}/rest/v1/booking_groups`, {
+          method: "POST",
+          headers: { ...authHeaders, "Content-Type": "application/json", Prefer: "return=representation" },
+          body: JSON.stringify([{
+            customer_name, customer_email, customer_mobile, booking_notes,
+            payment_status, total_price: total
+          }])
+        });
+        if (!gRes.ok) {
+          const t = await gRes.text();
+          return new Response("Group insert failed: " + t, { status: 500 });
+        }
+        const group = (await gRes.json())[0];
+
+        // 4. Insert one bookings row per slot
+        const bookingRows = slots.map(s => ({
+          slot_id: s.id,
+          customer_name, customer_email, customer_mobile, booking_notes,
+          payment_status, group_id: group.id
+        }));
+        const bRes = await fetch(`${SUPABASE_URL}/rest/v1/bookings`, {
+          method: "POST",
+          headers: { ...authHeaders, "Content-Type": "application/json", Prefer: "return=minimal" },
+          body: JSON.stringify(bookingRows)
+        });
+        if (!bRes.ok) {
+          const t = await bRes.text();
+          // Cleanup: remove the just-created group so it doesn't become orphan
+          await fetch(`${SUPABASE_URL}/rest/v1/booking_groups?id=eq.${group.id}`, {
+            method: "DELETE", headers: authHeaders
+          });
+          return new Response("Booking insert failed: " + t, { status: 500 });
+        }
+
+        // 5. Flip all slots to booked (single PATCH)
+        const flipRes = await fetch(`${SUPABASE_URL}/rest/v1/slots?id=in.(${slot_ids.join(",")})`, {
+          method: "PATCH",
+          headers: { ...authHeaders, "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "booked" })
+        });
+        if (!flipRes.ok) {
+          return new Response("Slot status update failed", { status: 500 });
+        }
+
+        return Response.json({
+          ok: true,
+          group_id: group.id,
+          booking_count: slots.length,
+          total_price: total,
+          slot_ids
+        });
+      }
+
+
+      // ==================
       // ADD BOOKING
       // ==================
 
@@ -141,43 +234,63 @@ export async function onRequest(context) {
       // status=available. This way the slot reopens automatically.
 
       if (body.action === "delete") {
-
         const id = body.id;
 
-        // Step 1: Get the slot_id for this booking before we delete it
+        // Look up the booking first
         const lookupRes = await fetch(
-          `${SUPABASE_URL}/rest/v1/bookings?id=eq.${id}&select=slot_id`,
+          `${SUPABASE_URL}/rest/v1/bookings?id=eq.${id}&select=slot_id,group_id`,
           { headers: authHeaders }
         );
+        const lookupArr = await lookupRes.json();
+        const target = lookupArr && lookupArr[0];
+        const slotId = target?.slot_id;
+        const groupId = target?.group_id;
 
-        const lookupData = await lookupRes.json();
-        const slotId = lookupData?.[0]?.slot_id;
+        // ---- Group delete path ----
+        if (groupId) {
+          // 1. Fetch all slot_ids in this group BEFORE deleting
+          const sibsRes = await fetch(
+            `${SUPABASE_URL}/rest/v1/bookings?group_id=eq.${groupId}&select=slot_id`,
+            { headers: authHeaders }
+          );
+          const sibs = await sibsRes.json();
+          const allSlotIds = (sibs || []).map(x => x.slot_id).filter(Boolean);
 
-        // Step 2: Delete the booking
+          // 2. Delete the group (cascade removes child bookings)
+          const grpDel = await fetch(
+            `${SUPABASE_URL}/rest/v1/booking_groups?id=eq.${groupId}`,
+            { method: "DELETE", headers: authHeaders }
+          );
+          if (!grpDel.ok) return new Response("Group delete failed", { status: 500 });
+
+          // 3. Flip all slots to available
+          if (allSlotIds.length > 0) {
+            await fetch(
+              `${SUPABASE_URL}/rest/v1/slots?id=in.(${allSlotIds.join(",")})`,
+              {
+                method: "PATCH",
+                headers: { ...authHeaders, "Content-Type": "application/json" },
+                body: JSON.stringify({ status: "available" })
+              }
+            );
+          }
+          return Response.json({ ok: true, deleted: "group", slot_count: allSlotIds.length });
+        }
+
+        // ---- Single delete path ----
         const deleteRes = await fetch(
           `${SUPABASE_URL}/rest/v1/bookings?id=eq.${id}`,
-          {
-            method: "DELETE",
-            headers: authHeaders
-          }
+          { method: "DELETE", headers: authHeaders }
         );
+        if (!deleteRes.ok) return new Response("Delete failed", { status: 500 });
 
-        if (!deleteRes.ok) {
-          return new Response("Delete failed", { status: 500 });
-        }
-
-        // Step 3: Revert slot status back to available (if we found the slot_id)
         if (slotId) {
-          await fetch(
-            `${SUPABASE_URL}/rest/v1/slots?id=eq.${slotId}`,
-            {
-              method: "PATCH",
-              headers: { ...authHeaders, "Content-Type": "application/json" },
-              body: JSON.stringify({ status: "available" })
-            }
-          );
+          await fetch(`${SUPABASE_URL}/rest/v1/slots?id=eq.${slotId}`, {
+            method: "PATCH",
+            headers: { ...authHeaders, "Content-Type": "application/json" },
+            body: JSON.stringify({ status: "available" })
+          });
         }
-
         return new Response("ok", { status: 200 });
       }
 

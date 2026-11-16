@@ -30,8 +30,6 @@ async function markPaid(bookingId) {
 
 // Filter bookings by payment status
 function filterBookings(status) {
-
-  // Update active button style
   ["all","pending","paid"].forEach(s => {
     const btn = document.getElementById("filter-" + s);
     if (btn) btn.classList.toggle("active", s === status);
@@ -47,45 +45,74 @@ function filterBookings(status) {
     return dateOk && payOk;
   });
 
-  renderBookingRows(filtered);
+  // Collapse by group_id: group members become ONE visual row,
+  // single bookings stay as-is.
+  const byKey = new Map();
+  filtered.forEach(b => {
+    const key = b.group_id ? `g:${b.group_id}` : `s:${b.id}`;
+    if (!byKey.has(key)) byKey.set(key, []);
+    byKey.get(key).push(b);
+  });
+  const groups = [...byKey.values()].map(list => {
+    list.sort((a, b) => (a.slots?.start_time || "").localeCompare(b.slots?.start_time || ""));
+    return { members: list, isGroup: list.length > 1 || (list[0] && list[0].group_id != null) };
+  });
+
+  renderBookingGroups(groups);
 }
 
 // Renders rows — called by both loadBookings and filterBookings
-function renderBookingRows(bookings) {
-
+function renderBookingGroups(groups) {
   const tbody = document.getElementById("bookingTableBody");
   tbody.innerHTML = "";
-
-  if (bookings.length === 0) {
+  if (!groups.length) {
     tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-3">No bookings found</td></tr>`;
     return;
   }
 
-  bookings.forEach(b => {
-    const slot = b.slots || {};
-    const slotLabel = slot.date
-      ? `${slot.date}<br><small class="text-muted">${slot.start_time||""} - ${slot.end_time||""}</small>`
-      : `Slot #${b.slot_id}`;
+  groups.forEach(g => {
+    const first = g.members[0];
+    const slot = first.slots || {};
 
-    const payBadge = b.payment_status === "paid"
+    // Slot label
+    let slotLabel;
+    if (g.isGroup) {
+      const times = g.members.map(m => `${m.slots?.start_time || ""}-${m.slots?.end_time || ""}`).join(", ");
+      slotLabel = `${slot.date || ""}<br>
+        <small class="text-muted">${times}</small><br>
+        <span class="badge bg-info">${g.members.length} slots</span>`;
+    } else {
+      slotLabel = slot.date
+        ? `${slot.date}<br><small class="text-muted">${slot.start_time||""} - ${slot.end_time||""}</small>`
+        : `Slot #${first.slot_id}`;
+    }
+
+    const payBadge = first.payment_status === "paid"
       ? `<span class="badge bg-success">Paid</span>`
       : `<span class="badge bg-warning text-dark">Pending</span>`;
+
+    const noteText = first.booking_notes || "";
+    const idsCsv = g.members.map(m => m.id).join(",");
+
+    const groupDeleteBtn = `<button class="btn btn-danger btn-sm my-1"
+      onclick="deleteBookingGroup('${idsCsv}')">Delete${g.isGroup ? " All" : ""}</button>`;
+    const groupEditBtn = `<button class="btn btn-primary btn-sm me-1 my-1"
+      onclick="editBooking(${first.id})">Edit</button>`;
+    const groupPaidBtn = (first.payment_status !== "paid" && !g.isGroup)
+      ? `<button class="btn btn-success btn-sm my-1 me-1" onclick="markPaid(${first.id})">✅ Paid</button>`
+      : (first.payment_status !== "paid" && g.isGroup
+          ? `<button class="btn btn-success btn-sm my-1 me-1" onclick="markPaidGroup('${idsCsv}')">✅ Paid All</button>`
+          : "");
 
     tbody.innerHTML += `
       <tr>
         <td>${slotLabel}</td>
-        <td>${b.customer_name || ""}</td>
-        <td><a href="tel:${b.customer_mobile}">${b.customer_mobile || ""}</a></td>
-        <td><a href="mailto:${b.customer_email}">${b.customer_email || ""}</a></td>
+        <td>${first.customer_name || ""}</td>
+        <td><a href="tel:${first.customer_mobile}">${first.customer_mobile || ""}</a></td>
+        <td><a href="mailto:${first.customer_email}">${first.customer_email || ""}</a></td>
         <td>${payBadge}</td>
-        <td>${b.booking_notes || ""}</td>
-        <td>
-          ${b.payment_status !== "paid"
-            ? `<button class="btn btn-success btn-sm my-1 me-1" onclick="markPaid(${b.id})">✅ Paid</button>`
-            : ""}
-          <button class="btn btn-primary btn-sm me-1 my-1" onclick="editBooking(${b.id})">Edit</button>
-          <button class="btn btn-danger btn-sm my-1" onclick="deleteBooking(${b.id})">Delete</button>
-        </td>
+        <td>${noteText}</td>
+        <td>${groupPaidBtn}${groupEditBtn}${groupDeleteBtn}</td>
       </tr>
     `;
   });
@@ -538,5 +565,38 @@ async function saveEditBooking() {
 
   loadBookings();
 }
-
 // Booking Modal ends here
+
+// two new helpers below for marking group bookings
+async function deleteBookingGroup(idsCsv) {
+  const ids = idsCsv.split(",").map(Number).filter(Boolean);
+  if (!ids.length) return;
+  if (!confirm(`Delete ${ids.length} booking(s)?`)) return;
+
+  for (const id of ids) {
+    await fetch("/api/admin-bookings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "delete", id })
+    });
+  }
+  showToast(`Deleted ${ids.length} booking(s)`);
+  loadBookings();
+  loadSlots();
+}
+
+async function markPaidGroup(idsCsv) {
+  const ids = idsCsv.split(",").map(Number).filter(Boolean);
+  if (!ids.length) return;
+  if (!confirm(`Mark ${ids.length} booking(s) as Paid?`)) return;
+
+  for (const id of ids) {
+    await fetch("/api/admin-bookings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "update", id, data: { payment_status: "paid" } })
+    });
+  }
+  showToast(`Marked ${ids.length} booking(s) as Paid`);
+  loadBookings();
+}

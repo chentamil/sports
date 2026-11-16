@@ -73,6 +73,65 @@
     .acha-bg{
       background: linear-gradient(90deg, #1d2a4d, #3b4a7b);
     }
+
+
+
+
+/* ============================= */
+/* Multi-hour booking UI         */
+/* ============================= */
+.date-tabs, .court-tabs {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.35rem 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.date-tabs::-webkit-scrollbar,
+.court-tabs::-webkit-scrollbar { display: none; }
+
+.date-tab, .court-tab {
+  flex: 0 0 auto;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+.date-tab.active, .court-tab.active {
+  background: #0f172a;
+  color: #fff;
+  border-color: #0f172a;
+}
+.court-tab.active { background: #2563eb; border-color: #2563eb; }
+
+.mh-slot-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.mh-slot-btn {
+  display: flex; justify-content: space-between; align-items: center;
+  width: 100%; padding: 0.7rem 0.9rem;
+  border-radius: 12px; border: 1px solid #e2e8f0;
+  background: #fff; text-align: left; cursor: pointer;
+  transition: all 0.15s ease;
+}
+.mh-slot-btn:hover { border-color: #2563eb; }
+.mh-slot-btn.selected { background: #2563eb; color: #fff; border-color: #2563eb; }
+.mh-slot-btn:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; border-color: #e2e8f0; }
+.mh-slot-btn .mh-slot-time { font-weight: 700; }
+.mh-slot-btn .mh-slot-price { font-weight: 600; opacity: 0.8; }
+.mh-slot-btn.selected .mh-slot-price { color: #fff; }
+
+.mh-summary {
+  background: #f8fafc; border-radius: 12px; padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+}
+.mh-summary .mh-total { font-weight: 700; font-size: 1.1rem; color: #0f172a; }
+
+#mhModal .modal-body { max-height: 70vh; overflow-y: auto; }
     </style>
 </head>
 
@@ -1010,9 +1069,8 @@ document.getElementById('next-day').addEventListener('click', () => {
           let badgeText="", badgeClass="", btnHTML="";
           if (status==="available") {
             badgeText="Available"; badgeClass="text-success-small";
-            const msg = encodeURIComponent(`Hi, I want to book ${displayTime} at ${courtName} for ₹${slot.price}`);
-            // btnHTML=`<a href="https://wa.me/${PHONE}?text=${msg}" target="_blank" class="btn btn-sm btn-primary">Book</a>`;
-            btnHTML = `<button type="button" class="btn btn-sm btn-primary" onclick="openPBR(${slot.id})">Book</button>`;
+            btnHTML=`<button type="button" class="btn btn-sm btn-primary"
+              onclick="openMH(${slot.id})">Book</button>`;
           } else if (status==="booked") {
             badgeText="Booked"; badgeClass="text-danger-small";
             btnHTML=`<button class="btn btn-sm btn-danger" disabled>Booked</button>`;
@@ -1203,38 +1261,102 @@ function renderAlerts(data) {
     </script>
 
 <!-- Public Booking Request Modal -->
-<div class="modal fade" id="pbrModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
+<!-- ============================================= -->
+<!-- Multi-hour Booking Modal                      -->
+<!-- ============================================= -->
+<div class="modal fade" id="mhModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content" style="border-radius:20px;">
-      <div class="modal-header">
-        <h5 class="modal-title">📅 Request This Slot</h5>
+      <div class="modal-header" style="border-bottom:2px solid #f1f5f9;">
+        <h5 class="modal-title fw-bold">📅 Book a Slot</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body">
-        <div id="pbrSlotInfo" class="alert alert-info py-2 mb-3"></div>
-        <div id="pbrAlert" class="alert d-none"></div>
-        <input type="hidden" id="pbr-slot-id">
-        <div class="mb-3">
-          <label class="form-label fw-semibold">Your Name</label>
-          <input type="text" class="form-control" id="pbr-name" maxlength="120" required>
+
+      <div class="modal-body p-3">
+        <!-- Step 1: date -->
+        <div class="mb-2">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <label class="fw-semibold small text-uppercase text-muted" style="letter-spacing:.5px;">Date</label>
+            <span class="small text-muted" id="mh-date-label"></span>
+          </div>
+          <div class="date-tabs" id="mh-date-tabs"></div>
         </div>
-        <div class="mb-3">
-          <label class="form-label fw-semibold">Email</label>
-          <input type="email" class="form-control" id="pbr-email" maxlength="200" required>
+
+        <!-- Step 2: court -->
+        <div class="mb-2">
+          <label class="fw-semibold small text-uppercase text-muted" style="letter-spacing:.5px;">Court</label>
+          <div class="court-tabs mt-1" id="mh-court-tabs"></div>
         </div>
-        <div class="mb-3">
-          <label class="form-label fw-semibold">Mobile</label>
-          <input type="tel" class="form-control" id="pbr-mobile" maxlength="20" required>
+
+        <!-- Step 3: start slot + duration -->
+        <div class="row g-2 mb-2">
+          <div class="col-7">
+            <label class="fw-semibold small text-uppercase text-muted" style="letter-spacing:.5px;">Start time</label>
+            <select class="form-select" id="mh-start-select" onchange="mhOnStartChange()"></select>
+          </div>
+          <div class="col-5">
+            <label class="fw-semibold small text-uppercase text-muted" style="letter-spacing:.5px;">Duration</label>
+            <select class="form-select" id="mh-duration-select" onchange="mhOnDurationChange()"></select>
+          </div>
         </div>
-        <div class="mb-3">
-          <label class="form-label fw-semibold">Notes (optional)</label>
-          <textarea class="form-control" id="pbr-notes" maxlength="1000" rows="2"></textarea>
+
+        <!-- Live summary of the selected slots -->
+        <div class="mh-summary mb-3">
+          <div id="mh-summary-slots" class="text-muted mb-1">Pick a start time to see availability.</div>
+          <div class="d-flex justify-content-between align-items-baseline">
+            <span class="text-muted small">Total</span>
+            <span class="mh-total" id="mh-summary-total">₹0</span>
+          </div>
+        </div>
+
+        <!-- Optional convenience list of slots (morning / evening) -->
+        <div class="mb-2">
+          <div class="fw-semibold small text-uppercase text-muted mb-1" style="letter-spacing:.5px;">All slots today</div>
+          <div class="mh-slot-list" id="mh-slot-list"></div>
+        </div>
+
+        <!-- Contact form -->
+        <hr>
+        <div id="mhAlert" class="alert d-none"></div>
+        <div class="mb-2">
+          <label class="form-label fw-semibold small">Your name</label>
+          <input type="text" class="form-control" id="mh-name" maxlength="120" placeholder="Full name">
+        </div>
+        <div class="row g-2 mb-2">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold small">Mobile</label>
+            <input type="tel" class="form-control" id="mh-mobile" maxlength="20" placeholder="9840253589">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold small">Email</label>
+            <input type="email" class="form-control" id="mh-email" maxlength="200" placeholder="you@example.com">
+          </div>
+        </div>
+        <div class="mb-2">
+          <label class="form-label fw-semibold small">Notes (optional)</label>
+          <textarea class="form-control" id="mh-notes" maxlength="1000" rows="2"></textarea>
         </div>
         <p class="text-muted small mb-0"><i class="bi bi-shield-check"></i> Protected by reCAPTCHA.</p>
       </div>
-      <div class="modal-footer">
+
+      <div class="modal-footer" style="border-top:2px solid #f1f5f9;">
         <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button class="btn btn-success" id="pbrSubmitBtn" onclick="submitPBR()">Submit Request</button>
+        <button class="btn btn-success" id="mh-submit-btn" onclick="mhSubmit()">Submit Booking Request</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Success + Pay modal (unchanged) -->
+<div class="modal fade" id="pbrSuccessModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:20px;">
+      <div class="modal-body text-center p-4">
+        <div class="display-4 text-success mb-2">✅</div>
+        <h5 class="fw-bold">Request Sent!</h5>
+        <p class="text-muted" id="pbrSuccessText"></p>
+        <button class="btn btn-primary w-100 mb-2" id="pbrPayBtn">Pay Now</button>
+        <button class="btn btn-outline-secondary w-100" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
@@ -1256,39 +1378,302 @@ function renderAlerts(data) {
 </div>
 
 <script>
-// Uses the existing `allData` array from renderSlots() and showToast()
-window._pbrLastSlot = null;
+/* ==================================================
+ * Multi-hour booking UI
+ * ==================================================
+ * Uses the existing `allData` global from renderSlots().
+ * State:
+ *   mhSelectedDate  "YYYY-MM-DD"
+ *   mhSelectedCourt number
+ *   mhSelectedStart string ("6:00PM")
+ *   mhSelectedDuration number (1..N)
+ *   mhSelectedSlotIds []   // computed from start + duration
+ * ================================================== */
 
-function openPBR(slotId) {
-  const slot = (allData || []).find(s => s.id == slotId);
-  if (!slot || (slot.status || "").toLowerCase() !== "available") {
-    showToast("Slot unavailable", "warning");
-    return;
-  }
-  window._pbrLastSlot = slot;
+window.mhSelectedDate = null;
+window.mhSelectedCourt = null;
+window.mhSelectedStart = null;
+window.mhSelectedDuration = 1;
+window.mhSelectedSlotIds = [];
 
-  document.getElementById("pbr-slot-id").value = slot.id;
-  document.getElementById("pbrSlotInfo").textContent =
-    `${slot.date} · ${slot.start_time} - ${slot.end_time} · Court ${slot.court_id} · ₹${slot.price}`;
-
-  ["pbr-name", "pbr-email", "pbr-mobile", "pbr-notes"].forEach(id =>
-    document.getElementById(id).value = ""
-  );
-  document.getElementById("pbrAlert").className = "alert d-none";
-  document.getElementById("pbrSubmitBtn").disabled = false;
-  document.getElementById("pbrSubmitBtn").textContent = "Submit Request";
-
-  new bootstrap.Modal(document.getElementById("pbrModal")).show();
+// ---- helpers ----
+function mhTimeToMin(t) {
+  if (!t) return 0;
+  const s = t.replace(/\s/g, "").toUpperCase();
+  const m = s.match(/^(\d+)(?::(\d+))?\s*(AM|PM)$/);
+  if (!m) return 0;
+  let h = parseInt(m[1], 10);
+  const mm = parseInt(m[2] || "0", 10);
+  if (m[3] === "PM" && h !== 12) h += 12;
+  if (m[3] === "AM" && h === 12) h = 0;
+  return h * 60 + mm;
 }
 
-async function submitPBR() {
-  const slotId = document.getElementById("pbr-slot-id").value;
-  const name = document.getElementById("pbr-name").value.trim();
-  const email = document.getElementById("pbr-email").value.trim();
-  const mobile = document.getElementById("pbr-mobile").value.trim();
-  const notes = document.getElementById("pbr-notes").value.trim();
-  const alertEl = document.getElementById("pbrAlert");
-  const btn = document.getElementById("pbrSubmitBtn");
+function mhFmtDate(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function mhUpcomingDates(n) {
+  const out = [];
+  const today = new Date();
+  for (let i = 0; i < n; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    out.push(mhFmtDate(d));
+  }
+  return out;
+}
+
+function mhPrettyDate(iso) {
+  const d = new Date(iso + "T00:00:00");
+  return d.toLocaleDateString("en-GB", { weekday: "short", day: "2-digit", month: "short" });
+}
+
+function mhSlotsFor(date, court) {
+  return (allData || [])
+    .filter(s => s.date === date && Number(s.court_id) === Number(court))
+    .sort((a, b) => mhTimeToMin(a.start_time || a.time) - mhTimeToMin(b.start_time || b.time));
+}
+
+function mhAvailableSlotsFor(date, court) {
+  return mhSlotsFor(date, court).filter(s => (s.status || "").toLowerCase() === "available");
+}
+
+function mhDurationOptions(startTime, allSlots) {
+  // Count how many consecutive 1-hour slots we can chain
+  const byStart = {};
+  allSlots.forEach(s => { byStart[s.start_time] = s; });
+
+  const startMin = mhTimeToMin(startTime);
+  let maxHours = 0;
+  for (let h = 1; h <= 10; h++) {
+    const key = mhMinToTime(startMin + (h - 1) * 60);
+    const slot = byStart[key];
+    if (!slot || slot.status !== "available") break;
+    maxHours++;
+  }
+  return maxHours;
+}
+
+function mhMinToTime(min) {
+  let h = Math.floor(min / 60);
+  const m = min % 60;
+  const period = h >= 12 ? "PM" : "AM";
+  if (h > 12) h -= 12;
+  if (h === 0) h = 12;
+  return `${h}:${String(m).padStart(2, "0")}${period}`;
+}
+
+// ---- open modal ----
+function openBookingModal(slotId) {
+  // ignore; kept only for backward-compat.
+}
+
+function openMH(slotId) {
+  const startSlot = (allData || []).find(s => s.id == slotId);
+  if (!startSlot) { showToast("Slot not found", "error"); return; }
+
+  window.mhSelectedDate = startSlot.date;
+  window.mhSelectedCourt = Number(startSlot.court_id);
+  window.mhSelectedStart = startSlot.start_time;
+  window.mhSelectedDuration = 1;
+  window.mhSelectedSlotIds = [];
+
+  // Reset form
+  document.getElementById("mh-name").value = "";
+  document.getElementById("mh-mobile").value = "";
+  document.getElementById("mh-email").value = "";
+  document.getElementById("mh-notes").value = "";
+  document.getElementById("mhAlert").className = "alert d-none";
+  document.getElementById("mh-submit-btn").disabled = false;
+  document.getElementById("mh-submit-btn").textContent = "Submit Booking Request";
+
+  mhRenderDateTabs();
+  mhRenderCourtTabs();
+  mhRenderStartSelect();
+  mhRenderDurationSelect();
+  mhRenderSlotList();
+  mhUpdateSummary();
+
+  new bootstrap.Modal(document.getElementById("mhModal")).show();
+}
+
+// ---- render tabs ----
+function mhRenderDateTabs() {
+  const tabs = document.getElementById("mh-date-tabs");
+  const dates = mhUpcomingDates(14);
+  tabs.innerHTML = dates.map(d => `
+    <button type="button" class="date-tab ${d === window.mhSelectedDate ? "active" : ""}"
+      onclick="mhPickDate('${d}')">${mhPrettyDate(d)}</button>
+  `).join("");
+  document.getElementById("mh-date-label").textContent =
+    mhPrettyDate(window.mhSelectedDate);
+}
+
+function mhPickDate(iso) {
+  window.mhSelectedDate = iso;
+  // If the currently selected court has no slots for this date, fall back to first with slots
+  const courts = [...new Set((allData || []).filter(s => s.date === iso).map(s => Number(s.court_id)))].sort((a,b)=>a-b);
+  if (!courts.includes(window.mhSelectedCourt) && courts.length > 0) {
+    window.mhSelectedCourt = courts[0];
+  }
+  window.mhSelectedStart = null;
+  window.mhSelectedDuration = 1;
+
+  mhRenderDateTabs();
+  mhRenderCourtTabs();
+  mhRenderStartSelect();
+  mhRenderDurationSelect();
+  mhRenderSlotList();
+  mhUpdateSummary();
+}
+
+function mhRenderCourtTabs() {
+  const tabs = document.getElementById("mh-court-tabs");
+  const courts = [...new Set((allData || []).filter(s => s.date === window.mhSelectedDate).map(s => Number(s.court_id)))].sort((a,b)=>a-b);
+  if (courts.length === 0) {
+    tabs.innerHTML = `<span class="text-muted small">No courts for this date</span>`;
+    return;
+  }
+  tabs.innerHTML = courts.map(c => `
+    <button type="button" class="court-tab ${c === window.mhSelectedCourt ? "active" : ""}"
+      onclick="mhPickCourt(${c})">Court ${c}</button>
+  `).join("");
+}
+
+function mhPickCourt(courtId) {
+  window.mhSelectedCourt = courtId;
+  window.mhSelectedStart = null;
+  window.mhSelectedDuration = 1;
+  mhRenderCourtTabs();
+  mhRenderStartSelect();
+  mhRenderDurationSelect();
+  mhRenderSlotList();
+  mhUpdateSummary();
+}
+
+function mhRenderStartSelect() {
+  const sel = document.getElementById("mh-start-select");
+  const slots = mhAvailableSlotsFor(window.mhSelectedDate, window.mhSelectedCourt);
+  if (slots.length === 0) {
+    sel.innerHTML = `<option value="">No available slots</option>`;
+    window.mhSelectedStart = null;
+    return;
+  }
+  if (!window.mhSelectedStart || !slots.some(s => s.start_time === window.mhSelectedStart)) {
+    window.mhSelectedStart = slots[0].start_time;
+  }
+  sel.innerHTML = slots.map(s => `
+    <option value="${s.start_time}" ${s.start_time === window.mhSelectedStart ? "selected" : ""}>
+      ${s.start_time} - ${s.end_time}
+    </option>
+  `).join("");
+}
+
+function mhRenderDurationSelect() {
+  const sel = document.getElementById("mh-duration-select");
+  const allSlots = mhSlotsFor(window.mhSelectedDate, window.mhSelectedCourt);
+  const maxH = window.mhSelectedStart ? mhDurationOptions(window.mhSelectedStart, allSlots) : 1;
+  if (maxH < 1) maxH = 1;
+  let options = "";
+  for (let h = 1; h <= maxH; h++) {
+    options += `<option value="${h}" ${h === window.mhSelectedDuration ? "selected" : ""}>${h} hour${h > 1 ? "s" : ""}</option>`;
+  }
+  sel.innerHTML = options;
+  if (window.mhSelectedDuration > maxH) window.mhSelectedDuration = maxH;
+  sel.disabled = maxH <= 1 && (document.querySelectorAll("#mh-start-select option").length <= 1);
+}
+
+function mhOnStartChange() {
+  window.mhSelectedStart = document.getElementById("mh-start-select").value;
+  window.mhSelectedDuration = 1;
+  mhRenderDurationSelect();
+  mhRenderSlotList();
+  mhUpdateSummary();
+}
+
+function mhOnDurationChange() {
+  window.mhSelectedDuration = Number(document.getElementById("mh-duration-select").value) || 1;
+  mhUpdateSummary();
+}
+
+function mhRenderSlotList() {
+  const container = document.getElementById("mh-slot-list");
+  const slots = mhSlotsFor(window.mhSelectedDate, window.mhSelectedCourt);
+  if (slots.length === 0) {
+    container.innerHTML = `<div class="text-muted small">No slots for this date/court.</div>`;
+    return;
+  }
+  // Group by morning / evening for readability
+  const morning = slots.filter(s => mhTimeToMin(s.start_time) < 720);
+  const evening = slots.filter(s => mhTimeToMin(s.start_time) >= 720);
+
+  const render = (label, list) => {
+    if (!list.length) return "";
+    return `<div class="fw-semibold small text-muted mt-2 mb-1">${label}</div>` +
+      list.map(s => {
+        const avail = (s.status || "").toLowerCase() === "available";
+        const selected = s.start_time === window.mhSelectedStart;
+        return `<button type="button" class="mh-slot-btn ${selected ? "selected" : ""}"
+          ${avail ? "" : "disabled"} onclick="mhPickStart('${s.start_time}')">
+          <span class="mh-slot-time">${s.start_time} - ${s.end_time}</span>
+          <span class="mh-slot-price">₹${s.price || 0}</span>
+        </button>`;
+      }).join("");
+  };
+
+  container.innerHTML = render("🌅 Morning", morning) + render("🌙 Evening", evening);
+}
+
+function mhPickStart(start) {
+  window.mhSelectedStart = start;
+  window.mhSelectedDuration = 1;
+  document.getElementById("mh-start-select").value = start;
+  mhRenderDurationSelect();
+  mhRenderSlotList();
+  mhUpdateSummary();
+}
+
+function mhUpdateSummary() {
+  const allSlots = mhSlotsFor(window.mhSelectedDate, window.mhSelectedCourt);
+  const byStart = {};
+  allSlots.forEach(s => { byStart[s.start_time] = s; });
+
+  const picked = [];
+  const startMin = mhTimeToMin(window.mhSelectedStart);
+  let total = 0;
+  for (let i = 0; i < window.mhSelectedDuration; i++) {
+    const key = mhMinToTime(startMin + i * 60);
+    const slot = byStart[key];
+    if (slot && slot.status === "available") {
+      picked.push(slot);
+      total += Number(slot.price || 0);
+    }
+  }
+  window.mhSelectedSlotIds = picked.map(s => s.id);
+
+  const summary = document.getElementById("mh-summary-slots");
+  if (!picked.length) {
+    summary.innerHTML = `<span class="text-muted">Pick a start time to see availability.</span>`;
+  } else {
+    summary.innerHTML = picked.map(s =>
+      `<span class="badge bg-primary me-1 mb-1">${s.start_time} - ${s.end_time}</span>`
+    ).join("");
+  }
+  document.getElementById("mh-summary-total").textContent = "₹" + total;
+}
+
+// ---- submit ----
+async function mhSubmit() {
+  const name = document.getElementById("mh-name").value.trim();
+  const mobile = document.getElementById("mh-mobile").value.trim();
+  const email = document.getElementById("mh-email").value.trim();
+  const notes = document.getElementById("mh-notes").value.trim();
+  const alertEl = document.getElementById("mhAlert");
+  const btn = document.getElementById("mh-submit-btn");
 
   const showErr = (m) => {
     alertEl.className = "alert alert-danger";
@@ -1296,16 +1681,32 @@ async function submitPBR() {
     alertEl.classList.remove("d-none");
   };
 
-  if (!name) return showErr("Name required");
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return showErr("Invalid email");
-  if (!/^[0-9+\-\s()]{7,20}$/.test(mobile)) return showErr("Invalid mobile");
-  if (/[<>;`\\]/.test(name + email + mobile + notes)) return showErr("Invalid characters");
+  if (!window.mhSelectedSlotIds.length) return showErr("Please pick at least one slot.");
+  if (!name) return showErr("Name required.");
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return showErr("Invalid email.");
+  if (!/^[0-9+\-\s()]{7,20}$/.test(mobile)) return showErr("Invalid mobile.");
+  if (/[<>;`\\]/.test(name + email + mobile + notes)) return showErr("Invalid characters.");
 
   btn.disabled = true;
   btn.textContent = "Sending…";
+  alertEl.className = "alert d-none";
 
   try {
-    // Reuse your existing reCAPTCHA v3 site key + helper
+    const slot_ids = window.mhSelectedSlotIds;
+    const primary_slot = slot_ids[0];
+
+    // Submit ONE request per slot (so admin's accept flow stays 1-to-1 with slots).
+    // The accept modal can accept the group by selecting them together.
+    const requests = slot_ids.map(sid => ({
+      slot_id: sid,
+      player_name: name,
+      player_email: email,
+      player_mobile: mobile,
+      notes,
+      recaptcha_token: null
+    }));
+
+    // Get one reCAPTCHA token, reuse it for all sub-requests
     if (typeof grecaptcha === "undefined") throw new Error("reCAPTCHA not loaded");
     const token = await new Promise((res, rej) => {
       grecaptcha.ready(async () => {
@@ -1314,56 +1715,53 @@ async function submitPBR() {
       });
     });
 
-    const r = await fetch("/api/public-booking-request", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        slot_id: Number(slotId), player_name: name, player_email: email,
-        player_mobile: mobile, notes, recaptcha_token: token
-      })
-    });
-    const data = await r.json();
-
-    if (!r.ok) {
-      showErr(data.error || "Request failed");
-      btn.disabled = false; btn.textContent = "Submit Request";
-      return;
+    let okCount = 0;
+    for (const body of requests) {
+      body.recaptcha_token = token;
+      const r = await fetch("/api/public-booking-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      if (r.ok) okCount++;
+      else {
+        const d = await r.json().catch(() => ({}));
+        throw new Error(d.error || `Failed at slot ${body.slot_id}`);
+      }
     }
 
-    // Hide form modal, show success modal
-    bootstrap.Modal.getInstance(document.getElementById("pbrModal")).hide();
-    const slot = window._pbrLastSlot;
+    // Hide modal, show success
+    bootstrap.Modal.getInstance(document.getElementById("mhModal")).hide();
+    const total = window.mhSelectedSlotIds.reduce((sum, sid) => {
+      const s = (allData || []).find(x => x.id === sid);
+      return sum + Number(s?.price || 0);
+    }, 0);
+
     document.getElementById("pbrSuccessText").textContent =
-      `${slot.date} · ${slot.start_time} - ${slot.end_time} · ₹${slot.price}. We'll email you once approved.`;
+      `${okCount} slot request(s) sent · total ₹${total}. We'll email you once approved.`;
 
-    // Pay button: UPI deep link on mobile, QR on desktop
     const payBtn = document.getElementById("pbrPayBtn");
-    const UPI_ID = "9994589034@sbi"; // ← your UPI ID
+    const UPI_ID = "9994589034@sbi";
     const UPI_NAME = "Shivani Elite Badminton";
-    const amount = slot.price || 0;
-    const note = `Court ${slot.court_id} ${slot.date} ${slot.start_time}`;
-
-    const upiUri = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(UPI_NAME)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
-
+    const note = `Court ${window.mhSelectedCourt} ${window.mhSelectedDate} ${window.mhSelectedStart}`;
+    const upiUri = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(UPI_NAME)}&am=${total}&cu=INR&tn=${encodeURIComponent(note)}`;
     payBtn.onclick = () => {
       const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      if (isMobile) {
-        window.location.href = upiUri;
-      } else {
-        // Desktop: show your static QR image in a new window
+      if (isMobile) window.location.href = upiUri;
+      else {
         const w = window.open("", "_blank");
         w.document.write(`<html><body style="text-align:center;font-family:sans-serif;padding:20px;">
-          <h3>Scan to pay ₹${amount}</h3>
-          <p>${note}</p>
+          <h3>Scan to pay ₹${total}</h3><p>${note}</p>
           <img src="/images/one-hr-qr.jpeg" style="max-width:320px;" />
         </body></html>`);
       }
     };
-
     new bootstrap.Modal(document.getElementById("pbrSuccessModal")).show();
-  } catch (e) {
-    showErr(e.message || "Something went wrong");
-    btn.disabled = false; btn.textContent = "Submit Request";
+  } catch (err) {
+    showErr(err.message || "Something went wrong.");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Submit Booking Request";
   }
 }
 </script>
